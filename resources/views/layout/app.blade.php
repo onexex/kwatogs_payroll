@@ -35,27 +35,27 @@
                 {{-- <img style="height:auto;width:40%;"  src="{{URL::asset('/img/wlogow.png')}}"> --}}
                 -----
                 </div>
-                <!-- <div class="sidebar-brand-text mx-3 ">Dashboard</div> -->
+                {{-- <!-- <div class="sidebar-brand-text mx-3 ">Dashboard</div> --> --}}
             </a>
 
             <hr class="sidebar-divider my-0">
 
-            @if (session()->has('home'))
                 <li class="nav-item active">
                     <a class="nav-link" href="{{ url('/') }}">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span >Home</span></a>
                 </li>
-            @endif
-
-            {{-- <li class="nav-item active">
+    
+            <li class="nav-item active">
                 <a class="nav-link" href="/pages/modules/registration">
                     <i class="fas fa-fw fa-tachometer-alt" ></i>
                     <span >Registration</span></a>
-            </li> --}}
+            </li> 
 
-
-            {{-- <li class="nav-item">
+                        <div class="sidebar-heading">
+                Modules
+            </div>
+            <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#patient"
                     aria-expanded="true" aria-controls="collapseTwo">
                     <i class="fas fa-fw fa-cog"></i>
@@ -65,17 +65,22 @@
                 <div id="patient" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Modules</h6>
+                        <a class="collapse-item" href="/pages/modules/checkRegister"><i class="fa-solid fa-building pr-2"> </i>  Check Register</a>
+                        <a class="collapse-item" href="/pages/modules/E201"> <i class="fa-solid fa-building pr-2"> </i>  E-201</a>
                         <a class="collapse-item" href="/pages/modules/earlyout"><i class="fa-solid fa-building pr-2"> </i>  Earlyout</a>
+                        <a class="collapse-item" href="/pages/modules/registration"> <i class="fa-solid fa-building pr-2"> </i> Enroll Employee</a>
                         <a class="collapse-item" href="/pages/modules/leaveApplication"><i class="fa-solid fa-building pr-2"> </i>  Leave Application</a>
+                        <a class="collapse-item" href="/pages/modules/memorandum"> <i class="fa-solid fa-building pr-2"> </i>  Memo Generator</a>
+                        <a class="collapse-item" href="/pages/modules/obtTracker"><i class="fa-solid fa-building pr-2"> </i>  Official Business Trip</a>
                         <a class="collapse-item" href="/pages/modules/overtime"><i class="fa-solid fa-building pr-2"> </i>  Overtime</a>
+                        <a class="collapse-item" href="/pages/modules/payroll"> <i class="fa-solid fa-building pr-2"> </i>  Payroll System</a>
+                        <a class="collapse-item" href="/pages/modules/debitAdvise"><i class="fa-solid fa-building pr-2"> </i>Debit Advise</a>
+                        <a class="collapse-item" href="/pages/modules/sendOBT"><i class="fa-solid fa-building pr-2"> </i>  Send to OBT</a>
                     </div>
                 </div>
-            </li> --}}
+            </li>
 
 
-
-
-            @if (session()->has('settings'))
                 <hr class="sidebar-divider my-0">
 
                 <div class="sidebar-heading">
@@ -94,7 +99,7 @@
                             <h6 class="collapse-header">Management</h6>
                             <a class="collapse-item" href="/pages/management/accessrights"><i class="fa-solid fa-building pr-2"> </i>  Access Rights</a>
                             <a class="collapse-item" href="/pages/management/agencies"><i class="fa-solid fa-building pr-2"> </i>  Agencies</a>
-                            {{-- <a class="collapse-item" href="/pages/management/archive"><i class="fa-solid fa-building pr-2"> </i>  Archive Management</a> --}}
+                            <a class="collapse-item" href="/pages/management/archive"><i class="fa-solid fa-building pr-2"> </i>  Archive Management</a>
                             <a class="collapse-item" href="/pages/management/classification"><i class="fa-solid fa-building pr-2"> </i>  Classification</a>
                             <a class="collapse-item" href="/pages/management/companies"><i class="fa-solid fa-building pr-2"> </i>  Companies</a>
                             <a class="collapse-item" href="/pages/management/departments"><i class="fa-solid fa-building pr-2"> </i> Departments</a>
@@ -104,11 +109,11 @@
                             <a class="collapse-item" href="/pages/management/hmo"><i class="fa-solid fa-building pr-2"> </i>  HMOs</a>
                             <a class="collapse-item" href="/pages/management/holidaylogger"><i class="fa-solid fa-building pr-2"> </i>  Holiday Logger</a>
                             <a class="collapse-item" href="/pages/management/joblevels"><i class="fa-solid fa-building pr-2"> </i>  Job Level</a>
-                            {{-- <a class="collapse-item" href="/pages/management/leavevalidations"><i class="fa-solid fa-building pr-2"> </i>  Leave Validation</a>/// --}}
+                            <a class="collapse-item" href="/pages/management/leavevalidations"><i class="fa-solid fa-building pr-2"> </i>  Leave Validation</a>///
                             <a class="collapse-item" href="/pages/management/lilovalidations"><i class="fa-solid fa-building pr-2"> </i>  Lilo Validation</a>
-                            {{-- <a class="collapse-item" href="/pages/modules/overtime"><i class="fa-solid fa-building pr-2"> </i>  Overtime</a> --}}
-                            {{-- <a class="collapse-item" href="/pages/management/obvalidations"><i class="fa-solid fa-building pr-2"> </i>  OB Validation</a> --}}
-                            {{-- <a class="collapse-item" href="/pages/management/otfiling"><i class="fa-solid fa-building pr-2"> </i>  OT Filing Maintenance</a>/// --}}
+                            <a class="collapse-item" href="/pages/modules/overtime"><i class="fa-solid fa-building pr-2"> </i>  Overtime</a>
+                            <a class="collapse-item" href="/pages/management/obvalidations"><i class="fa-solid fa-building pr-2"> </i>  OB Validation</a>
+                            <a class="collapse-item" href="/pages/management/otfiling"><i class="fa-solid fa-building pr-2"> </i>  OT Filing Maintenance</a>///
                             <a class="collapse-item" href="/pages/management/pagibigcontribution"><i class="fa-solid fa-building pr-2"> </i>  Pagibig Contribution</a>
                             <a class="collapse-item" href="/pages/management/parentalsetting"><i class="fa-solid fa-building pr-2"> </i>  Parental Settings</a>
                             <a class="collapse-item" href="/pages/management/philhealth"><i class="fa-solid fa-building pr-2"> </i>  Philhealth Contribution</a>
@@ -117,18 +122,17 @@
                             <a class="collapse-item" href="/pages/management/relationship"><i class="fa-solid fa-building pr-2"> </i>  Relationship</a>
                             <a class="collapse-item" href="/pages/management/empscheduler"><i class="fa-solid fa-building pr-2"> </i>  Scheduler</a>
                             <a class="collapse-item" href="/pages/management/time"><i class="fa-solid fa-building pr-2"> </i>  Schedule Time</a>
-                            {{-- <a class="collapse-item" href="/pages/management/sil"><i class="fa-solid fa-building pr-2"> </i>  SIL Loan</a> --}}
+                            <a class="collapse-item" href="/pages/management/sil"><i class="fa-solid fa-building pr-2"> </i>  SIL Loan</a>
                             <a class="collapse-item" href="/pages/management/ssscontribution"><i class="fa-solid fa-building pr-2"> </i>  SSS Contribution</a>
-                            {{-- <a class="collapse-item" href="/pages/management/leavetypes"> <i class="fa-solid fa-building pr-2"> </i> Types of Leaves</a> --}}
+                            <a class="collapse-item" href="/pages/management/leavetypes"> <i class="fa-solid fa-building pr-2"> </i> Types of Leaves</a>
                             <a class="collapse-item" href="/pages/management/   "><i class="fa-solid fa-building pr-2"> </i>  User Roles</a>
-                            {{-- <a type="submit" href="/login/testmoto"><i class="fa-solid fa-building pr-2"> </i>  test</a> --}}
+                            <a type="submit" href="/login/testmoto"><i class="fa-solid fa-building pr-2"> </i>  test</a>
 
                         </div>
                     </div>
                 </li>
-            @endif
+          
 
-            @if (session()->has('rpt_attend'))
                 <li class="nav-item ">
                     <a class="nav-link  nav-link-icon collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
                         aria-expanded="true" aria-controls="collapseUtilities">
@@ -144,11 +148,11 @@
                 </li>
 
                  <hr class="sidebar-divider d-none d-md-block">
-            @endif
+        
 
 
 
-            {{-- <li class="nav-item ">
+             <li class="nav-item ">
                 <a class="nav-link  nav-link-icon collapsed" href="#" data-toggle="collapse" data-target="#report"
                     aria-expanded="true" aria-controls="collapseUtilities">
                     <i class="fas fa-columns"></i>
@@ -161,7 +165,7 @@
                         <a class="collapse-item" href="{{ url('/users/manage') }}">Laboratory</a>
                     </div>
                 </div>
-            </li> --}}
+            </li> 
 
             <hr class="sidebar-divider d-none d-md-block">
             <div class="text-center d-none d-md-inline">
