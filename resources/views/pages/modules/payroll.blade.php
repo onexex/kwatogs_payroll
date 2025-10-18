@@ -87,7 +87,7 @@
                             </table>                                        
                         </div>
                     </div>
-
+{{-- 
                     <div class="row p-2">
                         <div class="col-lg-6">
                             Prepared By: <br>
@@ -98,7 +98,7 @@
                             <label class=" float-right" for="">Approved for Release by:</label><br><br><br>
                             <label  class="float-right" for="">Jomod A. Ferrer - General Manage</label>
                         </div>
-                    </div>
+                    </div> --}}
 
                 <!-- </div> -->
             <!-- </div> -->

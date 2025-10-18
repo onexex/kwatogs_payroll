@@ -65,15 +65,18 @@
                 <div class="row">
                     <div class="table-responsive  overflow-auto-settings tblattend">
                         <table class="table table-hover ">
-                            <thead class="text-center">
+                           <thead class="text-center">
                                 <th scope="col">No</th>
                                 <th scope="col">Name</th>
+                                <th scope="col">Date</th>
                                 <th scope="col">Time-in</th>
                                 <th scope="col">Time-out</th>
                                 <th scope="col">Duration</th>
-                            <tbody id="tbl_rptattendance" name="tbl_rptattendance" class="text-center">
-
-                            </tbody>
+                                <th scope="col">Late (mins)</th>
+                                <th scope="col">Undertime (mins)</th>
+                                <th scope="col">Night Diff (mins)</th>
+                            </thead>
+                            <tbody id="tbl_rptattendance" name="tbl_rptattendance" class="text-center"></tbody>
                         </table>
                     </div>
                 </div>

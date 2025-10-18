@@ -36,8 +36,10 @@ use App\Http\Controllers\leavevalidationCtrl;
 use App\Http\Controllers\liloValidationsCtrl;
 
  
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\parentalSettingsCtrl;
 use App\Http\Controllers\reportAttendanceCtrl;
+use App\Http\Controllers\EmployeeScheduleController;
 
 Route::get('/r', function () {
     $updated = User::where('id', 1)->update([
@@ -295,6 +297,26 @@ Route::group(['middleware'=>['AuthCheck']], function(){
     ///REPORTS
     // Route::post('/ViewReportAttend',[reportAttendanceCtrl::class, 'viewreportattend']);
     Route::get('/task/search',[reportAttendanceCtrl::class,'searchTask']);
+
+
+    //v2 scheduler
+    Route::prefix('employee-schedules')->group(function() {
+        Route::get('/', [EmployeeScheduleController::class, 'index'])->name('employee-schedules.index');
+        Route::get('/all', [EmployeeScheduleController::class, 'getSchedules'])->name('employee-schedules.get');
+        Route::post('/store', [EmployeeScheduleController::class, 'store'])->name('employee-schedules.store');
+        Route::get('/edit/{id}', [EmployeeScheduleController::class, 'edit'])->name('employee-schedules.edit');
+        Route::put('/update/{id}', [EmployeeScheduleController::class, 'update'])->name('employee-schedules.update');
+        Route::delete('/delete/{id}', [EmployeeScheduleController::class, 'destroy'])->name('employee-schedules.destroy');
+    });
+
+    Route::prefix('attendance')->group(function () {
+        Route::post('/login', [AttendanceController::class, 'timeIn'])->name('attendance.timein');
+        Route::post('/logout', [AttendanceController::class, 'timeOut'])->name('attendance.timeout');
+        Route::get('/list', [AttendanceController::class, 'getAttendanceList'])->name('attendance.list');
+    });
+
+    Route::get('/attendance/viewer', [reportAttendanceCtrl::class, 'index'])->name('attendance.viewer');
+    Route::post('/attendance/fetch', [reportAttendanceCtrl::class, 'fetchAttendance'])->name('attendance.fetch');
 
 
 
