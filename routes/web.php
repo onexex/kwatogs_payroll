@@ -40,6 +40,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\parentalSettingsCtrl;
 use App\Http\Controllers\reportAttendanceCtrl;
 use App\Http\Controllers\EmployeeScheduleController;
+use App\Http\Controllers\Roles\RolesController;
 
 Route::get('/r', function () {
     $updated = User::where('id', 1)->update([
@@ -181,6 +182,7 @@ Route::group(['middleware'=>['AuthCheck']], function(){
     Route::get('/leavetype/edit',[leavetypeCtrl::class, 'edit']);
 
     //userrole
+    Route::resource('/user-roles', RolesController::class);
     Route::post('/roles/create_update',[roleCtrl::class, 'create_update']);
     Route::get('/roles/getall',[roleCtrl::class, 'getall']);
     Route::get('/roles/edit',[roleCtrl::class, 'edit']);

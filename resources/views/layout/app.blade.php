@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name') }}</title>
+    <title>{{ config('app.name') }} - {{ $title ?? '' }}</title>
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous"> -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
@@ -40,6 +40,42 @@
 
 <body id="page-top">
 
+    @if (session('success'))
+        <div class="position-fixed top-0 end-0 p-3" id="flash-alert" style="z-index: 1080;">
+            <div class="alert alert-success alert-dismissible fade show shadow" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+
+        <script>
+            setTimeout(() => {
+                const alertEl = document.getElementById('flash-alert');
+                if (alertEl) {
+                    const bsAlert = bootstrap.Alert.getOrCreateInstance(alertEl);
+                    bsAlert.close();   
+                }
+            }, 5000);
+        </script>
+    @endif
+    @if (session('error'))
+        <div class="position-fixed top-0 end-0 p-3" id="flash-alert" style="z-index: 1080;">
+            <div class="alert alert-danger alert-dismissible fade show shadow" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+
+        <script>
+            setTimeout(() => {
+                const alertEl = document.getElementById('flash-alert');
+                if (alertEl) {
+                    const bsAlert = bootstrap.Alert.getOrCreateInstance(alertEl);
+                    bsAlert.close();   
+                }
+            }, 5000);
+        </script>
+    @endif
     <div id="wrapper">
         <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar" style="background-color: #008080">
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url('/') }}">
@@ -145,7 +181,7 @@
                         <a class="collapse-item" href="/pages/management/joblevels"><i
                                 class="fa-solid fa-building pr-2"> </i> Job Level</a>
                         <a class="collapse-item" href="/pages/management/leavevalidations"><i
-                                class="fa-solid fa-building pr-2"> </i> Leave Validation</a>///
+                                class="fa-solid fa-building pr-2"> </i> Leave Validation</a>
                         <a class="collapse-item" href="/pages/management/lilovalidations"><i
                                 class="fa-solid fa-building pr-2"> </i> Lilo Validation</a>
                         <a class="collapse-item" href="/pages/modules/overtime"><i class="fa-solid fa-building pr-2">
@@ -153,7 +189,7 @@
                         <a class="collapse-item" href="/pages/management/obvalidations"><i
                                 class="fa-solid fa-building pr-2"> </i> OB Validation</a>
                         <a class="collapse-item" href="/pages/management/otfiling"><i
-                                class="fa-solid fa-building pr-2"> </i> OT Filing Maintenance</a>///
+                                class="fa-solid fa-building pr-2"> </i> OT Filing Maintenance</a>
                         <a class="collapse-item" href="/pages/management/pagibigcontribution"><i
                                 class="fa-solid fa-building pr-2"> </i> Pagibig Contribution</a>
                         <a class="collapse-item" href="/pages/management/parentalsetting"><i
@@ -176,7 +212,7 @@
                                 class="fa-solid fa-building pr-2"> </i> SSS Contribution</a>
                         <a class="collapse-item" href="/pages/management/leavetypes"> <i
                                 class="fa-solid fa-building pr-2"> </i> Types of Leaves</a>
-                        <a class="collapse-item" href="/pages/management/   "><i class="fa-solid fa-building pr-2">
+                        <a class="collapse-item" href="/user-roles"><i class="fa-solid fa-building pr-2">
                             </i> User Roles</a>
                         <a type="submit" href="/login/testmoto"><i class="fa-solid fa-building pr-2"> </i> test</a>
 
