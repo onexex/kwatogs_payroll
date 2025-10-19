@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Roles;
 
+use App\Enums\Permissions\PagePermissionsEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Services\RoleServices;
 use Illuminate\Http\Request;
@@ -54,5 +55,47 @@ class RolesController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
+    }
+
+    public function show(Role $user_role, Request $request)
+    {
+        $permissionEnums = [];
+
+        if ($request->permission) {
+            if ($request->permission == 'page') {
+                $permissionEnums = [
+                    'Page Permissions' => PagePermissionsEnum::class,
+                ];
+            } else {
+                $permissionEnums = [
+                    'Page Permissions' => PagePermissionsEnum::class,
+                ];
+            }
+
+        }
+
+        $permissions = collect($permissionEnums)->map(function ($enumClass, $title) {
+            return [
+                'title' => $title,
+                'permissions' => $enumClass::toArray(),
+            ];
+        })->values()->toArray();
+        
+        return view('pages.users.role_permission', [
+            'permissions' => $permissions,
+            'role' => $user_role,   
+        ]);
+    }
+
+    public function addPermission(Role $role, Request $request)
+    {
+        $role->givePermissionTo($request->permission);
+        return response()->json(['status' => 'added']);
+    }
+
+    public function removePermission(Role $role, Request $request)
+    {
+        $role->revokePermissionTo($request->permission);
+        return response()->json(['status' => 'removed']);
     }
 }

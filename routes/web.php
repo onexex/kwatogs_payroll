@@ -183,6 +183,8 @@ Route::group(['middleware'=>['AuthCheck']], function(){
 
     //userrole
     Route::resource('/user-roles', RolesController::class);
+    Route::post('/roles/{role}/permissions', [RolesController::class, 'addPermission']);
+    Route::delete('/roles/{role}/permissions', [RolesController::class, 'removePermission']);
     Route::post('/roles/create_update',[roleCtrl::class, 'create_update']);
     Route::get('/roles/getall',[roleCtrl::class, 'getall']);
     Route::get('/roles/edit',[roleCtrl::class, 'edit']);
