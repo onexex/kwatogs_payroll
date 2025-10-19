@@ -43,6 +43,7 @@
         <th>Duration</th>
         <th>Night Diff</th>
         <th>Remarks</th>
+        <th>Status</th>
     </thead>
     <tbody id="tblAttendance" class="text-center"></tbody>
 </table>

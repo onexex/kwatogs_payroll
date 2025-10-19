@@ -145,7 +145,7 @@
                         <a class="collapse-item" href="/pages/management/joblevels"><i
                                 class="fa-solid fa-building pr-2"> </i> Job Level</a>
                         <a class="collapse-item" href="/pages/management/leavevalidations"><i
-                                class="fa-solid fa-building pr-2"> </i> Leave Validation</a>///
+                                class="fa-solid fa-building pr-2"> </i> Leave Validation</a>
                         <a class="collapse-item" href="/pages/management/lilovalidations"><i
                                 class="fa-solid fa-building pr-2"> </i> Lilo Validation</a>
                         <a class="collapse-item" href="/pages/modules/overtime"><i class="fa-solid fa-building pr-2">
@@ -153,7 +153,7 @@
                         <a class="collapse-item" href="/pages/management/obvalidations"><i
                                 class="fa-solid fa-building pr-2"> </i> OB Validation</a>
                         <a class="collapse-item" href="/pages/management/otfiling"><i
-                                class="fa-solid fa-building pr-2"> </i> OT Filing Maintenance</a>///
+                                class="fa-solid fa-building pr-2"> </i> OT Filing Maintenance</a>
                         <a class="collapse-item" href="/pages/management/pagibigcontribution"><i
                                 class="fa-solid fa-building pr-2"> </i> Pagibig Contribution</a>
                         <a class="collapse-item" href="/pages/management/parentalsetting"><i
@@ -178,7 +178,7 @@
                                 class="fa-solid fa-building pr-2"> </i> Types of Leaves</a>
                         <a class="collapse-item" href="/pages/management/   "><i class="fa-solid fa-building pr-2">
                             </i> User Roles</a>
-                        <a type="submit" href="/login/testmoto"><i class="fa-solid fa-building pr-2"> </i> test</a>
+                    
 
                     </div>
                 </div>
