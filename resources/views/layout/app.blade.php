@@ -87,12 +87,13 @@
             </a>
 
             <hr class="sidebar-divider my-0">
-
-            <li class="nav-item active">
-                <a class="nav-link" href="{{ url('/') }}">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Home</span></a>
-            </li>
+            @can('home')
+                <li class="nav-item active">
+                    <a class="nav-link" href="{{ url('/') }}">
+                        <i class="fas fa-fw fa-tachometer-alt"></i>
+                        <span>Home</span></a>
+                </li>
+            @endcan
 
             <li class="nav-item active">
                 <a class="nav-link" href="/pages/modules/registration">
@@ -157,7 +158,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Management</h6>
                         <a class="collapse-item" href="/pages/management/accessrights"><i
-                                class="fa-solid fa-building pr-2"> </i> Access Rights</a>
+                                class="fa-solid fa-building pr-2"> </i> Employee Role</a>
                         <a class="collapse-item" href="/pages/management/agencies"><i
                                 class="fa-solid fa-building pr-2"> </i> Agencies</a>
                         <a class="collapse-item" href="/pages/management/archive"><i

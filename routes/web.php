@@ -40,6 +40,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\parentalSettingsCtrl;
 use App\Http\Controllers\reportAttendanceCtrl;
 use App\Http\Controllers\EmployeeScheduleController;
+use App\Http\Controllers\Roles\EmployeeRoleController;
 use App\Http\Controllers\Roles\RolesController;
 
 Route::get('/r', function () {
@@ -136,7 +137,7 @@ Route::group(['middleware'=>['AuthCheck']], function(){
 
     // SHAIRA
     //MANAGEMENT
-    Route::get('/pages/management/accessrights',[pageCtrl::class, 'accessrights']);
+    Route::get('/pages/management/accessrights',[EmployeeRoleController::class, 'index']);
     Route::get('/pages/management/departments',[pageCtrl::class, 'departments']);
     Route::get('/pages/management/relationship',[pageCtrl::class, 'relationship']);
     Route::get('/pages/management/leavevalidations',[pageCtrl::class, 'leavevalidations']);
@@ -146,6 +147,9 @@ Route::group(['middleware'=>['AuthCheck']], function(){
     Route::get('/pages/management/ssscontribution',[pageCtrl::class, 'ssscontribution']);
     Route::get('/pages/management/pagibigcontribution',[pageCtrl::class, 'pagibigcontribution']);
     Route::get('/pages/management/empscheduler',[pageCtrl::class, 'empscheduler']);
+
+    // employee role
+    Route::post('/emprole/create_update',[EmployeeRoleController::class, 'create_update'])->name('employee.roles.assign');
 
     //MODULE
     Route::get('/pages/modules/obtTracker',[pageCtrl::class, 'obtTracker']);
