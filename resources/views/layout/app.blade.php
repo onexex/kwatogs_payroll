@@ -81,7 +81,7 @@
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url('/') }}">
                 <div class="sidebar-brand-icon ">
                     {{-- <img style="height:auto;width:40%;"  src="{{URL::asset('/img/wlogow.png')}}"> --}}
-                    -----
+                    {{-- ----- --}}
                 </div>
                 {{-- <!-- <div class="sidebar-brand-text mx-3 ">Dashboard</div> --> --}}
             </a>
@@ -94,11 +94,11 @@
                     <span>Home</span></a>
             </li>
 
-            <li class="nav-item active">
+            {{-- <li class="nav-item active">
                 <a class="nav-link" href="/pages/modules/registration">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Registration</span></a>
-            </li>
+            </li> --}}
 
             <div class="sidebar-heading">
                 Modules
@@ -113,28 +113,28 @@
                 <div id="patient" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Modules</h6>
-                        <a class="collapse-item" href="/pages/modules/checkRegister"><i
-                                class="fa-solid fa-building pr-2"> </i> Check Register</a>
-                        <a class="collapse-item" href="/pages/modules/E201"> <i class="fa-solid fa-building pr-2"> </i>
-                            E-201</a>
+                        {{-- <a class="collapse-item" href="/pages/modules/checkRegister"><i
+                                class="fa-solid fa-building pr-2"> </i> Check Register</a> --}}
+                        {{-- <a class="collapse-item" href="/pages/modules/E201"> <i class="fa-solid fa-building pr-2"> </i>
+                            E-201</a> --}}
                         <a class="collapse-item" href="/pages/modules/earlyout"><i class="fa-solid fa-building pr-2">
                             </i> Earlyout</a>
                         <a class="collapse-item" href="/pages/modules/registration"> <i
                                 class="fa-solid fa-building pr-2"> </i> Enroll Employee</a>
                         <a class="collapse-item" href="/pages/modules/leaveApplication"><i
                                 class="fa-solid fa-building pr-2"> </i> Leave Application</a>
-                        <a class="collapse-item" href="/pages/modules/memorandum"> <i class="fa-solid fa-building pr-2">
-                            </i> Memo Generator</a>
+                        {{-- <a class="collapse-item" href="/pages/modules/memorandum"> <i class="fa-solid fa-building pr-2">
+                            </i> Memo Generator</a> --}}
                         <a class="collapse-item" href="/pages/modules/obtTracker"><i class="fa-solid fa-building pr-2">
                             </i> Official Business Trip</a>
                         <a class="collapse-item" href="/pages/modules/overtime"><i class="fa-solid fa-building pr-2">
                             </i> Overtime</a>
                         <a class="collapse-item" href="/pages/modules/payroll"> <i class="fa-solid fa-building pr-2">
                             </i> Payroll System</a>
-                        <a class="collapse-item" href="/pages/modules/debitAdvise"><i class="fa-solid fa-building pr-2">
+                        {{-- <a class="collapse-item" href="/pages/modules/debitAdvise"><i class="fa-solid fa-building pr-2">
                             </i>Debit Advise</a>
                         <a class="collapse-item" href="/pages/modules/sendOBT"><i class="fa-solid fa-building pr-2">
-                            </i> Send to OBT</a>
+                            </i> Send to OBT</a> --}}
                     </div>
                 </div>
             </li>
@@ -168,10 +168,10 @@
                                 class="fa-solid fa-building pr-2"> </i> Companies</a>
                         <a class="collapse-item" href="/pages/management/departments"><i
                                 class="fa-solid fa-building pr-2"> </i> Departments</a>
-                        <a class="collapse-item" href="/pages/modules/E201"> <i class="fa-solid fa-building pr-2">
-                            </i> E-201</a>
-                        <a class="collapse-item" href="/pages/management/e201"><i class="fa-solid fa-building pr-2">
-                            </i> e-201 Document</a>
+                        {{-- <a class="collapse-item" href="/pages/modules/E201"> <i class="fa-solid fa-building pr-2">
+                            </i> E-201</a> --}}
+                        {{-- <a class="collapse-item" href="/pages/management/e201"><i class="fa-solid fa-building pr-2">
+                            </i> e-201 Document</a> --}}
                         <a class="collapse-item" href="/pages/management/employeestatus"><i
                                 class="fa-solid fa-building pr-2"> </i> Employee Status</a>
                         <a class="collapse-item" href="/pages/management/hmo"><i class="fa-solid fa-building pr-2">
@@ -235,26 +235,7 @@
                 </div>
             </li>
 
-            <hr class="sidebar-divider d-none d-md-block">
-
-
-
-
-            <li class="nav-item ">
-                <a class="nav-link  nav-link-icon collapsed" href="#" data-toggle="collapse"
-                    data-target="#report" aria-expanded="true" aria-controls="collapseUtilities">
-                    <i class="fas fa-columns"></i>
-                    <span>Reports</span>
-                </a>
-                <div id="report" class="collapse" aria-labelledby="headingUtilities"
-                    data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded ">
-                        <h6 class="collapse-header">Custom Reports:</h6>
-                        <a class="collapse-item" href="{{ url('/users/manage') }}">Laboratory</a>
-                    </div>
-                </div>
-            </li>
-
+           
             <hr class="sidebar-divider d-none d-md-block">
             <div class="text-center d-none d-md-inline">
                 <button class="rounded-circle border-0 toggler-icon" id="sidebarToggle"> </button>
