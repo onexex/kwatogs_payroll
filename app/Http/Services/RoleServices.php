@@ -2,6 +2,7 @@
 
 namespace App\Http\Services;
 
+use App\Models\User;
 use Spatie\Permission\Models\Role;
 
 class RoleServices
@@ -37,5 +38,36 @@ class RoleServices
         $role->name = $roleName;
         $role->save();
         return $role;
+    }
+
+    public function assignRoleToEmployee(
+        int $roleId,
+        int $employeeId
+    ): array
+    {
+        $role = Role::findById($roleId);
+        if (!$role) {
+            return [
+                'status' => 'error',
+                'message' => 'Role not found.'
+            ];
+        }
+
+        $employee = User::find($employeeId);
+        if (!$employee) {
+            return [
+                'status' => 'error',
+                'message' => 'Employee not found.'
+            ];
+        }
+
+            if (! $employee->hasRole($role->name)) {
+            $employee->assignRole($role->name);
+        }
+
+        return [
+            'status' => 'success',
+            'message' => 'Role assigned successfully.'
+        ];
     }
 }

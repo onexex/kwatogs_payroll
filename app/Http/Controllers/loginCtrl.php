@@ -7,6 +7,7 @@ use Carbon\Carbon;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class loginCtrl extends Controller
@@ -30,6 +31,10 @@ class loginCtrl extends Controller
                 return response()->json(['status'=>202,'msg'=>'Sorry We do not recognize your email!']);
             }else{
                 if (Hash::check($request->password,$userinfo->password)){
+
+                    if ($userinfo) {
+                        Auth::login($userinfo);
+                    }
                     $request->session()->put('LoggedUserID', $userinfo->id);
                     $request->session()->put('LoggedUserRole', $userinfo->role);
                     $request->session()->put('LoggedUserDep', $userinfo->empDepID);

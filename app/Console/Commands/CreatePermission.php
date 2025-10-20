@@ -50,6 +50,7 @@ class CreatePermission extends Command
 
         foreach ($users as $user) {
             $user->givePermissionTo('userroles');
+            $user->givePermissionTo('accessrights');
         }
     }
 }

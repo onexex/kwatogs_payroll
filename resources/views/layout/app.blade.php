@@ -87,153 +87,220 @@
             </a>
 
             <hr class="sidebar-divider my-0">
+            @can('home')
+                <li class="nav-item active">
+                    <a class="nav-link" href="{{ url('/') }}">
+                        <i class="fas fa-fw fa-tachometer-alt"></i>
+                        <span>Home</span></a>
+                </li>
+            @endcan
 
-            <li class="nav-item active">
-                <a class="nav-link" href="{{ url('/') }}">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Home</span></a>
-            </li>
+            @can('registration')
+                <li class="nav-item active">
+                    <a class="nav-link" href="/pages/modules/registration">
+                        <i class="fas fa-fw fa-tachometer-alt"></i>
+                        <span>Registration</span></a>
+                </li>
+            @endcan
 
-            {{-- <li class="nav-item active">
-                <a class="nav-link" href="/pages/modules/registration">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Registration</span></a>
-            </li> --}}
+            @php
+                $modulePages = [
+                    // 'checkregister' => ['name' => 'Check Register', 'url' => '/pages/modules/checkRegister'],
+                    'e201' => ['name' => 'E-201', 'url' => '/pages/modules/E201'],
+                    'earlyout' => ['name' => 'Earlyout', 'url' => '/pages/modules/earlyout'],
+                    'enrollemployee' => ['name' => 'Enroll Employee', 'url' => '/pages/modules/registration'],
+                    'leaveapplication' => ['name' => 'Leave Application', 'url' => '/pages/modules/leaveApplication'],
+                    // 'memorandum' => ['name' => 'Memo Generator', 'url' => '/pages/modules/memorandum'],
+                    'obttracker' => ['name' => 'Official Business Trip', 'url' => '/pages/modules/obtTracker'],
+                    'overtime' => ['name' => 'Overtime', 'url' => '/pages/modules/overtime'],
+                    'payroll' => ['name' => 'Payroll System', 'url' => '/pages/modules/payroll'],
+                    'debitadvise' => ['name' => 'Debit Advise', 'url' => '/pages/modules/debitAdvise'],
+                    'sendobt' => ['name' => 'Send to OBT', 'url' => '/pages/modules/sendOBT'],
+                ];
 
-            <div class="sidebar-heading">
-                Modules
-            </div>
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#patient"
-                    aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Modules</span>
-                </a>
-
-                <div id="patient" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Modules</h6>
-                        {{-- <a class="collapse-item" href="/pages/modules/checkRegister"><i
-                                class="fa-solid fa-building pr-2"> </i> Check Register</a> --}}
-                        {{-- <a class="collapse-item" href="/pages/modules/E201"> <i class="fa-solid fa-building pr-2"> </i>
-                            E-201</a> --}}
-                        <a class="collapse-item" href="/pages/modules/earlyout"><i class="fa-solid fa-building pr-2">
-                            </i> Earlyout</a>
-                        <a class="collapse-item" href="/pages/modules/registration"> <i
-                                class="fa-solid fa-building pr-2"> </i> Enroll Employee</a>
-                        <a class="collapse-item" href="/pages/modules/leaveApplication"><i
-                                class="fa-solid fa-building pr-2"> </i> Leave Application</a>
-                        {{-- <a class="collapse-item" href="/pages/modules/memorandum"> <i class="fa-solid fa-building pr-2">
-                            </i> Memo Generator</a> --}}
-                        <a class="collapse-item" href="/pages/modules/obtTracker"><i class="fa-solid fa-building pr-2">
-                            </i> Official Business Trip</a>
-                        <a class="collapse-item" href="/pages/modules/overtime"><i class="fa-solid fa-building pr-2">
-                            </i> Overtime</a>
-                        <a class="collapse-item" href="/pages/modules/payroll"> <i class="fa-solid fa-building pr-2">
-                            </i> Payroll System</a>
-                        {{-- <a class="collapse-item" href="/pages/modules/debitAdvise"><i class="fa-solid fa-building pr-2">
-                            </i>Debit Advise</a>
-                        <a class="collapse-item" href="/pages/modules/sendOBT"><i class="fa-solid fa-building pr-2">
-                            </i> Send to OBT</a> --}}
-                    </div>
+                $hasPagesAccess = false;
+                foreach ($modulePages as $key => $page) {
+                    if (auth()->user() && auth()->user()->can($key)) {
+                        $hasPagesAccess = true;
+                        break;
+                    }
+                }
+            @endphp
+            @if ($hasPagesAccess)
+                <div class="sidebar-heading">
+                    Modules
                 </div>
-            </li>
+                <li class="nav-item">
+                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#patient"
+                            aria-expanded="true" aria-controls="collapseTwo">
+                            <i class="fas fa-fw fa-cog"></i>
+                            <span>Modules</span>
+                        </a>
+
+                        <div id="patient" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                            <div class="bg-white py-2 collapse-inner rounded">
+                                <h6 class="collapse-header">Modules</h6>
+
+                                    @foreach ($modulePages as $key => $page)
+                                        @can($key)
+                                            <a class="collapse-item" href="{{ $page['url'] }}">
+                                                <i class="fa-solid fa-building pr-2"></i> {{ $page['name'] }}
+                                            </a>
+                                        @endcan
+                                    @endforeach
+
+
+                            </div>
+                        </div>
+                    </li>
+                @endif
 
 
             <hr class="sidebar-divider my-0">
+            
+            @php
+                $managementModules = [
+                    'accessrights' => ['name' => 'Employee Role', 'url' => '/pages/management/accessrights'],
+                    'agencies' => ['name' => 'Agencies', 'url' => '/pages/management/agencies'],
+                    'archive' => ['name' => 'Archive Management', 'url' => '/pages/management/archive'],
+                    'classification' => ['name' => 'Classification', 'url' => '/pages/management/classification'],
+                    'companies' => ['name' => 'Companies', 'url' => '/pages/management/companies'],
+                    'departments' => ['name' => 'Departments', 'url' => '/pages/management/departments'],
+                    // 'e201' => ['name' => 'E-201', 'url' => '/pages/modules/E201'],
+                    // 'e201document' => ['name' => 'E-201 Document', 'url' => '/pages/management/e201'],
+                    'employeestatus' => ['name' => 'Employee Status', 'url' => '/pages/management/employeestatus'],
+                    'hmo' => ['name' => 'HMOs', 'url' => '/pages/management/hmo'],
+                    'holidaylogger' => ['name' => 'Holiday Logger', 'url' => '/pages/management/holidaylogger'],
+                    'joblevels' => ['name' => 'Job Level', 'url' => '/pages/management/joblevels'],
+                    'leavevalidations' => ['name' => 'Leave Validation', 'url' => '/pages/management/leavevalidations'],
+                    'lilovalidations' => ['name' => 'Lilo Validation', 'url' => '/pages/management/lilovalidations'],
+                    'overtime' => ['name' => 'Overtime', 'url' => '/pages/modules/overtime'],
+                    'obvalidations' => ['name' => 'OB Validation', 'url' => '/pages/management/obvalidations'],
+                    'otfiling' => ['name' => 'OT Filing Maintenance', 'url' => '/pages/management/otfiling'],
+                    'pagibigcontribution' => ['name' => 'Pagibig Contribution', 'url' => '/pages/management/pagibigcontribution'],
+                    'parentalsetting' => ['name' => 'Parental Settings', 'url' => '/pages/management/parentalsetting'],
+                    'philhealth' => ['name' => 'Philhealth Contribution', 'url' => '/pages/management/philhealth'],
+                    'positions' => ['name' => 'Position', 'url' => '/pages/management/positions'],
+                    'registration' => ['name' => 'Registration', 'url' => '/pages/modules/registration'],
+                    'relationship' => ['name' => 'Relationship', 'url' => '/pages/management/relationship'],
+                    'employeeschedules' => ['name' => 'Scheduler', 'url' => '/employee-schedules'],
+                    'scheduletime' => ['name' => 'Schedule Time', 'url' => '/pages/management/time'],
+                    'sil' => ['name' => 'SIL Loan', 'url' => '/pages/management/sil'],
+                    'ssscontribution' => ['name' => 'SSS Contribution', 'url' => '/pages/management/ssscontribution'],
+                    'leavetypes' => ['name' => 'Types of Leaves', 'url' => '/pages/management/leavetypes'],
+                    'userroles' => ['name' => 'User Roles', 'url' => '/user-roles'],
+                ];
+                $hasManagementAccess = false;
+                foreach ($managementModules as $key => $module) {
+                    if (auth()->user() && auth()->user()->can($key)) {
+                        $hasManagementAccess = true;
+                        break;
+                    }
+                }
+            @endphp
 
-            <div class="sidebar-heading">
-                Modules
-            </div>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                    aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Settings</span>
-                </a>
-
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Management</h6>
-                        <a class="collapse-item" href="/pages/management/accessrights"><i
-                                class="fa-solid fa-building pr-2"> </i> Access Rights</a>
-                        <a class="collapse-item" href="/pages/management/agencies"><i
-                                class="fa-solid fa-building pr-2"> </i> Agencies</a>
-                        <a class="collapse-item" href="/pages/management/archive"><i
-                                class="fa-solid fa-building pr-2"> </i> Archive Management</a>
-                        <a class="collapse-item" href="/pages/management/classification"><i
-                                class="fa-solid fa-building pr-2"> </i> Classification</a>
-                        <a class="collapse-item" href="/pages/management/companies"><i
-                                class="fa-solid fa-building pr-2"> </i> Companies</a>
-                        <a class="collapse-item" href="/pages/management/departments"><i
-                                class="fa-solid fa-building pr-2"> </i> Departments</a>
-                        {{-- <a class="collapse-item" href="/pages/modules/E201"> <i class="fa-solid fa-building pr-2">
-                            </i> E-201</a> --}}
-                        {{-- <a class="collapse-item" href="/pages/management/e201"><i class="fa-solid fa-building pr-2">
-                            </i> e-201 Document</a> --}}
-                        <a class="collapse-item" href="/pages/management/employeestatus"><i
-                                class="fa-solid fa-building pr-2"> </i> Employee Status</a>
-                        <a class="collapse-item" href="/pages/management/hmo"><i class="fa-solid fa-building pr-2">
-                            </i> HMOs</a>
-                        <a class="collapse-item" href="/pages/management/holidaylogger"><i
-                                class="fa-solid fa-building pr-2"> </i> Holiday Logger</a>
-                        <a class="collapse-item" href="/pages/management/joblevels"><i
-                                class="fa-solid fa-building pr-2"> </i> Job Level</a>
-                        <a class="collapse-item" href="/pages/management/leavevalidations"><i
-                                class="fa-solid fa-building pr-2"> </i> Leave Validation</a>
-                        <a class="collapse-item" href="/pages/management/lilovalidations"><i
-                                class="fa-solid fa-building pr-2"> </i> Lilo Validation</a>
-                        <a class="collapse-item" href="/pages/modules/overtime"><i class="fa-solid fa-building pr-2">
-                            </i> Overtime</a>
-                        <a class="collapse-item" href="/pages/management/obvalidations"><i
-                                class="fa-solid fa-building pr-2"> </i> OB Validation</a>
-                        <a class="collapse-item" href="/pages/management/otfiling"><i
-                                class="fa-solid fa-building pr-2"> </i> OT Filing Maintenance</a>
-                        <a class="collapse-item" href="/pages/management/pagibigcontribution"><i
-                                class="fa-solid fa-building pr-2"> </i> Pagibig Contribution</a>
-                        <a class="collapse-item" href="/pages/management/parentalsetting"><i
-                                class="fa-solid fa-building pr-2"> </i> Parental Settings</a>
-                        <a class="collapse-item" href="/pages/management/philhealth"><i
-                                class="fa-solid fa-building pr-2"> </i> Philhealth Contribution</a>
-                        <a class="collapse-item" href="/pages/management/positions"><i
-                                class="fa-solid fa-building pr-2"> </i> Position</a>
-                        <a class="collapse-item" href="/pages/modules/registration"><i
-                                class="fa-solid fa-building pr-2"> </i> Registration</a>
-                        <a class="collapse-item" href="/pages/management/relationship"><i
-                                class="fa-solid fa-building pr-2"> </i> Relationship</a>
-                        <a class="collapse-item" href="/employee-schedules"><i
-                                class="fa-solid fa-building pr-2"> </i> Scheduler</a>
-                        <a class="collapse-item" href="/pages/management/time"><i class="fa-solid fa-building pr-2">
-                            </i> Schedule Time</a>
-                        <a class="collapse-item" href="/pages/management/sil"><i class="fa-solid fa-building pr-2">
-                            </i> SIL Loan</a>
-                        <a class="collapse-item" href="/pages/management/ssscontribution"><i
-                                class="fa-solid fa-building pr-2"> </i> SSS Contribution</a>
-                        <a class="collapse-item" href="/pages/management/leavetypes"> <i
-                                class="fa-solid fa-building pr-2"> </i> Types of Leaves</a>
-                        <a class="collapse-item" href="/user-roles"><i class="fa-solid fa-building pr-2">
-                            </i> User Roles</a>
-                    
-
-                    </div>
+            @if ($hasManagementAccess) 
+                <div class="sidebar-heading">
+                    Modules
                 </div>
-            </li>
 
+                <li class="nav-item">
 
-            <li class="nav-item ">
-                <a class="nav-link  nav-link-icon collapsed" href="#" data-toggle="collapse"
-                    data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
-                    <i class="fa-solid fa-gears"></i>
-                    <span>Reports</span>
-                </a>
-                <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
-                    data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded ">
-                        <a class="collapse-item" href="/pages/reports/attendance">Attendance Viewer</a>
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
+                        aria-expanded="true" aria-controls="collapseTwo">
+                        <i class="fas fa-fw fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+
+                    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            <h6 class="collapse-header">Management</h6>
+                            @foreach ($managementModules as $key => $module)
+                                @can($key)
+                                    <a class="collapse-item" href="{{ $module['url'] }}">
+                                        <i class="fa-solid fa-building pr-2"></i> {{ $module['name'] }}
+                                    </a>
+                                @endcan
+                            @endforeach
+                        </div>
                     </div>
-                </div>
-            </li>
+                </li>
+            @endif
+
+            @php
+                $moduleReports = [
+                    'attendance' => ['name' => 'Attendance Viewer', 'url' => '/pages/reports/attendance'],
+                ];   
+                $hasReportAccess = false;
+                foreach ($moduleReports as $key => $module) {
+                    if (auth()->user() && auth()->user()->can($key)) {
+                        $hasReportAccess = true;
+                        break;
+                    }
+                }
+            @endphp
+
+            @if ($hasReportAccess)
+                <li class="nav-item ">
+                    <a class="nav-link  nav-link-icon collapsed" href="#" data-toggle="collapse"
+                        data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
+                        <i class="fa-solid fa-gears"></i>
+                        <span>Reports</span>
+                    </a>
+                    <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
+                        data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded ">
+
+                            @foreach ($moduleReports as $key => $page)
+                                @can($key)
+                                    <a class="collapse-item" href="{{ $page['url'] }}">
+                                        <i class="fa-solid fa-building pr-2"></i> {{ $page['name'] }}
+                                    </a>
+                                @endcan
+                            @endforeach
+
+                        </div>
+                    </div>
+                </li>
+            @endif
+
+            <hr class="sidebar-divider d-none d-md-block">
+
+
+            @php
+                $moduleBottomReports = [
+                    'laboratory' => ['name' => 'Laboratory', 'url' => '/users/manage'],
+                ]; 
+                $hasAccessBRep = false;
+                foreach ($moduleBottomReports as $key => $module) {
+                    if (auth()->user() && auth()->user()->can($key)) {
+                        $hasAccessBRep = true;
+                        break;
+                    }
+                }
+            @endphp
+            @if ($hasAccessBRep)
+                <li class="nav-item ">
+                    <a class="nav-link  nav-link-icon collapsed" href="#" data-toggle="collapse"
+                        data-target="#report" aria-expanded="true" aria-controls="collapseUtilities">
+                        <i class="fas fa-columns"></i>
+                        <span>Reports</span>
+                    </a>
+                    <div id="report" class="collapse" aria-labelledby="headingUtilities"
+                        data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded ">
+                            <h6 class="collapse-header">Custom Reports:</h6>
+                            @foreach ($moduleReports as $key => $page)
+                                @can($key)
+                                    <a class="collapse-item" href="{{ $page['url'] }}">
+                                        <i class="fa-solid fa-building pr-2"></i> {{ $page['name'] }}
+                                    </a>
+                                @endcan
+                            @endforeach
+                        </div>
+                    </div>
+                </li>
+            @endif
 
            
             <hr class="sidebar-divider d-none d-md-block">
