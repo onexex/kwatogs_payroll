@@ -84,7 +84,16 @@
                                             <td class="text-uppercase">{{ $user->lname }}, {{ $user->fname }}</td>
                                             <td>
                                                 @foreach($user->roles as $role)
-                                                    <span class="badge bg-primary text-uppercase">{{ $role->name }}</span>
+                                                    <span 
+                                                        class="badge bg-primary text-uppercase role-badge"
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#removeRoleModal"
+                                                        data-user-id="{{ $user->id }}"
+                                                        data-role-name="{{ $role->name }}"
+                                                        style="cursor: pointer;"
+                                                    >
+                                                        {{ $role->name }}
+                                                    </span>
                                                 @endforeach
                                             </td>
                                         </tr>   
@@ -99,6 +108,48 @@
         </div>
     </div>
 
-
+    <!-- Remove Role Modal -->
+    <div class="modal fade" id="removeRoleModal" tabindex="-1" aria-labelledby="removeRoleLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="removeRoleLabel">Remove Role</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            Are you sure you want to remove the role 
+            <strong id="roleNameText"></strong> 
+            from this user?
+        </div>
+        <div class="modal-footer">
+            <form id="removeRoleForm" method="POST" action="">
+                @csrf
+                @method('DELETE')
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-danger">Remove</button>
+            </form>
+        </div>
+        </div>
+    </div>
+    </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const removeRoleModal = document.getElementById('removeRoleModal');
+        removeRoleModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const userId = button.getAttribute('data-user-id');
+            const roleName = button.getAttribute('data-role-name');
+
+            // Update modal text
+            document.getElementById('roleNameText').textContent = roleName;
+
+            // Update form action dynamically
+            const form = document.getElementById('removeRoleForm');
+            form.action = `/users/${userId}/roles/${roleName}`;
+        });
+    });
+</script>
+
 @endsection

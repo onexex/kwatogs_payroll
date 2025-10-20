@@ -33,4 +33,12 @@ class EmployeeRoleController extends Controller
 
         return redirect()->back()->with($response['status'], $response['message']);
     }
+
+    public function removeRole(User $user, string $roleName)
+    {
+        $role = Role::where('name', $roleName)->firstOrFail();
+        $user->removeRole($role);
+
+        return redirect()->back()->with('success', 'Role removed successfully.');
+    }
 }

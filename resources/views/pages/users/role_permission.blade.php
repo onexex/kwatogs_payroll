@@ -24,7 +24,7 @@
                     <li class="nav-item pr-2">
                     <a
                         href="{{ route('user-roles.show', ['user_role' => $role->id, 'permission' => 'page']) }}"
-                        class="nav-link active text-secondary list-inline-item shadow-sm "
+                        class="nav-link text-secondary list-inline-item shadow-sm {{ $permissiontab === 'page' ? 'active' : '' }}"
                     >
                         <i class="tf-icons bx bx-user"></i> Page Permission
                     </a>

@@ -84,6 +84,7 @@ class RolesController extends Controller
         return view('pages.users.role_permission', [
             'permissions' => $permissions,
             'role' => $user_role,   
+            'permissiontab' => $request->permission ?? '',
         ]);
     }
 

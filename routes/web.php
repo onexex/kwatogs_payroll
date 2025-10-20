@@ -150,6 +150,7 @@ Route::group(['middleware'=>['AuthCheck']], function(){
 
     // employee role
     Route::post('/emprole/create_update',[EmployeeRoleController::class, 'create_update'])->name('employee.roles.assign');
+    Route::delete('/users/{user}/roles/{role}', [EmployeeRoleController::class, 'removeRole'])->name('users.roles.remove');
 
     //MODULE
     Route::get('/pages/modules/obtTracker',[pageCtrl::class, 'obtTracker']);
