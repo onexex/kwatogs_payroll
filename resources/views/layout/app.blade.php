@@ -81,7 +81,7 @@
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url('/') }}">
                 <div class="sidebar-brand-icon ">
                     {{-- <img style="height:auto;width:40%;"  src="{{URL::asset('/img/wlogow.png')}}"> --}}
-                    -----
+                    {{-- ----- --}}
                 </div>
                 {{-- <!-- <div class="sidebar-brand-text mx-3 ">Dashboard</div> --> --}}
             </a>
@@ -105,12 +105,12 @@
 
             @php
                 $modulePages = [
-                    'checkregister' => ['name' => 'Check Register', 'url' => '/pages/modules/checkRegister'],
+                    // 'checkregister' => ['name' => 'Check Register', 'url' => '/pages/modules/checkRegister'],
                     'e201' => ['name' => 'E-201', 'url' => '/pages/modules/E201'],
                     'earlyout' => ['name' => 'Earlyout', 'url' => '/pages/modules/earlyout'],
                     'enrollemployee' => ['name' => 'Enroll Employee', 'url' => '/pages/modules/registration'],
                     'leaveapplication' => ['name' => 'Leave Application', 'url' => '/pages/modules/leaveApplication'],
-                    'memorandum' => ['name' => 'Memo Generator', 'url' => '/pages/modules/memorandum'],
+                    // 'memorandum' => ['name' => 'Memo Generator', 'url' => '/pages/modules/memorandum'],
                     'obttracker' => ['name' => 'Official Business Trip', 'url' => '/pages/modules/obtTracker'],
                     'overtime' => ['name' => 'Overtime', 'url' => '/pages/modules/overtime'],
                     'payroll' => ['name' => 'Payroll System', 'url' => '/pages/modules/payroll'],
@@ -131,29 +131,29 @@
                     Modules
                 </div>
                 <li class="nav-item">
-                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#patient"
-                        aria-expanded="true" aria-controls="collapseTwo">
-                        <i class="fas fa-fw fa-cog"></i>
-                        <span>Modules</span>
-                    </a>
+                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#patient"
+                            aria-expanded="true" aria-controls="collapseTwo">
+                            <i class="fas fa-fw fa-cog"></i>
+                            <span>Modules</span>
+                        </a>
 
-                    <div id="patient" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                        <div class="bg-white py-2 collapse-inner rounded">
-                            <h6 class="collapse-header">Modules</h6>
+                        <div id="patient" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                            <div class="bg-white py-2 collapse-inner rounded">
+                                <h6 class="collapse-header">Modules</h6>
 
-                                @foreach ($modulePages as $key => $page)
-                                    @can($key)
-                                        <a class="collapse-item" href="{{ $page['url'] }}">
-                                            <i class="fa-solid fa-building pr-2"></i> {{ $page['name'] }}
-                                        </a>
-                                    @endcan
-                                @endforeach
+                                    @foreach ($modulePages as $key => $page)
+                                        @can($key)
+                                            <a class="collapse-item" href="{{ $page['url'] }}">
+                                                <i class="fa-solid fa-building pr-2"></i> {{ $page['name'] }}
+                                            </a>
+                                        @endcan
+                                    @endforeach
 
 
+                            </div>
                         </div>
-                    </div>
-                </li>
-            @endif
+                    </li>
+                @endif
 
 
             <hr class="sidebar-divider my-0">
@@ -166,8 +166,8 @@
                     'classification' => ['name' => 'Classification', 'url' => '/pages/management/classification'],
                     'companies' => ['name' => 'Companies', 'url' => '/pages/management/companies'],
                     'departments' => ['name' => 'Departments', 'url' => '/pages/management/departments'],
-                    'e201' => ['name' => 'E-201', 'url' => '/pages/modules/E201'],
-                    'e201document' => ['name' => 'E-201 Document', 'url' => '/pages/management/e201'],
+                    // 'e201' => ['name' => 'E-201', 'url' => '/pages/modules/E201'],
+                    // 'e201document' => ['name' => 'E-201 Document', 'url' => '/pages/management/e201'],
                     'employeestatus' => ['name' => 'Employee Status', 'url' => '/pages/management/employeestatus'],
                     'hmo' => ['name' => 'HMOs', 'url' => '/pages/management/hmo'],
                     'holidaylogger' => ['name' => 'Holiday Logger', 'url' => '/pages/management/holidaylogger'],
@@ -205,6 +205,7 @@
                 </div>
 
                 <li class="nav-item">
+
                     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
                         aria-expanded="true" aria-controls="collapseTwo">
                         <i class="fas fa-fw fa-cog"></i>
@@ -301,6 +302,7 @@
                 </li>
             @endif
 
+           
             <hr class="sidebar-divider d-none d-md-block">
             <div class="text-center d-none d-md-inline">
                 <button class="rounded-circle border-0 toggler-icon" id="sidebarToggle"> </button>

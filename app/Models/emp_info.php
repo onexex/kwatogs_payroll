@@ -30,4 +30,10 @@ class emp_info extends Model
         'empZipcode',
         'empCountry',
     ];
+
+     // 🔗 Relationship back to User
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'empID', 'empID');
+    }
 }
