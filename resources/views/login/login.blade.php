@@ -87,7 +87,7 @@
                         <form id="frmlogin">
                             <div class="mb-3">
                                 <input  type="email" name="username" class="form-control form-control-user mb-1" id="floatingInput" placeholder="name@example.com" value="{{ old('username')}}">
-                                <label for="floatingInput">Email address</label>
+                                <label for="floatingInput">Email addressdddddd</label>
                                 <span class="text-danger small error-text username_error"></span>
                             </div>
                             <div class="mb-3">
