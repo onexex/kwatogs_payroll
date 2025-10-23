@@ -45,7 +45,7 @@
             background-color: #ffffff;
             padding: 40px;
             border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 1000px;
         }
