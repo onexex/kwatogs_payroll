@@ -1,22 +1,27 @@
-# ============================================
-# Laravel root .htaccess (shared hosting safe)
-# ============================================
+# =========================================================
+# Laravel Root .htaccess (shared hosting safe version)
+# =========================================================
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
 
-    # Force HTTPS
+    # 1️⃣ Force HTTPS
     RewriteCond %{HTTPS} !=on
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
 
-    # Redirect all requests to public/index.php
+    # 2️⃣ Redirect requests for existing files/folders in /public
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^ public/index.php [L]
+    RewriteRule ^(css|js|img|fonts|vendor)/(.*)$ public/$1/$2 [L]
+
+    # 3️⃣ Redirect all other requests to public/index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ public/index.php [L]
 </IfModule>
 
-# Disable directory browsing
+# Disable directory listing
 Options -Indexes
 
 # Hide dot files (.env, .git, etc.)
