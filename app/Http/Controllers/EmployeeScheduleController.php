@@ -18,28 +18,62 @@ class EmployeeScheduleController extends Controller
     }
 
     // Get all schedules (for AJAX table)
+    // public function getSchedules(Request $request)
+    // {
+    //     $search = $request->search ?? '';
+    //     $query = EmployeeSchedule::with('users')
+    //         ->when($search, fn($q) => $q->whereHas('users', fn($e) =>
+    //             $e->where('fname','like',"%$search%")->orWhere('lname','like',"%$search%")
+    //         ));
+
+    //     $schedules = $query->orderBy('sched_start_date', 'asc')->get();
+
+    //     $schedules->transform(fn($s) => [
+    //         'id' => $s->id,
+    //         'employee_name' => $s->users->lname . ', ' . $s->users->fname,
+    //         'sched_start_date' => $s->sched_start_date,
+    //         'sched_in' => $s->sched_in,
+    //         'sched_end_date' => $s->sched_end_date,
+    //         'sched_out' => $s->sched_out,
+    //         'shift_type' => $s->shift_type
+    //     ]);
+
+    //     return response()->json($schedules);
+    // }
+
     public function getSchedules(Request $request)
-    {
-        $search = $request->search ?? '';
-        $query = EmployeeSchedule::with('users')
-            ->when($search, fn($q) => $q->whereHas('users', fn($e) =>
-                $e->where('fname','like',"%$search%")->orWhere('lname','like',"%$search%")
-            ));
+{
+    $search = $request->search ?? '';
+    $perPage = $request->per_page ?? 10;
 
-        $schedules = $query->orderBy('sched_start_date', 'asc')->get();
+    $query = EmployeeSchedule::with('users')
+        ->when($search, fn($q) =>
+            $q->whereHas('users', fn($e) =>
+                $e->where('fname', 'like', "%$search%")
+                  ->orWhere('lname', 'like', "%$search%")
+            )
+        )
+        ->join('users', 'employee_schedules.employee_id', '=', 'users.empID')
+        ->orderBy('users.lname')
+        ->orderBy('users.fname')
+        ->orderBy('sched_start_date', 'asc')
+        ->select('employee_schedules.*'); // important when joining
 
-        $schedules->transform(fn($s) => [
-            'id' => $s->id,
-            'employee_name' => $s->users->lname . ', ' . $s->users->fname,
-            'sched_start_date' => $s->sched_start_date,
-            'sched_in' => $s->sched_in,
-            'sched_end_date' => $s->sched_end_date,
-            'sched_out' => $s->sched_out,
-            'shift_type' => $s->shift_type
-        ]);
+    $schedules = $query->paginate($perPage);
 
-        return response()->json($schedules);
-    }
+    $schedules->getCollection()->transform(fn($s) => [
+        'id' => $s->id,
+        'employee_name' => $s->users->lname . ', ' . $s->users->fname,
+        'sched_start_date' => $s->sched_start_date,
+        'sched_in' => $s->sched_in,
+        'sched_end_date' => $s->sched_end_date,
+        'sched_out' => $s->sched_out,
+        'shift_type' => $s->shift_type
+    ]);
+
+    return response()->json($schedules);
+}
+
 
     public function store(Request $request)
 {
