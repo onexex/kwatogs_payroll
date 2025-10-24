@@ -80,7 +80,7 @@
         <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar" style="background-color: #008080">
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url('/') }}">
                 <div class="sidebar-brand-icon ">
-                    {{-- <img style="height:auto;width:40%;"  src="{{URL::asset('/img/wlogow.png')}}"> --}}
+                    <img style="height:auto;width:40%;"  src="{{URL::asset('/img/kwatogslogo.jpg')}}" alt="Logo">
                     {{-- ----- --}}
                 </div>
                 {{-- <!-- <div class="sidebar-brand-text mx-3 ">Dashboard</div> --> --}}

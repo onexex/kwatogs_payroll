@@ -30,18 +30,19 @@ use App\Http\Controllers\eovalidationCtrl;
 use App\Http\Controllers\relationshipCtrl;
 use App\Http\Controllers\holidayLoggerCtrl;
 use App\Http\Controllers\obValidationsCtrl;
+use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\classiticationCtrl;
 use App\Http\Controllers\homeAttendanceCtrl;
 use App\Http\Controllers\leavevalidationCtrl;
-use App\Http\Controllers\liloValidationsCtrl;
 
  
+use App\Http\Controllers\liloValidationsCtrl;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\parentalSettingsCtrl;
 use App\Http\Controllers\reportAttendanceCtrl;
+use App\Http\Controllers\Roles\RolesController;
 use App\Http\Controllers\EmployeeScheduleController;
 use App\Http\Controllers\Roles\EmployeeRoleController;
-use App\Http\Controllers\Roles\RolesController;
 
 Route::get('/r', function () {
     $updated = User::where('id', 1)->update([
@@ -326,6 +327,7 @@ Route::group(['middleware'=>['AuthCheck']], function(){
 
     Route::get('/attendance/viewer', [reportAttendanceCtrl::class, 'index'])->name('attendance.viewer');
     Route::post('/attendance/fetch', [reportAttendanceCtrl::class, 'fetchAttendance'])->name('attendance.fetch');
+    Route::get('/payroll/compute', [PayrollController::class, 'computePayroll']);
 
 
 

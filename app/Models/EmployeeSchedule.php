@@ -20,9 +20,7 @@ class EmployeeSchedule extends Model
         'shift_type',
     ];
 
-    /* ============================
-       🔗 RELATIONSHIPS
-    ============================ */
+  
 
     // Schedule belongs to an employee
     public function users()
