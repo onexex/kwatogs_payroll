@@ -84,7 +84,7 @@
                 <div class="col-6">
                     <div class="login-card-form">
                         <h2>Login</h2>
-                        <form id="frmlogin" action="#">
+                        <form id="frmlogin">
                             <div class="mb-3">
                                 <input  type="email" name="username" class="form-control form-control-user mb-1" id="floatingInput" placeholder="name@example.com" value="{{ old('username')}}">
                                 <label for="floatingInput">Email address</label>

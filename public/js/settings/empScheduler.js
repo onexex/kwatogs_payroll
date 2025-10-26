@@ -1,136 +1,395 @@
-$(document).ready(function(){
+$(document).ready(function() {
+var empSID= "0";
+var dateID="";
+var IDinserted= "0";
+// getall();
+// getalltime()
 
-  let currentPage = 1;
-let sortField = 'sched_start_date';
-let sortDirection = 'asc';
-let perPage = 10;
+//create_update
+$(document).on('click', '#btnSaveScheduler', function() {
+    var datas = $('#frmEmpScheduler');
+    var formData = new FormData($(datas)[0]);
+    formData.append('empSID', empSID);
+    formData.append('IDinserted', IDinserted);
 
-function fetchSchedules(search = '') {
-    axios.get('/schedules', {
-        params: {
-            search,
-            page: currentPage,
-            sortField,
-            sortDirection,
-            perPage
-        }
-    })
-    .then(res => {
-        let data = res.data.data;
-        let html = '';
-        data.forEach(s => {
-            html += `<tr data-id="${s.id}">
-                <td>${s.employee_name}</td>
-                <td>${s.sched_start_date}</td>
-                <td>${s.sched_in}</td>
-                <td>${s.sched_end_date}</td>
-                <td>${s.sched_out}</td>
-                <td>${s.shift_type || ''}</td>
-                <td>
-                    <button class="btn btn-sm btn-primary editBtn">Edit</button>
-                    <button class="btn btn-sm btn-danger deleteBtn">Delete</button>
-                </td>
-            </tr>`;
-        });
-        $('#tblEmpScheduler tbody').html(html);
+    axios.post('/scheduler/create_update', formData)
+        .then(function(response) {
+            console.log(formData)
 
-        // Pagination buttons
-        let pagination = '';
-        for(let i=1;i<=res.data.last_page;i++){
-            pagination += `<button class="btn btn-sm btn-outline-secondary pageBtn ${i==currentPage?'active':''}" data-page="${i}">${i}</button>`;
-        }
-        $('#pagination').html(pagination);
-    });
-}
+            var statusU=response.data.stat;
+            var errorDataU = response.data.error;
 
-// Pagination click
-$(document).on('click', '.pageBtn', function(){
-    currentPage = $(this).data('page');
-    fetchSchedules($('#txtSearchEmp').val());
-});
 
-// Sorting click
-$(document).on('click', 'th.sortable', function(){
-    let field = $(this).data('field');
-    if(sortField === field){
-        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-    } else {
-        sortField = field;
-        sortDirection = 'asc';
-    }
-    fetchSchedules($('#txtSearchEmp').val());
-});
 
- 
+            if(statusU=='201'){
+                $.each(errorDataU, function(prefix, val) {
+                    // $('span.' + prefix + '_error').text(val[0]);
+                     $('span.' + prefix + '_error').text("This field is required!");
+                     $('#' + prefix ).addClass('border border-danger');
+                });
 
-    // Initial fetch
-    fetchSchedules();
+                dialog.alert({
+                    // title: "Message",
+                    message: "Some fields are required!",
+                    animation: "slide"
+                });
 
-    // Search input event
-    $('#txtSearchEmp').on('input', function(){
-        let val = $(this).val();
-        fetchSchedules(val);
-    });
+            }else if(statusU==200){
+                // getall();
+                // $("#frmOBVal")[0].reset()
+                $('span.error-text').text("");
+                $('select.border').removeClass('border border-danger');
+                $('input.border').removeClass('border border-danger');
 
-    // Show modal for add
-    $('#btnAddSchedule').click(function(){
-        $('#frmEmpScheduler')[0].reset();
-        $('#scheduleId').val('');
-        $('#mdlEmpScheduler').modal('show');
-    });
+                // $("#txtSearchEmp").trigger('keyup');
 
-    // Save or update
-    $('#btnSaveSchedule').click(function(){
-        let id = $('#scheduleId').val();
-        let url = id ? `/schedules/${id}/update` : '/schedules/store';
+                // $('#frmOBVal').modal('toggle');
 
-        axios.post(url, $('#frmEmpScheduler').serialize())
-            .then(res => {
-                Swal.fire('Success', res.data.message, 'success');
-                $('#mdlEmpScheduler').modal('hide');
-                fetchSchedules($('#txtSearchEmp').val());
-            })
-            .catch(err => {
-                if(err.response && err.response.data.errors){
-                    let messages = Object.values(err.response.data.errors)
-                        .map(a=>a.join(', ')).join('\n');
-                    Swal.fire('Error', messages, 'error');
-                }
-            });
-    });
+                dialog.alert({
+                    message:response.data.msg
+                })
+            }else if(statusU==199){
+                $('span.error-text').text("");
+                $('select.border').removeClass('border border-danger');
+                $('input.border').removeClass('border border-danger');
 
-    // Edit
-    $(document).on('click', '.editBtn', function(){
-        let id = $(this).closest('tr').data('id');
-        axios.get(`/schedules/${id}/edit`).then(res=>{
-            let d = res.data;
-            $('#scheduleId').val(d.id);
-            $('#selEmployee').val(d.employee_id);
-            $('#sched_start_date').val(d.sched_start_date);
-            $('#sched_in').val(d.sched_in);
-            $('#sched_end_date').val(d.sched_end_date);
-            $('#sched_out').val(d.sched_out);
-            $('#shift_type').val(d.shift_type);
-            $('#mdlEmpScheduler').modal('show');
-        });
-    });
-
-    // Delete
-    $(document).on('click', '.deleteBtn', function(){
-        let id = $(this).closest('tr').data('id');
-        Swal.fire({
-            title: 'Are you sure?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, delete!'
-        }).then(result=>{
-            if(result.isConfirmed){
-                axios.delete(`/schedules/${id}/delete`).then(res=>{
-                    Swal.fire('Deleted', res.data.message, 'success');
-                    fetchSchedules($('#txtSearchEmp').val());
+                dialog.alert({
+                    message: response.data.msg,
                 });
             }
+        })
+        .catch(function(error) {
+            dialog.alert({
+                message: error
+            });
+        })
+        .then(function() {});
+})
+
+//get
+function getall(){
+    axios.get('/scheduler/getall')
+    .then(function (response) {
+        var htmlData='';
+        // var i=1;
+        $(response.data.data).each(function(index, row) {
+            htmlData += "<tr>"+
+
+            // "<td>" + i++ + "</td>" +
+            "<td>" + row.lname + ", " + row.fname + "</td>" +
+            "<td>" + row.dFrom + "</td>" +
+            "<td>" + row.dTo + "</td>" ,
+
+            htmlData +="<td >" +  '<button type="button" value='+ row.id +' class="btn btn-details btn-sm radius-1 mx-1" id="btnViewModel" data-bs-toggle="modal" data-bs-target="#mdlViewModel"> <i class="fa-regular fa-clock"></i> </button>'   ;
+            htmlData += '<button type="button" value='+ row.id +' class="btn btn-details btn-sm radius-1 mx-1" id="btnUpdateModal" data-toggle="tooltip" data-bs-toggle="modal" data-bs-target="#mdlUpdateEffect"> <i class="fa-regular fa-calendar"></i> </button>'  + "</td>" ;
+            htmlData += "</tr>";
+        })
+        $("#tblEmpScheduler").empty().append(htmlData);
+
+    })
+    .catch(function (error) {
+        dialog.alert({
+            message: error
         });
-    });
+    })
+    .then(function () {});
+}
+
+//getmodaltime
+//  function getalltime(){
+$(document).on('click', '#btnViewModel', function() {
+    empSID = $(this).val();
+
+    axios.get('/scheduler/getall_time', {
+            params: {
+                empSID: empSID
+            }
+        })
+        .then(function(response) {
+            console.log(response.data.dataT)
+            var htmlData = '';
+
+            $(response.data.dataT).each(function(index, row) {
+
+                htmlData += "<tr>" +
+                        "<td>" + row.days + "</td>" +
+                        // "<td>" + row.wtID + "</td>" ,
+                        "<td class='" + 'cel' + row.ids + "'>" + row.wt_timefrom + " - " + row.wt_timeto + "</td>";
+                htmlData +="<td > <button type='button' value='"+ row.ids +"' class='btn btn-details btn-sm radius-1 mx-1' id='btnUpdateView' > <i class='fa-solid fa-pen'></i> </td>"   ;
+
+                htmlData += "</tr>";
+            })
+
+        $("#tblScheduler").empty().append(htmlData);
+
+        })
+        .catch(function (error) {
+            dialog.alert({
+                message: error
+            });
+        })
+        .then(function () {});
+})
+
+
+///edit time
+$(document).on('click', '#btnUpdateView', function(e) {
+    var id =$(this).val();
+    empSID=id;
+
+    $("#mdlUpdateTime").modal('show');
+
+
+
+    $('span.error-text').text("");
+    $('input.border').removeClass('border border-danger');
+
+    axios.get('/scheduler/edit_time',{
+        params: {
+            empSID: empSID
+            }
+        })
+    .then(function (response) {
+
+        $(response.data.data).each(function(index, row) {
+            $('#selWTime').val(row.wtID);
+            $("#btnUpdateView").val(row.id);
+        })
+    })
+    .catch(function (error) {
+        dialog.alert({
+            message: error
+        });
+    })
+    .then(function () {});
 
 });
+
+//UPDATE SCHED TIME
+$(document).on('click', '#btnUpdateTime', function() {
+    var datas = $('#frmUpdateTime');
+    var formData = new FormData($(datas)[0]);
+    formData.append('empSID', empSID);
+
+    var selTimeText = $("#selWTime option:selected").text();
+
+    axios.post('/scheduler/update_time', formData)
+        .then(function(response) {
+            var statusU=response.data.stat;
+            var errorDataU = response.data.error;
+
+            if(statusU=='201'){
+                $.each(errorDataU, function(prefix, val) {
+                     $('span.' + prefix + '_error').text("This field is required!");
+                     $('#' + prefix ).addClass('border border-danger');
+                });
+                dialog.alert({
+                    // title: "Message",
+                    message: "Some fields are required!",
+                    animation: "slide"
+                });
+
+            }else if(statusU==200){
+                // getall();
+                // getalltime()
+                // $("#frmOBVal")[0].reset()
+                $('span.error-text').text("");
+                $('select.border').removeClass('border border-danger');
+                $('input.border').removeClass('border border-danger');
+
+                $("#txtSearchEmp").trigger('keyup');
+
+
+                // $('#frmOBVal').modal('toggle');
+                 $(".cel" + empSID).text(selTimeText);
+                dialog.alert({
+                    message: "Successfully Updated!",
+                })
+            }else if(statusU==202){
+                $('span.error-text').text("");
+                $('select.border').removeClass('border border-danger');
+                $('input.border').removeClass('border border-danger');
+
+                dialog.alert({
+                    message: "Error!",
+                });
+            }
+            // alert(empSID);
+            console.log(response);
+        })
+        .catch(function(error) {
+            dialog.alert({
+                message: error
+            });
+        })
+        .then(function() {});
+})
+
+  //edit date
+  $(document).on('click', '#btnUpdateModal', function(e) {
+    empSID=$(this).val();
+
+    $('span.error-text').text("");
+    $('input.border').removeClass('border border-danger');
+
+    axios.get('/scheduler/edit_date',{
+        params: {
+            empSID: empSID
+            }
+        })
+    .then(function (response) {
+
+        $(response.data.data).each(function(index, row) {
+            $('#txtDateFromU').val(row.dFrom);
+            $('#txtDatetoU').val(row.dTo);
+            $("#btnUpdateModal").val(row.id);
+        })
+    })
+    .catch(function (error) {
+        dialog.alert({
+            message: error
+        });
+    })
+    .then(function () {});
+
+});
+
+//updatedate
+$(document).on('click', '#btnUpdateEffect', function() {
+    var id = empSID;
+
+
+    var dataA = $('#frmUpdateDate');
+    var formData = new FormData($(dataA)[0]);
+    formData.append('id', id);
+
+    axios.post('/scheduler/update_date', formData)
+        .then(function(response) {
+
+            var statusU=response.data.stat;
+            var errorDataU = response.data.error;
+
+            // console.log(response.data.msg);
+            //  return;
+
+            if(statusU=='201'){
+                //show error on input kung walang laman
+                $.each(errorDataU, function(prefix, val) {
+                     $('span.' + prefix + '_error').text("This field is required!");
+                     $('#' + prefix ).addClass('border border-danger');
+
+                });
+
+            }else if(statusU==200){
+                //created msg
+                // alert(response.data.msg);
+                // getalltime()
+                // getall();
+                $('select.border').removeClass('border border-danger');
+                $('input.border').removeClass('border border-danger');
+
+                $("#txtSearchEmp").trigger('keyup');
+
+                dialog.alert({
+                    message: "Data successfully updated!",
+                    animation: "slide"
+                });
+
+           }else if(statusU==199){
+                $('span.error-text').text("");
+                $('select.border').removeClass('border border-danger');
+                $('input.border').removeClass('border border-danger');
+
+                dialog.alert({
+                    message: response.data.msg,
+                    animation: "slide"
+                });
+            }
+            else{
+                dialog.alert({
+                    message: "Error!"
+                });
+            }
+
+        })
+        .catch(function(error) {
+            alert(error);
+        })
+        .then(function() {});
+})
+
+//search
+$(document).on('keyup', '#txtSearchEmp', function(e) {
+    var htmlData='';
+    if($(this).val()===""){
+         $("#tblEmpScheduler").empty();
+        return;
+    }
+    var datas = $('#frmSearch');
+    var formData = new FormData($(datas)[0]);
+        axios.post('/scheduler/search',formData)
+        .then(function (response) {
+            //error response
+
+            if (response.data.status == 201) {
+                $.each(response.data.error, function(prefix, val) {
+                    $('input[name='+ prefix +']').addClass(" border border-danger") ;
+                    $('span.' + prefix + '_error').text(val[0]);
+                });
+            }
+            //success respose
+            if(response.data.status == 200){
+                $('span.error-text').text("");
+                $('input.border').removeClass('border border-danger');
+
+                $(response.data.data).each(function(index, row) {
+                    htmlData += "<tr>"+
+
+                    "<td class='text-capitalize'>" + row.lname + ", " + row.fname + "</td>" +
+                    "<td>" + row.dFrom + "</td>" +
+                    "<td>" + row.dTo + "</td>" ,
+
+                    htmlData +="<td >" +  '<button type="button" value='+ row.id +' class="btn btn-details btn-sm radius-1 mx-1" id="btnViewModel" data-bs-toggle="modal" data-bs-target="#mdlViewModel"> <i class="fa-regular fa-clock"></i> </button>'   ;
+                    htmlData += '<button type="button" value='+ row.id +' class="btn btn-details btn-sm radius-1 mx-1" id="btnUpdateModal" data-toggle="tooltip" data-bs-toggle="modal" data-bs-target="#mdlUpdateEffect"> <i class="fa-regular fa-calendar"></i> </button>'  + "</td>" ;
+                    htmlData += "</tr>";
+                })
+                $("#tblEmpScheduler").empty().append(htmlData);
+            }
+
+            if(response.data.status == 199){
+                $('span.error-text').text("");
+                $('input.border').removeClass('border border-danger');
+                    htmlData += "<tr>" +
+                                "<td class='text-lowercase'> Result not found</td>" +
+                                "<td class='text-lowercase'> </td>" ;
+                     htmlData += "</tr>";
+
+                $("#tblEmpScheduler").empty().append(htmlData);
+
+            }
+             //success respose
+             if(response.data.status == 202){
+                $('span.error-text').text("");
+                $('input.border').removeClass('border border-danger');
+                dialog.alert({
+                    message: response.data.msg
+                });
+            }
+        })
+        .catch(function (error) {
+            dialog.alert({
+                message: error
+            });
+        })
+        .then(function () {});
+});
+
+$(document).on('click', '#closeEmpSched', function() {
+    $('span.error-text').text("");
+    $('select.border').removeClass('border border-danger');
+    $('input.border').removeClass('border border-danger');
+    $("#frmEmpScheduler")[0].reset()
+})
+
+
+})

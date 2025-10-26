@@ -1,14 +1,12 @@
 <?php
 
 
-use App\Models\User;
 use App\Http\Controllers\hmoCtrl;
 use App\Http\Controllers\silCtrl;
 use App\Http\Controllers\sssCtrl;
 use App\Http\Controllers\pageCtrl;
 use App\Http\Controllers\roleCtrl;
 use App\Http\Controllers\loginCtrl;
-use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\archiveCtrl;
 use App\Http\Controllers\companyCtrl;
 use App\Http\Controllers\empStatCtrl;
@@ -34,24 +32,8 @@ use App\Http\Controllers\classiticationCtrl;
 use App\Http\Controllers\homeAttendanceCtrl;
 use App\Http\Controllers\leavevalidationCtrl;
 use App\Http\Controllers\liloValidationsCtrl;
-
- 
-use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\parentalSettingsCtrl;
 use App\Http\Controllers\reportAttendanceCtrl;
-use App\Http\Controllers\EmployeeScheduleController;
-use App\Http\Controllers\Roles\EmployeeRoleController;
-use App\Http\Controllers\Roles\RolesController;
-
-Route::get('/r', function () {
-    $updated = User::where('id', 1)->update([
-        'password' => Hash::make('1') // change as needed
-    ]);
-
-    return $updated 
-        ? "Password for user ID 1 has been reset successfully."
-        : "User not found.";
-});
 
 Route::get('/auth/login', function () {return view('login.login');});
 Route::post('/loginSystem',[loginCtrl::class, 'loginSystem']);
@@ -137,7 +119,7 @@ Route::group(['middleware'=>['AuthCheck']], function(){
 
     // SHAIRA
     //MANAGEMENT
-    Route::get('/pages/management/accessrights',[EmployeeRoleController::class, 'index']);
+    Route::get('/pages/management/accessrights',[pageCtrl::class, 'accessrights']);
     Route::get('/pages/management/departments',[pageCtrl::class, 'departments']);
     Route::get('/pages/management/relationship',[pageCtrl::class, 'relationship']);
     Route::get('/pages/management/leavevalidations',[pageCtrl::class, 'leavevalidations']);
@@ -147,10 +129,6 @@ Route::group(['middleware'=>['AuthCheck']], function(){
     Route::get('/pages/management/ssscontribution',[pageCtrl::class, 'ssscontribution']);
     Route::get('/pages/management/pagibigcontribution',[pageCtrl::class, 'pagibigcontribution']);
     Route::get('/pages/management/empscheduler',[pageCtrl::class, 'empscheduler']);
-
-    // employee role
-    Route::post('/emprole/create_update',[EmployeeRoleController::class, 'create_update'])->name('employee.roles.assign');
-    Route::delete('/users/{user}/roles/{role}', [EmployeeRoleController::class, 'removeRole'])->name('users.roles.remove');
 
     //MODULE
     Route::get('/pages/modules/obtTracker',[pageCtrl::class, 'obtTracker']);
@@ -187,9 +165,6 @@ Route::group(['middleware'=>['AuthCheck']], function(){
     Route::get('/leavetype/edit',[leavetypeCtrl::class, 'edit']);
 
     //userrole
-    Route::resource('/user-roles', RolesController::class);
-    Route::post('/roles/{role}/permissions', [RolesController::class, 'addPermission']);
-    Route::delete('/roles/{role}/permissions', [RolesController::class, 'removePermission']);
     Route::post('/roles/create_update',[roleCtrl::class, 'create_update']);
     Route::get('/roles/getall',[roleCtrl::class, 'getall']);
     Route::get('/roles/edit',[roleCtrl::class, 'edit']);
@@ -306,26 +281,6 @@ Route::group(['middleware'=>['AuthCheck']], function(){
     ///REPORTS
     // Route::post('/ViewReportAttend',[reportAttendanceCtrl::class, 'viewreportattend']);
     Route::get('/task/search',[reportAttendanceCtrl::class,'searchTask']);
-
-
-    //v2 scheduler
-    Route::prefix('employee-schedules')->group(function() {
-        Route::get('/', [EmployeeScheduleController::class, 'index'])->name('employee-schedules.index');
-        Route::get('/all', [EmployeeScheduleController::class, 'getSchedules'])->name('employee-schedules.get');
-        Route::post('/store', [EmployeeScheduleController::class, 'store'])->name('employee-schedules.store');
-        Route::get('/edit/{id}', [EmployeeScheduleController::class, 'edit'])->name('employee-schedules.edit');
-        Route::put('/update/{id}', [EmployeeScheduleController::class, 'update'])->name('employee-schedules.update');
-        Route::delete('/delete/{id}', [EmployeeScheduleController::class, 'destroy'])->name('employee-schedules.destroy');
-    });
-
-    Route::prefix('attendance')->group(function () {
-        Route::post('/login', [AttendanceController::class, 'timeIn'])->name('attendance.timein');
-        Route::post('/logout', [AttendanceController::class, 'timeOut'])->name('attendance.timeout');
-        Route::get('/list', [AttendanceController::class, 'getAttendanceList'])->name('attendance.list');
-    });
-
-    Route::get('/attendance/viewer', [reportAttendanceCtrl::class, 'index'])->name('attendance.viewer');
-    Route::post('/attendance/fetch', [reportAttendanceCtrl::class, 'fetchAttendance'])->name('attendance.fetch');
 
 
 
