@@ -2,34 +2,55 @@
 
 namespace App\Http\Controllers;
 
+
 use Illuminate\Http\Request;
-use App\Models\AttendanceSummary;
 use App\Models\User;
+use App\Models\homeAttendance;
+use Validator;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
 
 class reportAttendanceCtrl extends Controller
 {
-    public function index()
-    {
-        $resultEmp = User::select('empID', 'fname', 'lname')->orderBy('lname')->get();
-        return view('reports.attendance', compact('resultEmp'));
-    }
+    public function searchTask(Request $request){
 
-    public function fetchAttendance(Request $request)
-    {
-        $request->validate([
-            'date_from' => 'required|date',
-            'date_to'   => 'required|date',
-            'employee_id' => 'nullable'
-        ]);
+        $search_emp =$request->empSearch;
+        $startdate = date('Y-m-d', strtotime($request->startd));
+        $enddate = date('Y-m-d', strtotime($request->endd.' + 1 days'));
 
-        $query = AttendanceSummary::with(['employee', 'homeAttendances'])
-                    ->whereBetween('attendance_date', [$request->date_from, $request->date_to])
-                    ->orderBy('attendance_date', 'asc');
+        // dd($);
 
-        if ($request->employee_id && $request->employee_id !== 'All') {
-            $query->where('employee_id', $request->employee_id);
+        if($search_emp=="All"){
+            $getData=homeAttendance::join('users as a','home_attendance.empID','=','a.empID')
+            ->select("a.*",'home_attendance.*')
+            ->whereBetween('home_attendance.created_at', [$startdate, $enddate])
+            ->get();
+        }else{
+            $getData=homeAttendance::join('users as a','home_attendance.empID','=','a.empID')
+            ->select("a.*",'home_attendance.*')
+            ->whereBetween('home_attendance.created_at', [$startdate, $enddate])
+            ->where('a.empID',$search_emp)
+            // ->groupBy('empID')
+            // ->where('lname', 'LIKE', '%'.$search_eqp.'%')
+            ->get();
         }
 
-        return response()->json($query->get());
+        $getData=$getData->map(function ($item) {
+            return [
+                'id'    => $item->id,
+                'lname' => $item->lname,
+                'fname' => $item->fname,
+                'timein'  => \Carbon\Carbon::parse($item->timeIn)->format('F j, Y g:i A'),
+                // 'timeout' => \Carbon\Carbon::parse($item->timeOut)->format('F j, Y g:i A'),
+                'timeout' => $item->timeOut ? \Carbon\Carbon::parse($item->timeOut)->format('F j, Y g:i A') : '',
+                'durationtime' => number_format($item->durationTime, 2),
+                // 'durationtime' => $item->durationTime,
+            ];
+        });
+
+        return response()->json(['status'=>200,'data'=> $getData]);
+
     }
+
 }
