@@ -23,9 +23,10 @@ class loginCtrl extends Controller
         if(!$validator->passes()){
             return response()->json(['status'=>201, 'error'=>$validator->errors()->toArray()]);
         }else{
-            $userinfo = User::where('email','=',$request->username)
-            ->leftjoin('emp_details','users.empID','=','emp_details.empID')
-            ->first();
+            $userinfo =  User::select('users.*', 'emp_details.empPos', 'emp_details.empISID','emp_details.empCompID', 'emp_details.empDepID' )
+                ->where('email','=',$request->username)
+                ->leftjoin('emp_details','users.empID','=','emp_details.empID')
+                ->first();
             // dd($userinfo->empCompID);
             if(!$userinfo){
                 return response()->json(['status'=>202,'msg'=>'Sorry We do not recognize your email!']);
