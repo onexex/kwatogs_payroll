@@ -7,6 +7,7 @@ use Carbon\Carbon;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class loginCtrl extends Controller
@@ -22,14 +23,19 @@ class loginCtrl extends Controller
         if(!$validator->passes()){
             return response()->json(['status'=>201, 'error'=>$validator->errors()->toArray()]);
         }else{
-            $userinfo = User::where('email','=',$request->username)
-            ->leftjoin('emp_details','users.empID','=','emp_details.empID')
-            ->first();
+            $userinfo = User::select('users.*', 'emp_details.empPos', 'emp_details.empISID','emp_details.empCompID', 'emp_details.empDepID' )
+                ->where('email','=',$request->username)
+                ->leftjoin('emp_details','users.empID','=','emp_details.empID')
+                ->first();
             // dd($userinfo->empCompID);
             if(!$userinfo){
                 return response()->json(['status'=>202,'msg'=>'Sorry We do not recognize your email!']);
             }else{
                 if (Hash::check($request->password,$userinfo->password)){
+
+                    if ($userinfo) {
+                        Auth::login($userinfo);
+                    }
                     $request->session()->put('LoggedUserID', $userinfo->id);
                     $request->session()->put('LoggedUserRole', $userinfo->role);
                     $request->session()->put('LoggedUserDep', $userinfo->empDepID);
