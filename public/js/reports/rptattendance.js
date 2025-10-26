@@ -45,11 +45,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     let empTotalNight = 0;
 
                     // Employee Header Row
-                    rows += `
-                        <tr class="fw-bold bg-secondary text-white">
-                            <td colspan="9" class="text-start ps-2">${empName}</td>
-                        </tr>
-                    `;
+                    // rows += `
+                    //     <tr class="fw-bold bg-secondary text-white">
+                    //         <td colspan="9" class="text-start ps-2">${empName}</td>
+                    //     </tr>
+                    // `;
 
                     // Employee’s Daily Records
                     records.forEach((item, index) => {
@@ -83,7 +83,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Employee Subtotal Row
                     rows += `
                         <tr class="fw-bold bg-light">
-                            <td colspan="5" class="text-end">Subtotal for ${empName}:</td>
+                     
+                            <td colspan="5" class="text-end">Total:</td>
                             <td>${empTotalHours.toFixed(2)} hrs</td>
                             <td>${empTotalLate}</td>
                             <td>${empTotalUnder}</td>
@@ -98,16 +99,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     grandNight += empTotalNight;
                 }
 
-                // Grand Total Row
-                rows += `
-                    <tr class="fw-bold bg-warning">
-                        <td colspan="5" class="text-end">GRAND TOTAL:</td>
-                        <td>${grandTotalHours.toFixed(2)} hrs</td>
-                        <td>${grandLate}</td>
-                        <td>${grandUnder}</td>
-                        <td>${grandNight}</td>
-                    </tr>
-                `;
+                // // Grand Total Row
+                // rows += `
+                //     <tr class="fw-bold bg-warning">
+                //         <td colspan="5" class="text-end">GRAND TOTAL:</td>
+                //         <td>${grandTotalHours.toFixed(2)} hrs</td>
+                //         <td>${grandLate}</td>
+                //         <td>${grandUnder}</td>
+                //         <td>${grandNight}</td>
+                //     </tr>
+                // `;
 
             } else {
                 rows = '<tr><td colspan="9">No attendance records found</td></tr>';

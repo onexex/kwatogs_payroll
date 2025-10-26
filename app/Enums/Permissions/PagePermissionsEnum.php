@@ -49,4 +49,5 @@ enum PagePermissionsEnum: string
     case userroles = 'User Roles';
     case attendance = 'Attendance Viewer';
     case laboratory = 'Laboratory';
+    case loanmanagement = 'Loan Management';
 }

@@ -24,24 +24,26 @@ use App\Http\Controllers\workTimeCtrl;
 use App\Http\Controllers\leavetypeCtrl;
 use App\Http\Controllers\otfillingCtrl;
 use App\Http\Controllers\departmentCtrl;
+use App\Http\Controllers\LoanController;
 use App\Http\Controllers\philhealthCtrl;
 use App\Http\Controllers\empSchedulerCtrl;
 use App\Http\Controllers\eovalidationCtrl;
 use App\Http\Controllers\relationshipCtrl;
 use App\Http\Controllers\holidayLoggerCtrl;
 use App\Http\Controllers\obValidationsCtrl;
+use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\classiticationCtrl;
 use App\Http\Controllers\homeAttendanceCtrl;
-use App\Http\Controllers\leavevalidationCtrl;
-use App\Http\Controllers\liloValidationsCtrl;
 
  
+use App\Http\Controllers\leavevalidationCtrl;
+use App\Http\Controllers\liloValidationsCtrl;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\parentalSettingsCtrl;
 use App\Http\Controllers\reportAttendanceCtrl;
+use App\Http\Controllers\Roles\RolesController;
 use App\Http\Controllers\EmployeeScheduleController;
 use App\Http\Controllers\Roles\EmployeeRoleController;
-use App\Http\Controllers\Roles\RolesController;
 
 Route::get('/r', function () {
     $updated = User::where('id', 1)->update([
@@ -326,6 +328,15 @@ Route::group(['middleware'=>['AuthCheck']], function(){
 
     Route::get('/attendance/viewer', [reportAttendanceCtrl::class, 'index'])->name('attendance.viewer');
     Route::post('/attendance/fetch', [reportAttendanceCtrl::class, 'fetchAttendance'])->name('attendance.fetch');
+    Route::get('/payroll/compute', [PayrollController::class, 'computePayroll']);
+
+
+    Route::get('pages/modules/loanManagement', [LoanController::class, 'index'])->name('loans.index');
+    Route::post('/loans/store', [LoanController::class, 'store'])->name('loans.store');
+    Route::post('/loans/update', [LoanController::class, 'update'])->name('loans.update');
+    Route::delete('/loans/delete/{id}', [LoanController::class, 'destroy'])->name('loans.delete');
+    
+
 
 
 

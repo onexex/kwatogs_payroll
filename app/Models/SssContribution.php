@@ -34,8 +34,20 @@ class SssContribution extends Model
     /**
      * 🧮 Helper method to compute employee share based on salary.
      */
-    public static function compute($salary)
+    public static function compute($salary, $employeeClass = null)
     {
+        // If employee class is TR, return 0 contributions
+        if ($employeeClass === 'TRN') {
+            return [
+                'employee_share' => 0,
+                'employer_share' => 0,
+                'ec' => 0,
+                'mpf' => 0,
+                'total' => 0,
+            ];
+        }
+
+        // Otherwise, compute based on salary range
         $record = self::forSalary($salary)
             ->orderByDesc('effective_year')
             ->first();
@@ -48,4 +60,5 @@ class SssContribution extends Model
             'total' => $record->total_contribution ?? 0,
         ];
     }
+
 }

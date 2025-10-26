@@ -17,6 +17,11 @@
     <script src="{{ asset('js/jquery.dialog.js') }}" defer></script>
     <link href="{{ asset('css/jquery.dialog.css') }}" rel="stylesheet">
     <script src="{{ asset('js/login.js') }}" defer></script>
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <style>
         body {
@@ -45,7 +50,7 @@
             background-color: #ffffff;
             padding: 40px;
             border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 1000px;
         }
@@ -87,7 +92,7 @@
                         <form id="frmlogin">
                             <div class="mb-3">
                                 <input  type="email" name="username" class="form-control form-control-user mb-1" id="floatingInput" placeholder="name@example.com" value="{{ old('username')}}">
-                                <label for="floatingInput">Email address</label>
+                                <label for="floatingInput">Email ad </label>
                                 <span class="text-danger small error-text username_error"></span>
                             </div>
                             <div class="mb-3">

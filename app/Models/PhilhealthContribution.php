@@ -34,19 +34,29 @@ class PhilhealthContribution extends Model
     /**
      * 🧮 Compute PhilHealth contribution based on salary.
      */
-    public static function compute($salary)
+    public static function compute($salary, $employeeClass = null)
     {
+        // ❗ If class is TRN → no PhilHealth contribution
+        if ($employeeClass === 'TRN') {
+            return [
+                'employee_share' => 0,
+                'employer_share' => 0,
+                'total' => 0,
+            ];
+        }
+
         $record = self::forSalary($salary)
             ->orderByDesc('effective_year')
             ->first();
 
         if (!$record) {
-            // Default rule if no range found
+            // Default PhilHealth rule if no table match
             $min = 10000;
             $max = 90000;
             $rate = 5 / 100;
             $salary = min(max($salary, $min), $max);
             $total = $salary * $rate;
+
             return [
                 'employee_share' => $total / 2,
                 'employer_share' => $total / 2,
@@ -65,4 +75,5 @@ class PhilhealthContribution extends Model
             'total' => $total,
         ];
     }
+
 }

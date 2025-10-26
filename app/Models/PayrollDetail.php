@@ -26,6 +26,7 @@ class PayrollDetail extends Model
         'adjustment_amount',
         'remarks',
         'date',
+        'payroll_date'
     ];
 
     protected $casts = [
