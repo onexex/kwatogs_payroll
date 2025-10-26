@@ -23,7 +23,7 @@ class User extends Authenticatable
         'empID',
         'email',
         'password',
-        'empID',
+        
         'status',
         'suffix',
         'lname',
@@ -55,5 +55,10 @@ class User extends Authenticatable
     public function empDetail()
     {
         return $this->hasOne(EmpDetail::class, 'empID', 'empID');
+    }
+
+      public function attendanceSummaries()
+    {
+        return $this->hasMany(AttendanceSummary::class, 'employee_id', 'empID');
     }
 }

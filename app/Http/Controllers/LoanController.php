@@ -35,6 +35,7 @@ class LoanController extends Controller
 
     public function update(Request $request)
     {
+       
         $loan = Loan::findOrFail($request->loan_id);
 
         $loan->update($request->except('loan_id'));

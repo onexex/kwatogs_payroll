@@ -13,6 +13,8 @@ use App\Models\EmployeeSchedule;
 use App\Helpers\ContributionHelper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\holidayLoggerModel;
+ 
 
 
 class PayrollController extends Controller
@@ -200,6 +202,10 @@ class PayrollController extends Controller
             // 6Delete payroll details within range
             PayrollDetail::whereBetween('payroll_date', [$startDate, $endDate])->delete();
 
+            $holidays = holidayLoggerModel::whereBetween('date', [$startDate, $endDate])->get();
+            $holidayDates = $holidays->pluck('type', 'date')->toArray(); 
+            // ['2025-10-25' => 'regular', '2025-10-31' => 'special']
+
             foreach ($employees as $emp) {
                 $salary = $emp->empDetail->getSalaryInfo();
 
@@ -208,6 +214,7 @@ class PayrollController extends Controller
                 $totalOT          = 0;
                 $totalLate        = 0;
                 $totalUndertime   = 0;
+                $holidayPay       = 0; // Holiday pay accumulator
 
                 $allowance  = $salary['allowance'];
                 $empBasic   = $salary['basic'];
@@ -219,18 +226,21 @@ class PayrollController extends Controller
                     ->with('attendanceSummaries')
                     ->get();
 
-                if ($employeeSchedules->isEmpty()) {
-                    continue;
-                }
+                if ($employeeSchedules->isEmpty()) continue;
+
+                // Index all attendance summaries once per employee
+                $attendanceSummaries = $emp->attendanceSummaries()
+                    ->whereBetween('attendance_date', [$startDate, $endDate])
+                    ->get()
+                    ->keyBy('attendance_date');
 
                 foreach ($employeeSchedules as $schedule) {
                     $schedStart = Carbon::parse($schedule->sched_start_date);
                     $schedEnd   = Carbon::parse($schedule->sched_end_date);
 
                     for ($date = $schedStart->copy(); $date->lte($schedEnd); $date->addDay()) {
-                        $summary = $schedule->attendanceSummaries
-                            ->where('attendance_date', $date->format('Y-m-d'))
-                            ->first();
+                        $dateStr = $date->format('Y-m-d');
+                        $summary = $attendanceSummaries[$dateStr] ?? null;
 
                         $hasOB    = 0;
                         $hasLeave = 0;
@@ -248,17 +258,36 @@ class PayrollController extends Controller
                             $totalUndertime   += $summary->mins_undertime;
                         }
 
-                        $otPay              = $summary ? $summary->ot_hours * ($hourlyRate * 1.25) : 0;
-                        $lateDeduction      = $summary ? ($summary->mins_late / 60) * $hourlyRate : 0;
-                        $undertimeDeduction = $summary ? ($summary->mins_undertime / 60) * $hourlyRate : 0;
-                        $absentDeduction    = $isAbsent ? $dailyRate : 0;
+                        // ✅ Holiday pay calculation
+                        if (isset($holidayDates[$dateStr])) {
+                            $holidayType = $holidayDates[$dateStr];
+                            $worked      = $summary && $summary->total_hours > 0;
+                            $prevDay = $date->copy()->subDay()->format('Y-m-d');
+                            $nextDay = $date->copy()->addDay()->format('Y-m-d');
+
+                            $presentBefore = isset($attendanceSummaries[$prevDay]) && $attendanceSummaries[$prevDay]->total_hours > 0;
+                            // $presentAfter  = isset($attendanceSummaries[$nextDay]) && $attendanceSummaries[$nextDay]->total_hours > 0;
+
+                            if ($holidayType === 'regular') {
+                                if ($worked) {
+                                    $holidayPay += $dailyRate * 2; // 200%
+                                // } elseif ($presentBefore || $presentAfter) {
+                                } elseif ($presentBefore) {
+                                    $holidayPay += $dailyRate; // 100%
+                                }
+                            } elseif ($holidayType === 'special') {
+                                if ($worked) {
+                                    $holidayPay += $dailyRate * 1.3; // 130%
+                                }
+                            }
+                        }
 
                         PayrollDetail::updateOrCreate(
                             [
                                 'payroll_id'  => null,
                                 'employee_id' => $emp->empID,
                                 'payroll_date'=> $paydate,
-                                'date'        => $schedStart,
+                                'date'        => $dateStr,
                                 'logsType'    => $logsType ?? '-',
                             ],
                             []
@@ -266,6 +295,7 @@ class PayrollController extends Controller
                     }
                 }
 
+                // 🧮 Compute final pays
                 $regularPay         = ($totalHoursWorked / 8) * $hourlyRate;
                 $otPay              = $totalOT;
                 $lateDeduction      = ($totalLate / 60) * $hourlyRate;
@@ -273,7 +303,8 @@ class PayrollController extends Controller
                 $absentDeduction    = $absentDays * $dailyRate;
                 $deductions         = $absentDeduction + $lateDeduction + $undertimeDeduction;
 
-                $grossPay = max((($regularPay ?? 0) + ($otPay ?? 0)) - ($deductions ?? 0), 0);
+                // ✅ Include holiday pay
+                $grossPay = max((($regularPay ?? 0) + ($otPay ?? 0) + $holidayPay) - ($deductions ?? 0), 0);
 
                 $previousGross = Payroll::getPreviousGrossIfEndOfMonth(
                     $emp->employee_id,
@@ -282,7 +313,6 @@ class PayrollController extends Controller
                 );
 
                 $monthlyGross = 10000; 
-
                 $endDates = Carbon::parse($paydate);
                 $isEndOfMonth = $endDates->isSameDay($endDates->copy()->endOfMonth());
                 $employeeClass = $emp->empDetail->empClassification;
@@ -323,9 +353,11 @@ class PayrollController extends Controller
                         'company_loan' => $contributions['loan_breakdown']['salary'] ?? 0,
                     ]
                 );
-
+           
                 if ($isEndOfMonth && $emp->empClassification !== 'TRN') {
+                     
                     foreach ($contributions['loan_details'] as $loan) {
+                        
                         LoanPayment::create([
                             'loan_id' => $loan['loan_id'],
                             'payroll_id' => $payroll->id,
@@ -340,10 +372,11 @@ class PayrollController extends Controller
                         ]);
                     }
                 }
+                
+            $updatedRows = PayrollDetail::where('employee_id', $emp->empID)
+                ->whereBetween('date', [$startDate, $endDate])
+                ->update(['payroll_id' => $payroll->id]);
 
-                PayrollDetail::where('employee_id', $emp->empID)
-                    ->whereBetween('payroll_date', [$startDate, $endDate])
-                    ->update(['payroll_id' => $payroll->id]);
             }
 
             DB::commit(); 

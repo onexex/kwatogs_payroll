@@ -11,8 +11,9 @@
         </button>
     </div>
 
-    <table class="table table-bordered mt-3 shadow-sm">
-         <thead style=" background-color: #f1f1f1;"  >
+    <div class="table-responsive mt-3 shadow-sm">
+    <table class="table table-bordered">
+        <thead style="background-color: #f1f1f1;">
             <tr>
                 <th>Employee</th>
                 <th>Type</th>
@@ -22,11 +23,11 @@
                 <th>Start Date</th>
                 <th>End Date</th>
                 <th>Status</th>
-                <th width="120">Action</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
-        @foreach($loans as $loan)
+            @foreach($loans as $loan)
             <tr>
                 <td>{{ $loan->employee->fname }}</td>
                 <td>{{ $loan->loan_type }}</td>
@@ -49,14 +50,16 @@
                         data-status="{{ $loan->status }}">
                         Edit
                     </button>
-                    <button class="btn btn-sm btn-danger deleteLoanBtn" data-id="{{ $loan->id }}">
+                    <button class="btn btn-sm btn-outline-danger deleteLoanBtn" data-id="{{ $loan->id }}">
                         Delete
                     </button>
                 </td>
             </tr>
-        @endforeach
+            @endforeach
         </tbody>
     </table>
+</div>
+
 </div>
 
 
@@ -71,7 +74,7 @@
             <form id="loanForm">
                 @csrf
 
-                <input type="hidden" id="loan_id">
+                <input type="hidden" id="loan_id" name="loan_id">
 
                 <div class="modal-body">
                     <label>Employee</label>
@@ -135,12 +138,25 @@ $('.editLoanBtn').click(function () {
 });
 
 
+const storeUrl = "{{ route('loans.store') }}";
+const updateUrl = "{{ route('loans.update') }}";
+
+axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
 $('#loanForm').submit(function (e) {
     e.preventDefault();
-    let url = $('#loan_id').val() ? "{{ route('loans.update') }}" : "{{ route('loans.store') }}";
+    let url = $('#loan_id').val() ? updateUrl : storeUrl;
 
-    axios.post(url, new FormData(this)).then(res => {
-        Swal.fire('Success', 'Loan saved successfully!', 'success').then(() => location.reload());
+    axios.post(url, new FormData(this), {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    .then(res => {
+        Swal.fire('Success', 'Loan saved successfully!', 'success')
+            .then(() => location.reload());
+    })
+    .catch(err => {
+        console.log(err);
+        Swal.fire('Error', 'Something went wrong!', 'error');
     });
 });
 
