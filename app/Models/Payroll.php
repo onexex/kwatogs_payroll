@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Payroll extends Model
 {
@@ -46,4 +47,20 @@ class Payroll extends Model
         'payroll_end_date' => 'date',
         'pay_date' => 'date',
     ];
+
+    public static function getPreviousGrossIfEndOfMonth($employeeId, $currentEndDate, $employeeClass = null)
+    {
+        $endDate = Carbon::parse($currentEndDate);
+
+        if (!$endDate->isLastOfMonth() || $employeeClass === 'TRN') {
+            return 0;
+        }
+
+        $previous = self::where('employee_id', $employeeId)
+            ->where('payroll_end_date', '<', $endDate)
+            ->orderByDesc('payroll_end_date')
+            ->first();
+
+        return $previous->gross_pay ?? 0;
+    }
 }

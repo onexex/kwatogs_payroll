@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
 
             // 🔗 Relationships
-            $table->foreignId('payroll_id')->constrained('payrolls')->onDelete('cascade');
-            $table->foreignId('employee_id')->constrained('employees')->onDelete('cascade');
+            $table->integer('payroll_id')->nullable();
+            $table->foreignId('employee_id');
 
             // 🧾 Payroll details
             $table->string('logsType')->nullable(); // Regular, OT, Absent, Leave, etc.

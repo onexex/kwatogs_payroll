@@ -109,6 +109,7 @@
                     'e201' => ['name' => 'E-201', 'url' => '/pages/modules/E201'],
                     'earlyout' => ['name' => 'Earlyout', 'url' => '/pages/modules/earlyout'],
                     'enrollemployee' => ['name' => 'Enroll Employee', 'url' => '/pages/modules/registration'],
+                    'loanmanagement' => ['name' => 'Loan Management', 'url' => '/pages/modules/loanManagement'],
                     'leaveapplication' => ['name' => 'Leave Application', 'url' => '/pages/modules/leaveApplication'],
                     // 'memorandum' => ['name' => 'Memo Generator', 'url' => '/pages/modules/memorandum'],
                     'obttracker' => ['name' => 'Official Business Trip', 'url' => '/pages/modules/obtTracker'],
@@ -185,7 +186,7 @@
                     'relationship' => ['name' => 'Relationship', 'url' => '/pages/management/relationship'],
                     'employeeschedules' => ['name' => 'Scheduler', 'url' => '/employee-schedules'],
                     'scheduletime' => ['name' => 'Schedule Time', 'url' => '/pages/management/time'],
-                    'sil' => ['name' => 'SIL Loan', 'url' => '/pages/management/sil'],
+                   
                     'ssscontribution' => ['name' => 'SSS Contribution', 'url' => '/pages/management/ssscontribution'],
                     'leavetypes' => ['name' => 'Types of Leaves', 'url' => '/pages/management/leavetypes'],
                     'userroles' => ['name' => 'User Roles', 'url' => '/user-roles'],
