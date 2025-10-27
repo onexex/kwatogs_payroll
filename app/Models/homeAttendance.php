@@ -202,7 +202,7 @@ class HomeAttendance extends Model
         $current = $actualIn->copy()->startOfDay();
 
         while ($current->lt($actualOut)) {
-            $nightStart = $current->copy()->setTime(20, 0); // 8 PM
+            $nightStart = $current->copy()->setTime(22, 0); // 10 PM
             $nightEnd   = $current->copy()->addDay()->setTime(6, 0); // 6 AM next day
 
             $start = $actualIn->greaterThan($nightStart) ? $actualIn : $nightStart;
