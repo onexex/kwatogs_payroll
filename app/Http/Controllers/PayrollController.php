@@ -205,7 +205,7 @@ class PayrollController extends Controller
             $holidays = holidayLoggerModel::whereBetween('date', [$startDate, $endDate])->get();
             $holidayDates = $holidays->pluck('type', 'date')->toArray(); 
             // ['2025-10-25' => 'regular', '2025-10-31' => 'special']
-
+            dd($holidayDates);
             foreach ($employees as $emp) {
                 $salary = $emp->empDetail->getSalaryInfo();
 
