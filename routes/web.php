@@ -329,6 +329,7 @@ Route::group(['middleware'=>['AuthCheck']], function(){
     Route::get('/attendance/viewer', [reportAttendanceCtrl::class, 'index'])->name('attendance.viewer');
     Route::post('/attendance/fetch', [reportAttendanceCtrl::class, 'fetchAttendance'])->name('attendance.fetch');
     Route::get('/payroll/compute', [PayrollController::class, 'computePayroll']);
+    Route::get('/payroll/fetch', [PayrollController::class, 'fetchPayroll']);
 
 
     Route::get('pages/modules/loanManagement', [LoanController::class, 'index'])->name('loans.index');

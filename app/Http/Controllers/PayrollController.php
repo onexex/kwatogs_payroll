@@ -14,6 +14,7 @@ use App\Helpers\ContributionHelper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\holidayLoggerModel;
+use Illuminate\Http\Request;
  
 
 
@@ -22,145 +23,274 @@ class PayrollController extends Controller
 
     // public function computePayroll()
     // {
-    //     // $employees = User::with('empDetail')
-    //     //     ->whereHas('empDetail', function ($q) {
-    //     //         $q->where('empStatus', '1');
-    //     //     })
-    //     //     ->get();
-    //     $employees = User::with('empDetail')
-    //     ->where('empID', 'KWTGS-0021') // ✅ use the string empID
-    //     ->whereHas('empDetail', function ($q) {
-    //         $q->where('empStatus', '1');
-    //     })
-    //     ->get();
+    //     DB::beginTransaction(); // 🧩 Start transaction
 
-    //     $startDate = '2025-10-26';
-    //     $endDate   = '2025-11-10';
-    //     $paydate   = '2025-11-15';
-
-    //     // 🧹 Delete existing payroll and details for this pay date (clean slate)
-    //     Payroll::where('pay_date', $paydate)->delete();
-    //     PayrollDetail::where('payroll_date', $paydate)->delete();
-
-    //     foreach ($employees as $emp) {
-    //         $salary = $emp->empDetail->getSalaryInfo();
-    //         $absentDays       = 0;
-    //         $totalHoursWorked = 0;
-    //         $totalOT          = 0;
-    //         $totalLate        = 0;
-    //         $totalUndertime   = 0;
-
-    //         // Get schedules within payroll period
-    //         $employeeSchedules = EmployeeSchedule::where('employee_id', $emp->empID)
-    //             ->whereBetween('sched_start_date', [$startDate, $endDate])
-    //             ->with('attendanceSummaries')
+    //     try {
+    //         // $employees = User::with('empDetail')
+    //         //     ->whereHas('empDetail', function ($q) {
+    //         //         $q->where('empStatus', '1');
+    //         //     })
+    //         //     ->get();
+    //         $employees = User::with('empDetail')
+    //             ->where('empID', 'KWTGS-0021')  
+    //             ->whereHas('empDetail', function ($q) {
+    //                 $q->where('empStatus', '1');
+    //             })
     //             ->get();
+    //         $startDate = '2025-11-11';
+    //         $endDate   = '2025-11-25';
+    //         $paydate   = '2025-11-30';
 
-                
-    //         foreach ($employeeSchedules as $schedule) {
-    //             $date = $schedule->sched_start_date;
-
-    //             // Check attendance for this day
-    //             $summary = $schedule->attendanceSummaries
-    //                 ->where('attendance_date', $date)
-    //                 ->first();
-
-    //             // Check leave
-    //             // $hasLeave = Leave::where('employee_id', $emp->empID)
-    //             //     ->where('leave_date', $date)
-    //             //     ->exists();
-
-    //             // // Check OB
-    //             // $hasOB = OB::where('employee_id', $emp->empID)
-    //             //     ->where('ob_date', $date)
-    //             //     ->exists();
-    //             $hasOB    = 0;
-    //             $hasLeave = 0;
-
-    //             // Absent if no attendance, no leave, no OB
-    //             if ((! $summary || $summary->total_hours == 0) && ! $hasLeave && ! $hasOB) {
-    //                 $absentDays++;
+    //         // Clean existing data for the same paydate
+    //         $existingPayrolls = Payroll::where('pay_date', $paydate)->get();
+    //         foreach ($existingPayrolls as $oldPayroll) {
+    //             $loanPayments = LoanPayment::where('payroll_id', $oldPayroll->id)->get();
+    //             foreach ($loanPayments as $payment) {
+    //                 $loan = Loan::find($payment->loan_id);
+    //                 if ($loan) {
+    //                     $loan->balance += $payment->amount_paid;
+    //                     if ($loan->balance > 0) {
+    //                         $loan->status = 'active';
+    //                     }
+    //                     $loan->save();
+    //                 }
+    //                 $payment->delete();
     //             }
-
-    //             if ($summary) {
-    //                 $totalHoursWorked += $summary->total_hours;
-    //                 $totalOT          += $summary->ot_hours;
-    //                 $totalLate        += $summary->mins_late;
-    //                 $totalUndertime   += $summary->mins_undertime;
-    //             }
+    //             $oldPayroll->delete();
     //         }
 
-    //         // Compute deductions and pay
-    //         $allowance  = $salary['allowance'];
-    //         $empBasic   = $salary['basic'];
-    //         $dailyRate  = $empBasic / 26;
-    //         $hourlyRate = $dailyRate / 8;
+    //         // Delete payroll details within range
+    //         PayrollDetail::where('payroll_date', $paydate)->delete();
 
-    //         $regularPay         = ($totalHoursWorked / 8) * $hourlyRate;
-    //         $otPay              = $totalOT * ($hourlyRate * 1.25); // OT 25% multiplier
-    //         $lateDeduction      = ($totalLate / 60) * $hourlyRate;
-    //         $undertimeDeduction = ($totalUndertime / 60) * $hourlyRate;
-    //         $absentDeduction    = $absentDays * $dailyRate;
+    //         $holidays = holidayLoggerModel::whereBetween('date', [$startDate, $endDate])->get();
+    //         $holidayDates = $holidays->mapWithKeys(function ($holiday) {
+    //             return [date('Y-m-d', strtotime($holiday->date)) => $holiday->type];
+    //         })->toArray();
 
-    //         $grossPay = $regularPay + $otPay + $allowance - ($lateDeduction + $undertimeDeduction + $absentDeduction);
+    //         foreach ($employees as $emp) {
+    //             $salary = $emp->empDetail->getSalaryInfo();
+    //             $absentDays       = 0;
+    //             $totalHoursWorked = 0;
+    //             $totalOT          = 0;
+    //             $totalLate        = 0;
+    //             $totalUndertime   = 0;
+    //             $holidayPay       = 0; // Holiday pay accumulator
+    //             $regularPayifNodedction = 0;
 
-    //         // TODO: apply SSS, PhilHealth, Pag-IBIG, BIR, loans
-    //         $deductions = $absentDeduction + $lateDeduction + $undertimeDeduction;
+    //             $allowance  = $salary['allowance'] / 2;
+    //             $empBasic   = $salary['basic'];
+    //             $dailyRate  = $empBasic / 26;
+    //             $hourlyRate = $dailyRate / 8;
+        
+    //             $employeeSchedules = EmployeeSchedule::where('employee_id', $emp->empID)
+    //                 ->whereBetween('sched_start_date', [$startDate, $endDate])
+    //                 ->with('attendanceSummaries')
+    //                 ->get();
+              
+    //             if ($employeeSchedules->isEmpty()) continue;
 
-    //         $netPay = $grossPay - $deductions;
+    //             // Index all attendance summaries once per employee
+    //             $attendanceSummaries = $emp->attendanceSummaries()
+    //                 ->whereBetween('attendance_date', [$startDate, $endDate])
+    //                 ->get()
+    //                 ->keyBy(function ($summary) {
+    //                     return date('Y-m-d', strtotime($summary->attendance_date));
+    //                 });
 
-    //         // Save payroll
-    //         $payroll = Payroll::updateOrCreate(
-    //             [
-    //                 'employee_id'        => $emp->empID,
-    //                 'payroll_start_date' => $startDate,
-    //                 'payroll_end_date'   => $endDate,
-    //                 'basic_salary'       => $empBasic,
-    //                 'allowances'         => $allowance,
-    //                 'total_deductions'   => $deductions,
-    //                 'pay_date'           => $paydate,
-    //             ],
-    //             [
-    //                 'gross_pay' => $grossPay,
-    //                 'net_pay'   => $netPay,
-    //             ]
-    //         );
+    //             foreach ($employeeSchedules as $schedule) {
+    //                 $schedStart = Carbon::parse($schedule->sched_start_date);
+    //                 $schedEnd   = Carbon::parse($schedule->sched_end_date);
 
-    //         // Save payroll details
-    //         PayrollDetail::updateOrCreate(
-    //             [
-    //                 'payroll_id'  => $payroll->id,
-    //                 'employee_id' => $emp->empID,
-    //             ],
-    //             [
-    //                 'regular_pay'         => $regularPay,
-    //                 'ot_pay'              => $otPay,
-    //                 'allowance'           => $allowance,
-    //                 'late_deduction'      => $lateDeduction,
-    //                 'undertime_deduction' => $undertimeDeduction,
-    //                 'absent_deduction'    => $absentDeduction,
-    //                 'deductions'          => $deductions,
-    //                 'net_pay'             => $netPay,
-    //                 'payroll_date'        => $paydate,
-    //             ]
-    //         );
+    //                 for ($date = $schedStart->copy(); $date->lte($schedEnd); $date->addDay()) {
+    //                     $dateStr = $date->format('Y-m-d');
+    //                     $summary = $attendanceSummaries[$dateStr] ?? null;
+    //                     $hasOB    = 0;
+    //                     $hasLeave = 0;
+    //                     $isAbsent = ((! $summary || $summary->total_hours == 0) && ! $hasLeave && ! $hasOB);
+    //                     if ($isAbsent) {
+    //                         $absentDays++;
+    //                         $logsType = 'Absent';
+    //                     }
+
+    //                     if ($summary) {
+    //                         $totalHoursWorked += $summary->total_hours;
+    //                         $totalOT          += $summary->ot_hours;
+    //                         $totalLate        += $summary->mins_late;
+    //                         $totalUndertime   += $summary->mins_undertime;
+    //                     }
+                 
+    //                     //  Holiday pay calculation 
+    //                     if (array_key_exists($dateStr, $holidayDates)) {
+    //                         $holidayType = $holidayDates[$dateStr];
+    //                         $worked      = $summary && $summary->total_hours > 0;
+                           
+    //                         $prevDay = $date->copy()->subDay()->format('Y-m-d');
+    //                         $nextDay = $date->copy()->addDay()->format('Y-m-d');
+                      
+    //                         $presentBefore = isset($attendanceSummaries[$prevDay]) && $attendanceSummaries[$prevDay]->total_hours > 0;
+    //                         // $presentAfter  = isset($attendanceSummaries[$nextDay]) && $attendanceSummaries[$nextDay]->total_hours > 0;
+                           
+    //                         if ($holidayType == '1') {
+    //                             if ($worked) {
+    //                                 $holidayPay += $dailyRate * 2; // 200%
+    //                             // } elseif ($presentBefore || $presentAfter) {
+    //                             } elseif ($presentBefore) {
+    //                                 $holidayPay += $dailyRate; // 100%
+    //                             }
+    //                         } elseif ($holidayType == '0') {
+    //                             if ($worked) {
+    //                                 $holidayPay += $dailyRate * 1.3; // 130%
+    //                             }
+    //                         }
+    //                     }
+
+    //                     PayrollDetail::updateOrCreate(
+    //                         [
+    //                             'payroll_id'  => null,
+    //                             'employee_id' => $emp->empID,
+    //                             'payroll_date'=> $paydate,
+    //                             'date'        => $dateStr,
+    //                             'logsType'    => $logsType ?? '-',
+    //                         ],
+    //                         []
+    //                     );
+    //                 }
+    //             }
+
+    //             $employeeClass = $emp->empDetail->empClassification;
+    //             $regularPay         = ($totalHoursWorked * $hourlyRate);
+    //             $otPay              = $totalOT;
+    //             $lateDeduction      = ($totalLate / 60) * $hourlyRate;
+    //             $undertimeDeduction = ($totalUndertime / 60) * $hourlyRate;
+    //             $absentDeduction    = $absentDays * $dailyRate;
+    //             $deductions         = $absentDeduction + $lateDeduction + $undertimeDeduction;
+    //             // $regularPayifNoDeduction = $dailyRate * $employeeSchedules->count();
+              
+    //             // Include holiday pay
+    //             $grossPay = max((($regularPay ?? 0) + ($otPay ?? 0) + $holidayPay), 0);
+    //             $previousGross = Payroll::getPreviousGrossIfEndOfMonth(
+    //                 $emp->employee_id,
+    //                 $paydate,
+    //                 $emp->empClassification
+    //             );
+
+    //             $monthlyGross = 10000 + $grossPay; 
+    //             $endDates = Carbon::parse($paydate);
+    //             $isEndOfMonth = $endDates->isSameDay($endDates->copy()->endOfMonth());
+                
+    //             $contributions = ContributionHelper::computeAll(
+    //                 $monthlyGross,
+    //                 $employeeClass,
+    //                 $isEndOfMonth,
+    //                 $emp->empID
+    //             );
+
+    //             $salaryLoan = $contributions['loan_breakdown']['salary'] ?? 0;
+    //             $govDues = $contributions['sss']['employee_share']
+    //                         + $contributions['philhealth']['employee_share']
+    //                         + $contributions['pagibig']['employee_share']
+    //                         + $contributions['withholding_tax'];
+
+    //             $netPay = max(0, ($grossPay - $govDues - $salaryLoan) + ($allowance ?? 0));
+         
+    //             $payroll = Payroll::updateOrCreate(
+    //                 [
+    //                     'employee_id'        => $emp->empID,
+    //                     'payroll_start_date' => $startDate, 
+    //                     'payroll_end_date'   => $endDate,
+    //                     'basic_salary'       => $empBasic,
+    //                     'allowances'         => $allowance,
+    //                     'total_deductions'   => $deductions,
+    //                     'pay_date'           => $paydate,
+                        
+    //                 ],
+    //                 [
+    //                     'gross_pay' => $grossPay,
+    //                     'net_pay'   => $netPay,
+    //                     'sss_contribution' => $contributions['sss']['employee_share'],
+    //                     'philhealth_contribution' => $contributions['philhealth']['employee_share'],
+    //                     'pagibig_contribution' => $contributions['pagibig']['employee_share'],
+    //                     'withholding_tax' => $contributions['withholding_tax'],
+    //                     'sss_loan' => $contributions['loan_breakdown']['sss'] ?? 0,
+    //                     'pagibig_loan' => $contributions['loan_breakdown']['pagibig'] ?? 0,
+    //                     'company_loan' => $contributions['loan_breakdown']['salary'] ?? 0,
+    //                     'sss_employer' => $contributions['sss']['employer_share'],
+    //                     'philhealth_employer' => $contributions['philhealth']['employer_share'],
+    //                     'pagibig_employer'=> $contributions['pagibig']['employer_share'],
+ 
+    //                 ]
+    //             );
+           
+    //             if ($isEndOfMonth && $emp->empClassification !== 'TRN') {
+    //                 foreach ($contributions['loan_details'] as $loan) {
+    //                     LoanPayment::create([
+    //                         'loan_id' => $loan['loan_id'],
+    //                         'payroll_id' => $payroll->id,
+    //                         'amount_paid' => $loan['deducted_amount'],
+    //                         'payment_date' => now(),
+    //                         'remarks' => 'Auto payroll deduction',
+    //                     ]);
+
+    //                     Loan::where('id', $loan['loan_id'])->update([
+    //                         'balance' => $loan['new_balance'],
+    //                         'status'  => $loan['new_balance'] <= 0 ? 'paid' : 'active'
+    //                     ]);
+    //                 }
+    //             }
+                
+    //         $updatedRows = PayrollDetail::where('employee_id', $emp->empID)
+    //             ->whereBetween('date', [$startDate, $endDate])
+    //             ->update(['payroll_id' => $payroll->id]);
+    //         }
+    //         DB::commit(); 
+    //         return " Gross  $monthlyGross Payroll computed successfully for pay date $paydate ($startDate to $endDate)";
+    //     } catch (\Throwable $e) {
+    //         DB::rollBack();
+
+    //         // Log detailed info
+    //         Log::error('Payroll computation failed', [
+    //             'message' => $e->getMessage(),
+    //             'line' => $e->getLine(),
+    //             'file' => $e->getFile(),
+    //             'trace' => $e->getTraceAsString(),
+    //         ]);
+
+    //         // Return or throw
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => 'Payroll computation failed: '.$e->getMessage(),
+    //         ], 500);
     //     }
-
-    //     return "Payroll computed successfully for pay date $paydate ($startDate to $endDate)";
     // }
+
+    public function fetchPayroll(Request $request)
+    {
+        $dateFrom = $request->query('date_from');
+        $dateTo = $request->query('date_to');
+        $filter = $request->query('filter', 'all'); // optional filter: all, released, pending
+
+        $query = Payroll::with('employee'); // eager load employee info
+
+        if ($dateFrom && $dateTo) {
+            $query->where('pay_date',$pay_date);
+        }
+
+        if ($filter !== 'all') {
+            $query->where('status', $filter);
+        }
+
+        $payrolls = $query->orderBy('pay_date', 'desc')->get();
+
+        return response()->json($payrolls);
+    }
 
     public function computePayroll()
     {
-        DB::beginTransaction(); // 🧩 Start transaction
+        DB::beginTransaction();
 
         try {
-            // $employees = User::with('empDetail')
-            //     ->whereHas('empDetail', function ($q) {
-            //         $q->where('empStatus', '1');
-            //     })
-            //     ->get();
             $employees = User::with('empDetail')
-                ->where('empID', 'KWTGS-0021') // ✅ use the string empID
+                ->where('empID', 'KWTGS-0021')
                 ->whereHas('empDetail', function ($q) {
                     $q->where('empStatus', '1');
                 })
@@ -170,56 +300,44 @@ class PayrollController extends Controller
             $endDate   = '2025-11-25';
             $paydate   = '2025-11-30';
 
-            // 🧹 Clean existing data for the same paydate
+            // 🔄 Clean old payroll for same paydate
             $existingPayrolls = Payroll::where('pay_date', $paydate)->get();
             foreach ($existingPayrolls as $oldPayroll) {
-                // 1️⃣ Get all loan payments linked to this payroll
                 $loanPayments = LoanPayment::where('payroll_id', $oldPayroll->id)->get();
-
                 foreach ($loanPayments as $payment) {
                     $loan = Loan::find($payment->loan_id);
-
                     if ($loan) {
-                        // 2️⃣ Restore previous deducted amount
                         $loan->balance += $payment->amount_paid;
-
-                        // 3️⃣ If previously marked paid, reactivate if balance > 0
-                        if ($loan->balance > 0) {
-                            $loan->status = 'active';
-                        }
-
+                        if ($loan->balance > 0) $loan->status = 'active';
                         $loan->save();
                     }
-
-                    // 4️⃣ Delete loan payment record after reversal
                     $payment->delete();
                 }
-
-                // 5️⃣ Delete payroll record itself
                 $oldPayroll->delete();
             }
+            PayrollDetail::where('payroll_date', $paydate)->delete();
 
-            // 6Delete payroll details within range
-            PayrollDetail::whereBetween('payroll_date', [$startDate, $endDate])->delete();
-
+            // 🎌 Load holidays
             $holidays = holidayLoggerModel::whereBetween('date', [$startDate, $endDate])->get();
-            $holidayDates = $holidays->pluck('type', 'date')->toArray(); 
-            // ['2025-10-25' => 'regular', '2025-10-31' => 'special']
-            dd($holidayDates);
+            $holidayDates = $holidays->mapWithKeys(fn($holiday) => [
+                date('Y-m-d', strtotime($holiday->date)) => $holiday->type
+            ])->toArray();
+
             foreach ($employees as $emp) {
                 $salary = $emp->empDetail->getSalaryInfo();
-
-                $absentDays       = 0;
-                $totalHoursWorked = 0;
-                $totalOT          = 0;
-                $totalLate        = 0;
-                $totalUndertime   = 0;
-                $holidayPay       = 0; // Holiday pay accumulator
-
-                $allowance  = $salary['allowance'];
                 $empBasic   = $salary['basic'];
+                $allowance  = $salary['allowance'] / 2;
                 $dailyRate  = $empBasic / 26;
                 $hourlyRate = $dailyRate / 8;
+
+                $absentDays = 0;
+                $totalHoursWorked = 0;
+                $totalOT = 0;
+                $totalLate = 0;
+                $totalUndertime = 0;
+                $holidayPay = 0;
+                $basicPay=0;
+
 
                 $employeeSchedules = EmployeeSchedule::where('employee_id', $emp->empID)
                     ->whereBetween('sched_start_date', [$startDate, $endDate])
@@ -228,11 +346,10 @@ class PayrollController extends Controller
 
                 if ($employeeSchedules->isEmpty()) continue;
 
-                // Index all attendance summaries once per employee
                 $attendanceSummaries = $emp->attendanceSummaries()
                     ->whereBetween('attendance_date', [$startDate, $endDate])
                     ->get()
-                    ->keyBy('attendance_date');
+                    ->keyBy(fn($s) => date('Y-m-d', strtotime($s->attendance_date)));
 
                 foreach ($employeeSchedules as $schedule) {
                     $schedStart = Carbon::parse($schedule->sched_start_date);
@@ -242,14 +359,8 @@ class PayrollController extends Controller
                         $dateStr = $date->format('Y-m-d');
                         $summary = $attendanceSummaries[$dateStr] ?? null;
 
-                        $hasOB    = 0;
-                        $hasLeave = 0;
-
-                        $isAbsent = ((! $summary || $summary->total_hours == 0) && ! $hasLeave && ! $hasOB);
-                        if ($isAbsent) {
-                            $absentDays++;
-                            $logsType = 'Absent';
-                        }
+                        $isAbsent = (!$summary || $summary->total_hours == 0);
+                        if ($isAbsent) $absentDays++;
 
                         if ($summary) {
                             $totalHoursWorked += $summary->total_hours;
@@ -258,28 +369,24 @@ class PayrollController extends Controller
                             $totalUndertime   += $summary->mins_undertime;
                         }
 
-                        // ✅ Holiday pay calculation
-                        if (isset($holidayDates[$dateStr])) {
+                        // Holiday pay
+                        if (array_key_exists($dateStr, $holidayDates)) {
                             $holidayType = $holidayDates[$dateStr];
-                            $worked      = $summary && $summary->total_hours > 0;
+                            $worked = $summary && $summary->total_hours > 0;
                             $prevDay = $date->copy()->subDay()->format('Y-m-d');
-                            $nextDay = $date->copy()->addDay()->format('Y-m-d');
-
                             $presentBefore = isset($attendanceSummaries[$prevDay]) && $attendanceSummaries[$prevDay]->total_hours > 0;
-                            // $presentAfter  = isset($attendanceSummaries[$nextDay]) && $attendanceSummaries[$nextDay]->total_hours > 0;
-
-                            if ($holidayType === 'regular') {
-                                if ($worked) {
-                                    $holidayPay += $dailyRate * 2; // 200%
-                                // } elseif ($presentBefore || $presentAfter) {
-                                } elseif ($presentBefore) {
-                                    $holidayPay += $dailyRate; // 100%
-                                }
-                            } elseif ($holidayType === 'special') {
-                                if ($worked) {
-                                    $holidayPay += $dailyRate * 1.3; // 130%
-                                }
-                            }
+                           
+                            if ($holidayType == '1') {
+                                if ($worked){
+                                    $holidayPay += $dailyRate * 1;
+                                } 
+                                elseif ($presentBefore){
+                                     $holidayPay += $dailyRate;
+                                    $absentDays=$absentDays-1;
+                                } 
+                            } elseif ($holidayType == '0' && $worked) {
+                                $holidayPay += $dailyRate * .3;
+                            } 
                         }
 
                         PayrollDetail::updateOrCreate(
@@ -288,34 +395,45 @@ class PayrollController extends Controller
                                 'employee_id' => $emp->empID,
                                 'payroll_date'=> $paydate,
                                 'date'        => $dateStr,
-                                'logsType'    => $logsType ?? '-',
+                                'logsType'    => $isAbsent ? 'Absent' : 'Present',
                             ],
                             []
                         );
                     }
                 }
 
-                // 🧮 Compute final pays
-                $regularPay         = ($totalHoursWorked / 8) * $hourlyRate;
-                $otPay              = $totalOT;
-                $lateDeduction      = ($totalLate / 60) * $hourlyRate;
-                $undertimeDeduction = ($totalUndertime / 60) * $hourlyRate;
-                $absentDeduction    = $absentDays * $dailyRate;
-                $deductions         = $absentDeduction + $lateDeduction + $undertimeDeduction;
-
-                // ✅ Include holiday pay
-                $grossPay = max((($regularPay ?? 0) + ($otPay ?? 0) + $holidayPay) - ($deductions ?? 0), 0);
-
-                $previousGross = Payroll::getPreviousGrossIfEndOfMonth(
-                    $emp->employee_id,
-                    $paydate,
-                    $emp->empClassification
-                );
-
-                $monthlyGross = 10000; 
-                $endDates = Carbon::parse($paydate);
-                $isEndOfMonth = $endDates->isSameDay($endDates->copy()->endOfMonth());
+                // ======================
+                //  REGULAR vs DAILY
+                // ======================
                 $employeeClass = $emp->empDetail->empClassification;
+
+                if ($employeeClass === 'RGLR') {
+                    //  Monthly payroll
+                    $basicPay=$empBasic /2;
+                    $absentDeduction    = $absentDays * $dailyRate;
+                    $lateDeduction      = ($totalLate / 60) * $hourlyRate;
+                    $undertimeDeduction = ($totalUndertime / 60) * $hourlyRate;
+                    $deductions = $absentDeduction + $lateDeduction + $undertimeDeduction; //overbrake time passout
+                    $grossPay = $empBasic - $deductions + $holidayPay + $allowance;
+                    $monthlyGross = $grossPay;
+                } else {
+                     
+                    //  Daily / Non-Regular payroll
+                    $basicPay= $dailyRate;
+                    $regularPay   = $totalHoursWorked * $hourlyRate;
+                    $otPay        = $totalOT;
+                    $absentDeduction    = $absentDays * $dailyRate;
+                    $lateDeduction      = ($totalLate / 60) * $hourlyRate;
+                    $undertimeDeduction = ($totalUndertime / 60) * $hourlyRate;
+                    $deductions = $absentDeduction + $lateDeduction + $undertimeDeduction;
+                    $grossPay = max(($regularPay + $otPay + $holidayPay), 0);
+                    $monthlyGross = $grossPay;
+                }
+         
+                // ======================
+                //  CONTRIBUTIONS
+                // ======================
+                $isEndOfMonth = Carbon::parse($paydate)->isSameDay(Carbon::parse($paydate)->endOfMonth());
                 $contributions = ContributionHelper::computeAll(
                     $monthlyGross,
                     $employeeClass,
@@ -323,41 +441,61 @@ class PayrollController extends Controller
                     $emp->empID
                 );
 
-                $loanDeduction = $contributions['loan_deduction'] ?? 0;
-                $govDues = $contributions['sss']['employee_share']
-                            + $contributions['philhealth']['employee_share']
-                            + $contributions['pagibig']['employee_share']
-                            + $contributions['withholding_tax'];
+                $salaryLoan = $contributions['loan_breakdown']['salary'] ?? 0;
+                $charges = $contributions['loan_breakdown']['salary'] ?? 0;
+                $salaryLoan = $contributions['loan_breakdown']['salary'] ?? 0;
+                $taxable_income = $contributions['taxable_income'];
+           
+                $govDues = 
+                $contributions['sss']['employee_share']
+                    + $contributions['philhealth']['employee_share']
+                    + $contributions['pagibig']['employee_share']
+                    + $contributions['withholding_tax'];
 
-                $netPay = max(0, ($grossPay - $govDues - $loanDeduction) + ($allowance ?? 0));
+                $netPay = max(0, ($grossPay - $govDues - $salaryLoan  + $allowance));
 
+                // ======================
+                //  SAVE PAYROLL
+                // ======================
                 $payroll = Payroll::updateOrCreate(
                     [
                         'employee_id'        => $emp->empID,
                         'payroll_start_date' => $startDate,
                         'payroll_end_date'   => $endDate,
-                        'basic_salary'       => $empBasic,
-                        'allowances'         => $allowance,
-                        'total_deductions'   => $deductions,
                         'pay_date'           => $paydate,
                     ],
                     [
-                        'gross_pay' => $grossPay,
-                        'net_pay'   => $netPay,
+                        'basic_salary' => $empBasic,
+                        'basicPay' => $basicPay,
+                        //-
+                        'total_deductions' => $deductions,
+                        //+ot
+                        'gross_pay'    => $grossPay,
+                        //-
                         'sss_contribution' => $contributions['sss']['employee_share'],
                         'philhealth_contribution' => $contributions['philhealth']['employee_share'],
                         'pagibig_contribution' => $contributions['pagibig']['employee_share'],
-                        'withholding_tax' => $contributions['withholding_tax'],
                         'sss_loan' => $contributions['loan_breakdown']['sss'] ?? 0,
                         'pagibig_loan' => $contributions['loan_breakdown']['pagibig'] ?? 0,
+                        //=
+                        'taxable_income'=>  $taxable_income,
+                        //-
+                        'withholding_tax' => $contributions['withholding_tax'],
+                        'allowances'   => $allowance,
+                        'net_pay'      => $netPay,
+                        'holiday_pay'=>$holidayPay,
                         'company_loan' => $contributions['loan_breakdown']['salary'] ?? 0,
+                        'sss_employer' => $contributions['sss']['employer_share'],
+                        'philhealth_employer' => $contributions['philhealth']['employer_share'],
+                        'pagibig_employer'=> $contributions['pagibig']['employer_share'],
+                        'penalty_amount'=> $contributions['loan_breakdown']['charges/penalty'],
+
                     ]
                 );
-           
-                if ($isEndOfMonth && $emp->empClassification !== 'TRN') {
-                     
+
+                //  Auto loan deduction if end of month
+                if ($isEndOfMonth && $employeeClass !== 'TRN') {
                     foreach ($contributions['loan_details'] as $loan) {
-                        
                         LoanPayment::create([
                             'loan_id' => $loan['loan_id'],
                             'payroll_id' => $payroll->id,
@@ -372,20 +510,17 @@ class PayrollController extends Controller
                         ]);
                     }
                 }
-                
-            $updatedRows = PayrollDetail::where('employee_id', $emp->empID)
-                ->whereBetween('date', [$startDate, $endDate])
-                ->update(['payroll_id' => $payroll->id]);
 
+                //  Update payroll details
+                PayrollDetail::where('employee_id', $emp->empID)
+                    ->whereBetween('date', [$startDate, $endDate])
+                    ->update(['payroll_id' => $payroll->id]);
             }
 
-            DB::commit(); 
+            DB::commit();
             return "Payroll computed successfully for pay date $paydate ($startDate to $endDate)";
-
         } catch (\Throwable $e) {
             DB::rollBack();
-
-            // 🧠 Log detailed info
             Log::error('Payroll computation failed', [
                 'message' => $e->getMessage(),
                 'line' => $e->getLine(),
@@ -393,7 +528,6 @@ class PayrollController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            // Return or throw
             return response()->json([
                 'status' => 'error',
                 'message' => 'Payroll computation failed: '.$e->getMessage(),

@@ -20,6 +20,8 @@ class AttendanceSummary extends Model
         'mins_night_diff',
         'status',
         'remarks',
+        'over_break_minutes',
+        'outpass_minutes'
     ];
 
     // Relationships

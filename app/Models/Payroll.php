@@ -40,6 +40,12 @@ class Payroll extends Model
         'total_deductions',
         'net_pay',
         'status',
+         'sss_employer',
+        'philhealth_employer',
+        'pagibig_employer',
+        'basicPay',
+        'taxable_income'
+
     ];
 
     protected $casts = [
@@ -62,5 +68,10 @@ class Payroll extends Model
             ->first();
 
         return $previous->gross_pay ?? 0;
+    }
+
+    public function employee()
+    {
+        return $this->belongsTo(User::class, 'employee_id','empID');
     }
 }

@@ -117,6 +117,16 @@
                             <span class="text-danger error-text sched_out_error"></span>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label>Break Start</label>
+                            <input type="time" class="form-control" name="break_start" id="break_start">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label>Break End</label>
+                            <input type="time" class="form-control" name="break_end" id="break_end">
+                        </div>
+                    </div>
 
                     <div class="mb-2">
                         <label>Shift Type</label>
@@ -221,6 +231,8 @@ $(document).ready(function(){
             sched_end_date: $('#sched_end_date').val(),
             sched_out: $('#sched_out').val(),
             shift_type: $('#shift_type').val(),
+            break_start: $('#break_start').val(),
+            break_end: $('#break_end').val(),
             days: selectedDays,
         };
 
@@ -313,7 +325,10 @@ $(document).ready(function(){
             $('#sched_end_date').val(s.sched_end_date);
             $('#sched_out').val(s.sched_out);
             $('#shift_type').val(s.shift_type);
+            $('#break_start').val(s.break_start);
+            $('#break_end').val(s.break_end);
             $('#mdlEmpScheduler').modal('show');
+
         });
     });
 

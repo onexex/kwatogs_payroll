@@ -16,30 +16,7 @@ class EmployeeScheduleController extends Controller
       
         return view('pages.management.empscheduler', compact('employees'));
     }
-
-    // Get all schedules (for AJAX table)
-    // public function getSchedules(Request $request)
-    // {
-    //     $search = $request->search ?? '';
-    //     $query = EmployeeSchedule::with('users')
-    //         ->when($search, fn($q) => $q->whereHas('users', fn($e) =>
-    //             $e->where('fname','like',"%$search%")->orWhere('lname','like',"%$search%")
-    //         ));
-
-    //     $schedules = $query->orderBy('sched_start_date', 'asc')->get();
-
-    //     $schedules->transform(fn($s) => [
-    //         'id' => $s->id,
-    //         'employee_name' => $s->users->lname . ', ' . $s->users->fname,
-    //         'sched_start_date' => $s->sched_start_date,
-    //         'sched_in' => $s->sched_in,
-    //         'sched_end_date' => $s->sched_end_date,
-    //         'sched_out' => $s->sched_out,
-    //         'shift_type' => $s->shift_type
-    //     ]);
-
-    //     return response()->json($schedules);
-    // }
+ 
 
     public function getSchedules(Request $request)
 {
@@ -85,6 +62,8 @@ class EmployeeScheduleController extends Controller
         'sched_out' => 'required|date_format:H:i',
         'days' => 'nullable|array',
         'shift_type' => 'nullable|string|max:50',
+        'break_start' => 'required|date_format:H:i',
+        'break_end' => 'required|date_format:H:i',
     ]);
 
     if ($validator->fails()) {
@@ -136,6 +115,8 @@ class EmployeeScheduleController extends Controller
             'sched_in' => $startDateTime->format('H:i'),
             'sched_out' => $endDateTime->format('H:i'),
             'shift_type' => $request->shift_type,
+            'break_start' => $request->break_start,
+'break_end' => $request->break_end,
         ]);
 
         $created++;
@@ -155,6 +136,8 @@ class EmployeeScheduleController extends Controller
         'sched_in' => 'required|date_format:H:i',
         'sched_out' => 'required|date_format:H:i',
         'shift_type' => 'nullable|string|max:50',
+        'break_start' => 'required|date_format:H:i',
+        'break_end' => 'required|date_format:H:i',
     ]);
 
     if ($validator->fails()) {
@@ -196,6 +179,8 @@ class EmployeeScheduleController extends Controller
         'sched_in' => $startDateTime->format('H:i'),
         'sched_out' => $endDateTime->format('H:i'),
         'shift_type' => $request->shift_type,
+        'break_start' => $request->break_start,
+'break_end' => $request->break_end,
     ]);
 
     return response()->json(['message' => 'Schedule updated successfully!']);

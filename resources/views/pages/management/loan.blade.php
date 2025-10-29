@@ -5,9 +5,9 @@
 <div class="container-fluid">
 
     <div class="d-flex justify-content-between">
-        <h3>Loan Management</h3>
+        <h3>Charges/Penalty/Loan Management</h3>
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loanModal" id="addLoanBtn">
-            Add Loan
+            Add 
         </button>
     </div>
 
@@ -17,9 +17,9 @@
             <tr>
                 <th>Employee</th>
                 <th>Type</th>
-                <th>Loan Amount</th>
+                <th>Amount</th>
                 <th>Balance</th>
-                <th>Monthly Amortization</th>
+                <th>Amortization</th>
                 <th>Start Date</th>
                 <th>End Date</th>
                 <th>Status</th>
@@ -68,7 +68,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 id="modalTitle">Add Loan</h5>
+                <h5 id="modalTitle">Add Charges/Penalty/Loan</h5>
             </div>
 
             <form id="loanForm">
@@ -78,27 +78,30 @@
 
                 <div class="modal-body">
                     <label>Employee</label>
-                    <select class="form-control" name="employee_id" id="employee_id" required>
+                    <select class="form-control text-uppercase" name="employee_id" id="employee_id" required>
                         <option value="">-- Select Employee --</option>
                         @foreach($employees as $emp)
                             <option value="{{ $emp->empID }}">{{ $emp->fname }}</option>
                         @endforeach
                     </select>
 
-                    <label class="mt-2">Loan Type</label>
-                    <select class="form-control" name="loan_type" id="loan_type" required>
-                        <option value="">-- Select Loan Type --</option>
-                        <option value="pagibig">Pag-IBIG</option>
-                        <option value="sss">SSS</option>
-                        <option value="philhealth">PhilHealth</option>
+                    <label class="mt-2">Charges Type</label>
+                    <select class="form-control text-uppercase" name="loan_type" id="loan_type" required>
+                        <option value="">-- Select Type --</option>
+                        <option value="pagibig">Pag-IBIG Loan</option>
+                        <option value="sss">SSS Loan</option>
+                        {{-- <option value="philhealth">PhilHealth</option> --}}
                         <option value="salary">Salary Loan</option>
+                        <option value="cash_adv">Cash Advance</option>
+                        <option value="charges/penalty">Charges/Penalty</option>
+                        <option value="other">Other</option>
                     </select>
 
-                    <label class="mt-2">Loan Amount</label>
+                    <label class="mt-2"> Amount</label>
                     <input type="number" step="0.01" class="form-control" name="loan_amount" id="loan_amount" required>
 
-                    <label class="mt-2">Monthly Amortization</label>
-                    <input type="number" step="0.01" class="form-control" name="monthly_amortization" id="monthly_amortization" required>
+                    <label class="mt-2"> Amortization</label>
+                    <input type="number" step="0.01" class="form-control text-uppercase" name="monthly_amortization" id="monthly_amortization" required>
 
                     <label class="mt-2">Start Date</label>
                     <input type="date" class="form-control" name="start_date" id="start_date" required>
@@ -121,12 +124,12 @@
 $('#addLoanBtn').click(function () {
     $('#loanForm')[0].reset();
     $('#loan_id').val('');
-    $('#modalTitle').text('Add Loan');
+    $('#modalTitle').text('Add Loan/Charges');
     $('#loanModal').modal('show');
 });
 
 $('.editLoanBtn').click(function () {
-    $('#modalTitle').text('Edit Loan');
+    $('#modalTitle').text('Edit Data');
     $('#loan_id').val($(this).data('id'));
     $('#employee_id').val($(this).data('employee'));
     $('#loan_type').val($(this).data('type'));
@@ -136,7 +139,6 @@ $('.editLoanBtn').click(function () {
     $('#end_date').val($(this).data('end'));
     $('#loanModal').modal('show');
 });
-
 
 const storeUrl = "{{ route('loans.store') }}";
 const updateUrl = "{{ route('loans.update') }}";
@@ -151,7 +153,7 @@ $('#loanForm').submit(function (e) {
         headers: { 'Content-Type': 'multipart/form-data' }
     })
     .then(res => {
-        Swal.fire('Success', 'Loan saved successfully!', 'success')
+        Swal.fire('Success', 'Item saved successfully!', 'success')
             .then(() => location.reload());
     })
     .catch(err => {
@@ -165,13 +167,13 @@ $('.deleteLoanBtn').click(function () {
 
     Swal.fire({
         title: 'Are you sure?',
-        text: 'This will permanently delete the loan',
+        text: 'This will permanently delete the item',
         icon: 'warning',
         showCancelButton: true,
     }).then(result => {
         if (result.isConfirmed) {
             axios.delete("/loans/delete/" + id).then(() => {
-                Swal.fire('Deleted!', 'Loan removed', 'success').then(() => location.reload());
+                Swal.fire('Deleted!', 'Item removed', 'success').then(() => location.reload());
             });
         }
     });
