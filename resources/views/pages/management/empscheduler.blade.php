@@ -36,7 +36,7 @@
                         <th>Name</th>
                         <th>From</th>
                         <th>To</th>
-                        <th>Shift</th>
+                        {{-- <th>Shift</th> --}}
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -52,96 +52,112 @@
 </div>
 
 
-<!-- Modal -->
+<!-- Employee Scheduler Modal -->
 <div class="modal fade" id="mdlEmpScheduler" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Employee Schedule</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0 rounded-3">
+
+            <!-- Header -->
+            <div class="modal-header bg-gradient text-white" style="background: linear-gradient(90deg, #008080, #00b3b3);">
+                <h5 class="modal-title fw-semibold">
+                    <i class="bi bi-calendar-check me-2"></i> Employee Schedule
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
 
-            <div class="modal-body">
-                <form id="frmEmpScheduler">
+            <!-- Body -->
+            <div class="modal-body p-4">
+                <form id="frmEmpScheduler" autocomplete="off">
                     <input type="hidden" id="schedule_id">
 
-                    <div class="mb-2">
-                        <label>Employee</label>
-                        <select class="form-select" id="selEmployee" name="employee_id">
+                    <!-- Employee -->
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Employee</label>
+                        <select class="form-select text-uppercase" id="selEmployee" name="employee_id">
                             <option selected disabled>Select Employee</option>
                             @foreach($employees as $emp)
                                 <option value="{{ $emp->empID }}">{{ $emp->lname }}, {{ $emp->fname }}</option>
                             @endforeach
                         </select>
-                        <span class="text-danger error-text employee_id_error"></span>
+                        <span class="text-danger small error-text employee_id_error"></span>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-2">
-                            <label>Start Date</label>
+                    <!-- Date Range -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Start Date</label>
                             <input type="date" class="form-control" name="sched_start_date" id="sched_start_date">
-                            <span class="text-danger error-text sched_start_date_error"></span>
+                            <span class="text-danger small error-text sched_start_date_error"></span>
                         </div>
-                        <div class="col-md-6 mb-2">
-                            <label>End Date</label>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">End Date</label>
                             <input type="date" class="form-control" name="sched_end_date" id="sched_end_date">
-                            <span class="text-danger error-text sched_end_date_error"></span>
+                            <span class="text-danger small error-text sched_end_date_error"></span>
                         </div>
                     </div>
 
-                    <div class="mb-2">
-                        <label>Apply To Days</label>
+                    <!-- Apply to Days -->
+                    <div class="mb-3">
+                        <label class="form-label fw-medium d-block mb-1">Apply To Days</label>
                         <div class="d-flex flex-wrap gap-2">
                             @php
                                 $days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
                             @endphp
                             @foreach($days as $day)
-                                <div class="form-check form-check-inline">
+                                <div class="form-check form-check-inline px-2 py-1 border rounded-pill bg-light">
                                     <input class="form-check-input day-check" type="checkbox" value="{{ $day }}" id="chk{{ $day }}">
                                     <label class="form-check-label" for="chk{{ $day }}">{{ $day }}</label>
                                 </div>
                             @endforeach
                         </div>
-                        <small class="text-muted">Select which days to repeat within range.</small>
+                        <small class="text-muted fst-italic">Select which days to repeat within range.</small>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-2">
-                            <label>Schedule In</label>
+                    <!-- Time Schedule -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Schedule In</label>
                             <input type="time" class="form-control" name="sched_in" id="sched_in">
-                            <span class="text-danger error-text sched_in_error"></span>
+                            <span class="text-danger small error-text sched_in_error"></span>
                         </div>
-                        <div class="col-md-6 mb-2">
-                            <label>Schedule Out</label>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Schedule Out</label>
                             <input type="time" class="form-control" name="sched_out" id="sched_out">
-                            <span class="text-danger error-text sched_out_error"></span>
+                            <span class="text-danger small error-text sched_out_error"></span>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-2">
-                            <label>Break Start</label>
+
+                    <!-- Break Time -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Break Start</label>
                             <input type="time" class="form-control" name="break_start" id="break_start">
                         </div>
-                        <div class="col-md-6 mb-2">
-                            <label>Break End</label>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Break End</label>
                             <input type="time" class="form-control" name="break_end" id="break_end">
                         </div>
                     </div>
 
+                    <!-- Shift Type -->
                     <div class="mb-2">
-                        <label>Shift Type</label>
-                        <input type="text" class="form-control" name="shift_type" id="shift_type">
-                        <span class="text-danger error-text shift_type_error"></span>
+                        <label class="form-label fw-medium">Shift Type</label>
+                        <input type="text" class="form-control" name="shift_type" id="shift_type" placeholder="e.g. Morning, Night, Split">
+                        <span class="text-danger small error-text shift_type_error"></span>
                     </div>
                 </form>
             </div>
 
-            <div class="modal-footer">
-                <button type="button" id="btnSaveScheduler" class="btn btn-success">Save</button>
+            <!-- Footer -->
+            <div class="modal-footer d-flex justify-content-end bg-light border-top-0">
+                <button type="button" id="btnSaveScheduler" class="btn btn-success px-4 rounded-pill shadow-sm">
+                    <i class="bi bi-save me-1"></i> Save
+                </button>
             </div>
         </div>
     </div>
 </div>
+
 
 
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -160,11 +176,11 @@ $(document).ready(function(){
             data.forEach(s => {
                 html += `
                     <tr>
-                        <td>${s.employee_name}</td>
+                        <td class="text-uppercase">${s.employee_name}</td>
                         <td>${s.sched_start_date} ${s.sched_in}</td>
                         <td>${s.sched_end_date} ${s.sched_out}</td>
-                        <td>${s.shift_type ?? ''}</td>
-                        <td>
+                       <-- <td>${s.shift_type ?? ''}</td> -->
+                        <td >
                             <button class="btn btn-sm btn-primary btnEdit" data-id="${s.id}">Edit</button>
                             <button class="btn btn-sm btn-danger btnDelete" data-id="${s.id}">Delete</button>
                         </td>
