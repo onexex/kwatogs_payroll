@@ -179,7 +179,7 @@ $(document).ready(function(){
                         <td class="text-uppercase">${s.employee_name}</td>
                         <td>${s.sched_start_date} ${s.sched_in}</td>
                         <td>${s.sched_end_date} ${s.sched_out}</td>
-                       <-- <td>${s.shift_type ?? ''}</td> -->
+                       
                         <td >
                             <button class="btn btn-sm btn-primary btnEdit" data-id="${s.id}">Edit</button>
                             <button class="btn btn-sm btn-danger btnDelete" data-id="${s.id}">Delete</button>
