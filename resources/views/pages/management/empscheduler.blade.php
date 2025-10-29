@@ -132,10 +132,14 @@
                         <div class="col-md-6">
                             <label class="form-label fw-medium">Break Start</label>
                             <input type="time" class="form-control" name="break_start" id="break_start">
+                            <span class="text-danger small error-text break_start_error"></span>
+
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-medium">Break End</label>
                             <input type="time" class="form-control" name="break_end" id="break_end">
+                            <span class="text-danger small error-text break_end_error"></span>
+
                         </div>
                     </div>
 
@@ -229,6 +233,7 @@ $(document).ready(function(){
     });
 
         $('#btnSaveScheduler').on('click', function() {
+            
         let schedule_id = $('#schedule_id').val();
         let url = schedule_id
             ? `{{ url('employee-schedules/update') }}/${schedule_id}`
@@ -273,6 +278,10 @@ $(document).ready(function(){
                 $('#frmEmpScheduler')[0].reset();
                 $('#schedule_id').val('');
                 loadSchedules();
+                    $('span.error-text').text('');
+    
+    // Or remove spans entirely if you appended them dynamically:
+    $('span.error-text').remove();
             })
             .catch(err => {
                 Swal.close();
@@ -333,16 +342,23 @@ $(document).ready(function(){
         let id = $(this).data('id');
         axios.get(`{{ url('employee-schedules/edit') }}/${id}`)
         .then(res => {
+
+            function trimSeconds(timeString) {
+    if (!timeString) return '';
+    return timeString.substring(0, 5); // e.g. "06:00:00" → "06:00"
+}
             let s = res.data;
             $('#schedule_id').val(s.id);
             $('#selEmployee').val(s.employee_id);
             $('#sched_start_date').val(s.sched_start_date);
-            $('#sched_in').val(s.sched_in);
+       
             $('#sched_end_date').val(s.sched_end_date);
-            $('#sched_out').val(s.sched_out);
+           
             $('#shift_type').val(s.shift_type);
-            $('#break_start').val(s.break_start);
-            $('#break_end').val(s.break_end);
+$('#sched_in').val(trimSeconds(s.sched_in));
+$('#sched_out').val(trimSeconds(s.sched_out));
+$('#break_start').val(trimSeconds(s.break_start));
+$('#break_end').val(trimSeconds(s.break_end));
             $('#mdlEmpScheduler').modal('show');
 
         });
