@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::table('payroll_details', function (Blueprint $table) {
 
             // Drop foreign key if exists
-            $table->dropForeign(['employee_id']);
+            // $table->dropForeign(['employee_id']);
 
             // Change column type
             $table->string('employee_id')->change();
