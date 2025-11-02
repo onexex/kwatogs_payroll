@@ -15,11 +15,13 @@ return new class extends Migration
         Schema::create('overtimes', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(EmpDetail::class);
+            $table->foreignIdFor(EmpDetail::class, 'approved_by')->nullable();
+            $table->dateTime('approved_at')->nullable();
             $table->string('status');
             $table->date('date_from')->nullable();
             $table->date('date_to')->nullable();
-            $table->timestamp('time_in')->nullable();
-            $table->timestamp('time_out')->nullable();
+            $table->time('time_in')->nullable();
+            $table->time('time_out')->nullable();
             $table->text('purpose');
             $table->timestamps();
         });

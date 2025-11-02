@@ -65,7 +65,7 @@
     </div>
 
       <!-- Modal OVERTIME Form-->
-      <div class="modal fade" id="mdlOvertime" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="background-color: rgb(249 200 200 / 17%);">
+    <div class="modal fade" id="mdlOvertime" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="background-color: rgb(249 200 200 / 17%);">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header dragable_touch" >
@@ -120,7 +120,7 @@
                                             <div class="col-lg-12">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtPurposeRem"> Purpose <label for="" class="text-danger mb-0"></label></label>
-                                                    <textarea class="form-control" id="txtPurposeRem" name="purpose" rows="4" placeholder="-" style="height: 100px"></textarea>
+                                                    <textarea class="form-control" id="txtPurposeRem" name="purpose" rows="4" placeholder="-" style="height: 100px">{{ old('purpose')}}</textarea>
                                                     <span class="text-danger small error-text purpose_error"></span>
                                                 </div>
                                             </div>
@@ -153,18 +153,24 @@
                                             <div class="col-lg-6">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtOTDateFrom">OT Date From<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtOTDateFrom" name="dateFrom" required type="date" placeholder="-"/>
-
-                                                    <span class="text-danger small error-text dateFrom_error"></span>
+                                                    <input class="form-control" id="txtOTDateFrom" value="{{ old('dateFrom') }}" name="dateFrom" required type="date" placeholder="-"/>
+                                                    @if ($errors->has('dateFrom'))
+                                                        @foreach ($errors->get('dateFrom') as $error)
+                                                            <span class="text-danger small d-block error-text">{{ $error }}</span>
+                                                        @endforeach
+                                                    @endif
                                                 </div>
                                             </div>
 
                                             <div class="col-lg-6">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtOTTimeFrom">OT Time From<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtOTTimeFrom" name="timeFrom" required type="time" placeholder="-"/>
-
-                                                    <span class="text-danger small error-text timeFrom_error"></span>
+                                                    <input class="form-control" id="txtOTTimeFrom" value="{{ old('timeFrom') }}"  name="timeFrom" required type="time" placeholder="-"/>
+                                                    @if ($errors->has('timeFrom'))
+                                                        @foreach ($errors->get('timeFrom') as $error)
+                                                            <span class="text-danger small d-block error-text">{{ $error }}</span>
+                                                        @endforeach
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
@@ -173,18 +179,24 @@
                                             <div class="col-lg-6">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtOTDateTo">OT Date To<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtOTDateTo" name="dateTo" required type="date" placeholder="-"/>
-
-                                                    <span class="text-danger small error-text dateTo_error"></span>
+                                                    <input class="form-control" id="txtOTDateTo" value="{{ old('dateTo') }}" name="dateTo" required type="date" placeholder="-"/>
+                                                    @if ($errors->has('dateTo'))
+                                                        @foreach ($errors->get('dateTo') as $error)
+                                                            <span class="text-danger small d-block error-text">{{ $error }}</span>
+                                                        @endforeach
+                                                    @endif
                                                 </div>
                                             </div>
 
                                             <div class="col-lg-6">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtOTTimeTo">OT Time To<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtOTTimeTo" name="timeTo" required type="time" placeholder="-"/>
-
-                                                    <span class="text-danger small error-text timeTo_error"></span>
+                                                    <input class="form-control" id="txtOTTimeTo" name="timeTo" value="{{ old('timeTo') }}" required type="time" placeholder="-"/>
+                                                    @if ($errors->has('timeTo'))
+                                                        @foreach ($errors->get('timeTo') as $error)
+                                                            <span class="text-danger small d-block error-text">{{ $error }}</span>
+                                                        @endforeach
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
@@ -205,5 +217,13 @@
 
 
 </div>
+@if ($errors->any())
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var myModal = new bootstrap.Modal(document.getElementById('mdlOvertime'));
+            myModal.show();
+        });
+    </script>
+@endif
 
 @endsection
