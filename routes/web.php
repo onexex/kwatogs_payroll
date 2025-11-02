@@ -43,6 +43,7 @@ use App\Http\Controllers\parentalSettingsCtrl;
 use App\Http\Controllers\reportAttendanceCtrl;
 use App\Http\Controllers\Roles\RolesController;
 use App\Http\Controllers\EmployeeScheduleController;
+use App\Http\Controllers\OvertimeController;
 use App\Http\Controllers\Roles\EmployeeRoleController;
 
 Route::get('/r', function () {
@@ -157,7 +158,7 @@ Route::group(['middleware'=>['AuthCheck']], function(){
     //MODULE
     Route::get('/pages/modules/obtTracker',[pageCtrl::class, 'obtTracker']);
     Route::get('/pages/modules/sendOBT',[pageCtrl::class, 'sendOBT']);
-    Route::get('/pages/modules/overtime',[pageCtrl::class, 'overtime']);
+    Route::get('/pages/modules/overtime',[OvertimeController::class, 'index']);
     Route::get('/pages/modules/earlyout',[pageCtrl::class, 'earlyout']);
     Route::get('/pages/modules/leaveApplication',[pageCtrl::class, 'leaveApplication']);
     Route::get('/pages/modules/debitAdvise',[pageCtrl::class, 'debitAdvise']);
@@ -337,20 +338,7 @@ Route::group(['middleware'=>['AuthCheck']], function(){
     Route::post('/loans/update', [LoanController::class, 'update'])->name('loans.update');
     Route::delete('/loans/delete/{id}', [LoanController::class, 'destroy'])->name('loans.delete');
     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    Route::resource('/overtime', OvertimeController::class);
 
 });
 

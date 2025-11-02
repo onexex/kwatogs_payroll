@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EmpDetail extends Model
 {
@@ -31,6 +32,21 @@ class EmpDetail extends Model
         'empDateResigned' => 'date',
         'empDateRegular' => 'date',
     ];
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(company::class, 'empCompID', 'comp_id');
+    }
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(department::class, 'empDepID', 'id');
+    }
+
+    public function position(): BelongsTo
+    {
+        return $this->belongsTo(position::class, 'empPos', 'id');
+    }
 
     public function user()
     {

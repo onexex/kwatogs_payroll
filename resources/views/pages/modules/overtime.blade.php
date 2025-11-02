@@ -1,4 +1,6 @@
-@extends('layout.app')
+@extends('layout.app', [
+    'title' => 'Overtime Filing'
+])
 @section('content')
 
 <!--SHAIRA-->
@@ -74,14 +76,15 @@
                     <div class="card mb-3 rounded">
                         <div class="card-body ">
 
-                            <form action="" id="frmOvertimeForm">
+                            <form action="{{ route('overtime.store') }}" method="POST" id="frmOvertimeForm">
+                                @csrf
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <div class="row">
                                             <div class="col-lg-12 ">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtPersonnel">Personnel Name <label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtPersonnel" name="personnel" type="text" placeholder="-" readonly/>
+                                                    <input class="form-control text-uppercase" id="txtPersonnel" name="personnel" value="{{ auth()->user()->fname . ' ' . auth()->user()->lname }}" type="text" placeholder="-" readonly/>
 
                                                     <span class="text-danger small error-text personnel_error"></span>
                                                 </div>
@@ -90,7 +93,7 @@
                                             <div class="col-lg-12">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtCompany">Company Name <label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtCompany" name="company" type="text" placeholder="-" readonly/>
+                                                    <input class="form-control" id="txtCompany" value="{{ auth()->user()->empDetail->company->comp_name }}" name="company" type="text" placeholder="-" readonly/>
 
                                                     <span class="text-danger small error-text company_error"></span>
                                                 </div>
@@ -99,7 +102,7 @@
                                             <div class="col-lg-12">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtDepartment">Department<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtDepartment" name="department" type="text" placeholder="-" readonly/>
+                                                    <input class="form-control" id="txtDepartment" value="{{ auth()->user()->empDetail?->department?->dep_name }}" name="department" type="text" placeholder="-" readonly/>
 
                                                     <span class="text-danger small error-text department_error"></span>
                                                 </div>
@@ -108,7 +111,7 @@
                                             <div class="col-lg-12">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtDesignation">Designation<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtDesignation" name="designation" type="text" placeholder="-" readonly/>
+                                                    <input class="form-control" id="txtDesignation" value="{{ auth()->user()->empDetail?->position?->pos_desc }}" name="designation" type="text" placeholder="-" readonly/>
 
                                                     <span class="text-danger small error-text designation_error"></span>
                                                 </div>
@@ -130,7 +133,7 @@
                                             <div class="col-lg-6">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtFilingDate">Filing Date<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtFilingDate" name="dateFil" type="date" placeholder="-" readonly/>
+                                                    <input class="form-control" id="txtFilingDate" name="dateFil" value="{{ now()->format('Y-m-d') }}" type="date" placeholder="-" readonly/>
 
                                                     <span class="text-danger small error-text dateFil_error"></span>
                                                 </div>
@@ -139,7 +142,7 @@
                                             <div class="col-lg-6">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtFilingTime">filing Time<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtFilingTime" name="timeFil" type="time" placeholder="-" readonly/>
+                                                    <input class="form-control" id="txtFilingTime" name="timeFil" value="{{ now()->format('H:i') }}" type="time" placeholder="-" readonly/>
 
                                                     <span class="text-danger small error-text timeFil_error"></span>
                                                 </div>
@@ -150,7 +153,7 @@
                                             <div class="col-lg-6">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtOTDateFrom">OT Date From<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtOTDateFrom" name="dateFrom" type="date" placeholder="-"/>
+                                                    <input class="form-control" id="txtOTDateFrom" name="dateFrom" required type="date" placeholder="-"/>
 
                                                     <span class="text-danger small error-text dateFrom_error"></span>
                                                 </div>
@@ -159,7 +162,7 @@
                                             <div class="col-lg-6">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtOTTimeFrom">OT Time From<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtOTTimeFrom" name="timeFrom" type="time" placeholder="-"/>
+                                                    <input class="form-control" id="txtOTTimeFrom" name="timeFrom" required type="time" placeholder="-"/>
 
                                                     <span class="text-danger small error-text timeFrom_error"></span>
                                                 </div>
@@ -170,7 +173,7 @@
                                             <div class="col-lg-6">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtOTDateTo">OT Date To<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtOTDateTo" name="dateTo" type="date" placeholder="-"/>
+                                                    <input class="form-control" id="txtOTDateTo" name="dateTo" required type="date" placeholder="-"/>
 
                                                     <span class="text-danger small error-text dateTo_error"></span>
                                                 </div>
@@ -179,7 +182,7 @@
                                             <div class="col-lg-6">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtOTTimeTo">OT Time To<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtOTTimeTo" name="timeTo" type="time" placeholder="-"/>
+                                                    <input class="form-control" id="txtOTTimeTo" name="timeTo" required type="time" placeholder="-"/>
 
                                                     <span class="text-danger small error-text timeTo_error"></span>
                                                 </div>
@@ -188,13 +191,13 @@
 
                                     </div>
                                 </div>
+                                <div class="d-flex justify-content-end">
+                                    <!-- <button type="button" class="btn btn-secondary closereset_update" data-bs-dismiss="modal">Close</button> -->
+                                    <button  id="btnSaveOT" type="submit" class="btn text-white" style="background-color: #008080">Submit</button>
+                                </div>
                             </form>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <!-- <button type="button" class="btn btn-secondary closereset_update" data-bs-dismiss="modal">Close</button> -->
-                    <button  id="btnSaveOT" type="button" class="btn text-white" style="background-color: #008080">Submit</button>
                 </div>
             </div>
         </div>
