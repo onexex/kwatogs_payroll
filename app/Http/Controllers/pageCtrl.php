@@ -280,7 +280,6 @@ class pageCtrl extends Controller
 
     public function overtime()
     {
-        return view('pages.modules.overtime');
     }
 
     public function earlyout()
