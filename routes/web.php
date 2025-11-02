@@ -339,6 +339,7 @@ Route::group(['middleware'=>['AuthCheck']], function(){
     Route::delete('/loans/delete/{id}', [LoanController::class, 'destroy'])->name('loans.delete');
     
     Route::resource('/overtime', OvertimeController::class);
+    Route::put('/overtime/{overtime}/updatestatus', [OvertimeController::class, 'updateStatus'])->name('overtime.status.update');
 
 });
 

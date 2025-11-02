@@ -13,7 +13,31 @@ class OvertimeController extends Controller
 {
     public function index()
     {
-        return view('pages.modules.overtime');
+        $user = Auth::user();
+
+        $overtimes = Overtime::where('emp_detail_id', $user->empDetail->id)
+            ->orderByDesc('created_at')
+            ->paginate(10)
+            ->through(function ($ot) {
+                $from = Carbon::parse($ot->date_from . ' ' . $ot->time_in);
+                $to = Carbon::parse($ot->date_to . ' ' . $ot->time_out);
+
+                $hours = $from->diffInHours($to);
+                $minutes = $from->diffInMinutes($to) % 60;
+
+                return [
+                    'id' => $ot->id,
+                    'filing_datetime' => Carbon::parse($ot->created_at)->format('M d, Y h:i A'),
+                    'time_in' => $from->format('M d, Y h:i A'),
+                    'time_out' => $to->format('M d, Y h:i A'),
+                    'purpose' => $ot->purpose,
+                    'duration' => sprintf('%d hr %d min', $hours, $minutes),
+                    'status' => strtoupper($ot->status ?? 'PENDING'),
+                    'status_value' => OvertimeStatusEnum::fromName($ot->status),
+                ];
+            });
+        
+        return view('pages.modules.overtime', compact('overtimes'));
     }
 
     public function store(Request $request)
@@ -72,5 +96,18 @@ class OvertimeController extends Controller
 
             return back()->with('success', 'Overtime filed successfully!');
         }
+    }
+
+    public function updateStatus(Overtime $overtime, Request $request) 
+    {
+        if ($overtime) {
+            
+
+            $overtime->status = $request->status;
+            $overtime->save();
+
+            return back()->with('success', 'Overtime updated status!');
+        }
+
     }
 }

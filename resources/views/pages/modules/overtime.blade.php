@@ -44,9 +44,9 @@
                                 <thead>
                                     <tr>
                                         <th class="text-dark" scope="col">No</th>
-                                        <th class="text-dark" scope="col">FilingDateTime</th>
-                                        <th class="text-dark" scope="col">TimeIn</th>
-                                        <th class="text-dark" scope="col">TimeOut</th>
+                                        <th class="text-dark" scope="col">Filing Date Time</th>
+                                        <th class="text-dark" scope="col">Time In</th>
+                                        <th class="text-dark" scope="col">Time Out</th>
                                         <th class="text-dark" scope="col">Purpose</th>
                                         <th class="text-dark" scope="col">Duration</th>
                                         <th class="text-dark" scope="col">Status</th>
@@ -54,7 +54,55 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tblOvertime">
+                                    @forelse ($overtimes as $index => $overtime)
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td>
+                                                {{ $overtime['filing_datetime'] }}
+                                            </td>
+                                            <td>
+                                                {{ $overtime['time_in'] }}
+                                            </td>
+                                            <td>
+                                                {{ $overtime['time_out'] }}
+                                            </td>
+                                            <td>{{ $overtime['purpose'] ?? '-' }}</td>
+                                            <td>
+                                                {{ $overtime['duration'] }}
+                                            </td>
 
+                                            <td>
+                                                @php
+                                                    $badgeClass = match($overtime['status']) {
+                                                        'APPROVED' => 'bg-success',
+                                                        'DISAPPROVED' => 'bg-danger',
+                                                        'FORAPPROVAL' => 'bg-warning text-dark',
+                                                        default => 'bg-secondary'
+                                                    };
+                                                @endphp
+                                                <span class="badge {{ $badgeClass }}">{{ strtoupper($overtime['status_value']) }}</span>
+                                            </td>
+
+                                            <td>
+                                                <div class="btn-group gap-2">
+                                                    @if ($overtime['status'] == 'FORAPPROVAL')
+                                                        <a href="javascript:void(0)"
+                                                            class="btn btn-sm btn-danger text-uppercase btnCancelOT"
+                                                            data-id="{{ $overtime['id'] }}"
+                                                            data-url="{{ route('overtime.status.update', ['overtime' => $overtime['id']]) }}"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#mdlCancelOvertime">
+                                                                Cancel
+                                                        </a>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="8" class="text-center text-muted">No overtime records found.</td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
@@ -215,15 +263,56 @@
         </div>
     </div>
 
+    <!-- Cancel Modal -->
+    <div class="modal fade" id="mdlCancelOvertime" tabindex="-1" aria-labelledby="mdlCancelOvertimeLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="mdlCancelOvertimeLabel">Cancel Overtime</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
 
-</div>
+                <div class="modal-body">
+                    <p>Are you sure you want to cancel this overtime request? This action cannot be undone.</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Keep It</button>
+                     <form id="cancelOvertimeForm" method="POST" style="display:inline;">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="status" value="CANCELED">
+                        <button type="submit" class="btn btn-danger">Yes, Cancel It</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @if ($errors->any())
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var myModal = new bootstrap.Modal(document.getElementById('mdlOvertime'));
             myModal.show();
+            
         });
+
     </script>
 @endif
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const cancelButtons = document.querySelectorAll('.btnCancelOT');
+            const cancelForm = document.getElementById('cancelOvertimeForm');
+
+            cancelButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const url = this.dataset.url;
+                    cancelForm.setAttribute('action', url);
+                    console.log('Set cancel form action to:', url);
+                });
+            });
+        });
+    </script>
 
 @endsection
