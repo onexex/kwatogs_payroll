@@ -1,4 +1,6 @@
-@extends('layout.app')
+@extends('layout.app', [
+    'title' => 'Overtime Filing'
+])
 @section('content')
 
 <!--SHAIRA-->
@@ -42,9 +44,9 @@
                                 <thead>
                                     <tr>
                                         <th class="text-dark" scope="col">No</th>
-                                        <th class="text-dark" scope="col">FilingDateTime</th>
-                                        <th class="text-dark" scope="col">TimeIn</th>
-                                        <th class="text-dark" scope="col">TimeOut</th>
+                                        <th class="text-dark" scope="col">Filing Date Time</th>
+                                        <th class="text-dark" scope="col">Time In</th>
+                                        <th class="text-dark" scope="col">Time Out</th>
                                         <th class="text-dark" scope="col">Purpose</th>
                                         <th class="text-dark" scope="col">Duration</th>
                                         <th class="text-dark" scope="col">Status</th>
@@ -52,7 +54,55 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tblOvertime">
+                                    @forelse ($overtimes as $index => $overtime)
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td>
+                                                {{ $overtime['filing_datetime'] }}
+                                            </td>
+                                            <td>
+                                                {{ $overtime['time_in'] }}
+                                            </td>
+                                            <td>
+                                                {{ $overtime['time_out'] }}
+                                            </td>
+                                            <td>{{ $overtime['purpose'] ?? '-' }}</td>
+                                            <td>
+                                                {{ $overtime['duration'] }}
+                                            </td>
 
+                                            <td>
+                                                @php
+                                                    $badgeClass = match($overtime['status']) {
+                                                        'APPROVED' => 'bg-success',
+                                                        'DISAPPROVED' => 'bg-danger',
+                                                        'FORAPPROVAL' => 'bg-warning text-dark',
+                                                        default => 'bg-secondary'
+                                                    };
+                                                @endphp
+                                                <span class="badge {{ $badgeClass }}">{{ strtoupper($overtime['status_value']) }}</span>
+                                            </td>
+
+                                            <td>
+                                                <div class="btn-group gap-2">
+                                                    @if ($overtime['status'] == 'FORAPPROVAL')
+                                                        <a href="javascript:void(0)"
+                                                            class="btn btn-sm btn-danger text-uppercase btnCancelOT"
+                                                            data-id="{{ $overtime['id'] }}"
+                                                            data-url="{{ route('overtime.status.update', ['overtime' => $overtime['id']]) }}"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#mdlCancelOvertime">
+                                                                Cancel
+                                                        </a>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="8" class="text-center text-muted">No overtime records found.</td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
@@ -63,7 +113,7 @@
     </div>
 
       <!-- Modal OVERTIME Form-->
-      <div class="modal fade" id="mdlOvertime" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="background-color: rgb(249 200 200 / 17%);">
+    <div class="modal fade" id="mdlOvertime" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="background-color: rgb(249 200 200 / 17%);">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header dragable_touch" >
@@ -74,14 +124,15 @@
                     <div class="card mb-3 rounded">
                         <div class="card-body ">
 
-                            <form action="" id="frmOvertimeForm">
+                            <form action="{{ route('overtime.store') }}" method="POST" id="frmOvertimeForm">
+                                @csrf
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <div class="row">
                                             <div class="col-lg-12 ">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtPersonnel">Personnel Name <label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtPersonnel" name="personnel" type="text" placeholder="-" readonly/>
+                                                    <input class="form-control text-uppercase" id="txtPersonnel" name="personnel" value="{{ auth()->user()->fname . ' ' . auth()->user()->lname }}" type="text" placeholder="-" readonly/>
 
                                                     <span class="text-danger small error-text personnel_error"></span>
                                                 </div>
@@ -90,7 +141,7 @@
                                             <div class="col-lg-12">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtCompany">Company Name <label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtCompany" name="company" type="text" placeholder="-" readonly/>
+                                                    <input class="form-control" id="txtCompany" value="{{ auth()->user()->empDetail->company->comp_name }}" name="company" type="text" placeholder="-" readonly/>
 
                                                     <span class="text-danger small error-text company_error"></span>
                                                 </div>
@@ -99,7 +150,7 @@
                                             <div class="col-lg-12">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtDepartment">Department<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtDepartment" name="department" type="text" placeholder="-" readonly/>
+                                                    <input class="form-control" id="txtDepartment" value="{{ auth()->user()->empDetail?->department?->dep_name }}" name="department" type="text" placeholder="-" readonly/>
 
                                                     <span class="text-danger small error-text department_error"></span>
                                                 </div>
@@ -108,7 +159,7 @@
                                             <div class="col-lg-12">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtDesignation">Designation<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtDesignation" name="designation" type="text" placeholder="-" readonly/>
+                                                    <input class="form-control" id="txtDesignation" value="{{ auth()->user()->empDetail?->position?->pos_desc }}" name="designation" type="text" placeholder="-" readonly/>
 
                                                     <span class="text-danger small error-text designation_error"></span>
                                                 </div>
@@ -117,7 +168,7 @@
                                             <div class="col-lg-12">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtPurposeRem"> Purpose <label for="" class="text-danger mb-0"></label></label>
-                                                    <textarea class="form-control" id="txtPurposeRem" name="purpose" rows="4" placeholder="-" style="height: 100px"></textarea>
+                                                    <textarea class="form-control" id="txtPurposeRem" name="purpose" rows="4" placeholder="-" style="height: 100px">{{ old('purpose')}}</textarea>
                                                     <span class="text-danger small error-text purpose_error"></span>
                                                 </div>
                                             </div>
@@ -130,7 +181,7 @@
                                             <div class="col-lg-6">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtFilingDate">Filing Date<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtFilingDate" name="dateFil" type="date" placeholder="-" readonly/>
+                                                    <input class="form-control" id="txtFilingDate" name="dateFil" value="{{ now()->format('Y-m-d') }}" type="date" placeholder="-" readonly/>
 
                                                     <span class="text-danger small error-text dateFil_error"></span>
                                                 </div>
@@ -139,7 +190,7 @@
                                             <div class="col-lg-6">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtFilingTime">filing Time<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtFilingTime" name="timeFil" type="time" placeholder="-" readonly/>
+                                                    <input class="form-control" id="txtFilingTime" name="timeFil" value="{{ now()->format('H:i') }}" type="time" placeholder="-" readonly/>
 
                                                     <span class="text-danger small error-text timeFil_error"></span>
                                                 </div>
@@ -150,18 +201,24 @@
                                             <div class="col-lg-6">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtOTDateFrom">OT Date From<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtOTDateFrom" name="dateFrom" type="date" placeholder="-"/>
-
-                                                    <span class="text-danger small error-text dateFrom_error"></span>
+                                                    <input class="form-control" id="txtOTDateFrom" value="{{ old('dateFrom') }}" name="dateFrom" required type="date" placeholder="-"/>
+                                                    @if ($errors->has('dateFrom'))
+                                                        @foreach ($errors->get('dateFrom') as $error)
+                                                            <span class="text-danger small d-block error-text">{{ $error }}</span>
+                                                        @endforeach
+                                                    @endif
                                                 </div>
                                             </div>
 
                                             <div class="col-lg-6">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtOTTimeFrom">OT Time From<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtOTTimeFrom" name="timeFrom" type="time" placeholder="-"/>
-
-                                                    <span class="text-danger small error-text timeFrom_error"></span>
+                                                    <input class="form-control" id="txtOTTimeFrom" value="{{ old('timeFrom') }}"  name="timeFrom" required type="time" placeholder="-"/>
+                                                    @if ($errors->has('timeFrom'))
+                                                        @foreach ($errors->get('timeFrom') as $error)
+                                                            <span class="text-danger small d-block error-text">{{ $error }}</span>
+                                                        @endforeach
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
@@ -170,37 +227,92 @@
                                             <div class="col-lg-6">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtOTDateTo">OT Date To<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtOTDateTo" name="dateTo" type="date" placeholder="-"/>
-
-                                                    <span class="text-danger small error-text dateTo_error"></span>
+                                                    <input class="form-control" id="txtOTDateTo" value="{{ old('dateTo') }}" name="dateTo" required type="date" placeholder="-"/>
+                                                    @if ($errors->has('dateTo'))
+                                                        @foreach ($errors->get('dateTo') as $error)
+                                                            <span class="text-danger small d-block error-text">{{ $error }}</span>
+                                                        @endforeach
+                                                    @endif
                                                 </div>
                                             </div>
 
                                             <div class="col-lg-6">
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtOTTimeTo">OT Time To<label for="" class="text-danger mb-0">*</label></label>
-                                                    <input class="form-control" id="txtOTTimeTo" name="timeTo" type="time" placeholder="-"/>
-
-                                                    <span class="text-danger small error-text timeTo_error"></span>
+                                                    <input class="form-control" id="txtOTTimeTo" name="timeTo" value="{{ old('timeTo') }}" required type="time" placeholder="-"/>
+                                                    @if ($errors->has('timeTo'))
+                                                        @foreach ($errors->get('timeTo') as $error)
+                                                            <span class="text-danger small d-block error-text">{{ $error }}</span>
+                                                        @endforeach
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
 
                                     </div>
                                 </div>
+                                <div class="d-flex justify-content-end">
+                                    <!-- <button type="button" class="btn btn-secondary closereset_update" data-bs-dismiss="modal">Close</button> -->
+                                    <button  id="btnSaveOT" type="submit" class="btn text-white" style="background-color: #008080">Submit</button>
+                                </div>
                             </form>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <!-- <button type="button" class="btn btn-secondary closereset_update" data-bs-dismiss="modal">Close</button> -->
-                    <button  id="btnSaveOT" type="button" class="btn text-white" style="background-color: #008080">Submit</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Cancel Modal -->
+    <div class="modal fade" id="mdlCancelOvertime" tabindex="-1" aria-labelledby="mdlCancelOvertimeLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="mdlCancelOvertimeLabel">Cancel Overtime</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
 
-</div>
+                <div class="modal-body">
+                    <p>Are you sure you want to cancel this overtime request? This action cannot be undone.</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Keep It</button>
+                     <form id="cancelOvertimeForm" method="POST" style="display:inline;">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="status" value="CANCELED">
+                        <button type="submit" class="btn btn-danger">Yes, Cancel It</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@if ($errors->any())
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var myModal = new bootstrap.Modal(document.getElementById('mdlOvertime'));
+            myModal.show();
+            
+        });
+
+    </script>
+@endif
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const cancelButtons = document.querySelectorAll('.btnCancelOT');
+            const cancelForm = document.getElementById('cancelOvertimeForm');
+
+            cancelButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const url = this.dataset.url;
+                    cancelForm.setAttribute('action', url);
+                    console.log('Set cancel form action to:', url);
+                });
+            });
+        });
+    </script>
 
 @endsection
