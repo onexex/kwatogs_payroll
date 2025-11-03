@@ -22,7 +22,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const generatedAt = now.toLocaleString('en-US', options);
 
             // Get current logged-in user name (Laravel Blade interpolation)
-            const generatedBy = `{{ Auth::user()->fname ?? '' }} {{ Auth::user()->lname ?? '' }}`;
+   const generatedBy = window.loggedEmployee || 'Unknown User';
+            
 
             // Open print window
             const printWindow = window.open('', '', 'width=1200,height=800');
@@ -138,94 +139,191 @@ document.addEventListener("DOMContentLoaded", function () {
             const dateFrom = $('#date_from').val();
             const dateTo = $('#date_to').val();
             const filter = $('#selFilter').val() || 'all';
+            const payDate = $('#pay_date').val();
 
-            $payrollTableBody.html('<tr><td colspan="30">Loading...</td></tr>');
+
+            $payrollTableBody.html('<tr><td colspan="25">Loading...</td></tr>');
 
             axios.get('/payroll/fetch', {
-                params: {
-                    date_from: dateFrom,
-                    date_to: dateTo,
-                    filter: filter
-                }
+                params: { date_from: dateFrom, date_to: dateTo, filter: filter,payDate:payDate }
             })
-                .then(function (response) {
-                    const data = response.data;
-                    $payrollTableBody.empty();
+            .then(function (response) {
+                const data = response.data;
+                $payrollTableBody.empty();
 
-                    if (data.length === 0) {
-                        $payrollTableBody.html('<tr><td colspan="30">No payroll data found.</td></tr>');
-                        return;
-                    }
+                if (data.length === 0) {
+                    $payrollTableBody.html('<tr><td colspan="25">No payroll data found.</td></tr>');
+                    return;
+                }
 
-                    $.each(data, function (index, payroll) {
-                        const row = `
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td>${(payroll.employee?.fname || '') + ' ' + (payroll.employee?.lname || '')}</td>
-                                <td>${formatNumber(payroll.basic_salary)}</td>
-                                <td>${formatNumber(payroll.basicPay)}</td>
-                                <td>${formatNumber(payroll.reg_working_day)}</td>
-                                <td>${formatNumber(payroll.reg_ot_hours)}</td>
-                                <td>${formatNumber(payroll.reg_ot_amount)}</td>
-                                <td>${formatNumber(payroll.night_diff_hours)}</td>
-                                <td>${formatNumber(payroll.night_diff_amount)}</td>
-                                <td>${formatNumber(payroll.other_earnings)}</td>
-                                <td>${formatNumber(payroll.total_working_days)}</td>
-                                <td>${formatNumber(payroll.total_allowance)}</td>
-                                <td>${formatNumber(payroll.adjustment)}</td>
-                                <td>${formatNumber(payroll.gross_pay)}</td>
-                                <td>${formatNumber(payroll.tardiness_hours)}</td>
-                                <td>${formatNumber(payroll.tardiness_amount)}</td>
-                                <td>${formatNumber(payroll.leave_without_pay_days)}</td>
-                                <td>${formatNumber(payroll.leave_without_pay_amount)}</td>
-                                <td>${formatNumber(payroll.sss)}</td>
-                                <td>${formatNumber(payroll.phic)}</td>
-                                <td>${formatNumber(payroll.pagibig)}</td>
-                                <td>${formatNumber(payroll.charges_penalties)}</td>
-                                <td>${formatNumber(payroll.cash_advance)}</td>
-                                <td>${formatNumber(payroll.cash_advance_balance)}</td>
-                                <td>${formatNumber(payroll.total_deductions)}</td>
-                                <td>${formatNumber(payroll.net_pay)}</td>
-                            </tr>
-                        `;
-                        $payrollTableBody.append(row);
-                    });
-                })
-                .catch(function (error) {
-                    console.error(error);
-                    $payrollTableBody.html('<tr><td colspan="30">Error fetching payroll data.</td></tr>');
+                $.each(data, function (index, payroll) {
+                    const row = `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${(payroll.employee?.fname || '') + ' ' + (payroll.employee?.lname || '')}</td>
+                            <td>${formatNumber(payroll.basic_salary)}</td>
+                            <td>${formatNumber(payroll.basicPay)}</td>
+                            <td>${formatNumber(payroll.abs_ut_deduction || 0)}</td>
+
+                            <!-- Earnings -->
+                            <td>${formatNumber(payroll.holiday_pay || 0)}</td>
+                            <td>${formatNumber(payroll.overtime_pay || 0)}</td>
+                            <td>${formatNumber(payroll.night_diff_pay || 0)}</td>
+
+                            <!-- Gross -->
+                            <td>${formatNumber(payroll.gross_pay || 0)}</td>
+
+                            <!-- Gov contributions/loans -->
+                            <td>${formatNumber(payroll.sss_contribution || 0)}</td>
+                            <td>${formatNumber(payroll.sss_loan || 0)}</td>
+                            <td>${formatNumber(payroll.pagibig_contribution || 0)}</td>
+                            <td>${formatNumber(payroll.pagibig_loan || 0)}</td>
+                            <td>${formatNumber(payroll.philhealth_contribution || 0)}</td>
+
+                            <!-- Taxable income, tax, net pay -->
+                            <td>${formatNumber(payroll.taxable_income || 0)}</td>
+                            <td>${formatNumber(payroll.withholding_tax || 0)}</td>
+                            <td>${formatNumber(payroll.net_pay || 0)}</td>
+
+                            <!-- Allowance + Adjustment -->
+                            <td>${formatNumber(payroll.allowances || 0)}</td>
+                            <td>${formatNumber(payroll.adjustment || 0)}</td>
+
+                            <!-- Charges, Cash Advance, Pay Receivable -->
+                            <td>${formatNumber(payroll.penalty_amount || 0)}</td>
+                            <td>${formatNumber(payroll.company_loan || 0)}</td>
+                            <td>${formatNumber(payroll.net_pay || 0)}</td>
+                        </tr>
+                    `;
+                    $payrollTableBody.append(row);
                 });
+            })
+            .catch(function (error) {
+                console.error(error);
+                $payrollTableBody.html('<tr><td colspan="25">Error fetching payroll data.</td></tr>');
+            });
         }
 
         // ✅ Bind event: Fetch Payroll
         $('#btnPayroll').on('click', fetchPayroll);
 
         // ✅ Bind event: Generate Payroll
-        $(document).on('click', '#btnGenerate', function (e) {
-            e.preventDefault();
-            $('#btnGenerate').prop('disabled', true).text('Generating...');
+    $(document).on('click', '#btnGenerate', function (e) {
+        e.preventDefault();
 
-            axios.get('/payroll/compute')
-                .then(function (response) {
-                    fetchPayroll();
-                    console.log(response.data);
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Payroll Generated',
-                        text: response.data.message || 'Payroll computation completed successfully!'
-                    });
-                })
-                .catch(function (error) {
-                    console.error(error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: error.response?.data?.message || 'An error occurred while generating payroll.'
-                    });
-                })
-                .finally(function () {
-                    $('#btnGenerate').prop('disabled', false).text('Generate');
-                });
+        // Get date values
+        let dateFrom = $('#date_from').val();
+        let dateTo = $('#date_to').val();
+        let payDate = $('#pay_date').val();
+
+        if (!dateFrom || !dateTo || !payDate) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Dates',
+                text: 'Please fill in the cut-off dates and pay date before generating payroll.'
+            });
+            return;
+        }
+
+        $('#btnGenerate').prop('disabled', true).text('Generating...');
+
+        // ✅ FIX: Proper GET request with params
+        axios.get('/payroll/compute', {
+            params: {
+                date_from: dateFrom,
+                date_to: dateTo,
+                pay_date: payDate
+            }
+        })
+        .then(function (response) {
+            fetchPayroll(); // reload payroll table
+            Swal.fire({
+                icon: 'success',
+                title: 'Payroll Generated',
+                text: response.data.message || 'Payroll computation completed successfully!'
+            });
+        })
+        .catch(function (error) {
+            console.error(error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.response?.data?.message || 'An error occurred while generating payroll.'
+            });
+        })
+        .finally(function () {
+            $('#btnGenerate').prop('disabled', false).text('Generate');
         });
+    });
+
+    // ✅ Pay Date Logic
+    const payDateInput = $('#pay_date');
+    const dateFromInput = $('#date_from');
+    const dateToInput = $('#date_to');
+
+    // Helper: Format date to YYYY-MM-DD
+    const formatDate = (d) => {
+        let mm = String(d.getMonth() + 1).padStart(2, '0');
+        let dd = String(d.getDate()).padStart(2, '0');
+        return `${d.getFullYear()}-${mm}-${dd}`;
+    };
+
+    // Helper: Check if selected date is valid pay date (15th or last day)
+    const isValidPayDate = (dateStr) => {
+        const date = new Date(dateStr);
+        if (isNaN(date)) return false;
+        const day = date.getDate();
+        const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+        return day === 15 || day === lastDay;
+    };
+
+    // ✅ When pay date changes
+    payDateInput.on('change', function () {
+        const selectedDate = $(this).val();
+
+        if (!isValidPayDate(selectedDate)) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Pay Date',
+                text: 'Only the 15th and the end of the month are valid pay dates.',
+                confirmButtonColor: '#008080'
+            }).then(() => {
+                $(this).val(''); // Clear invalid date
+                dateFromInput.val('');
+                dateToInput.val('');
+            });
+            return;
+        }
+
+        const payDate = new Date(selectedDate);
+        const year = payDate.getFullYear();
+        const month = payDate.getMonth();
+        const day = payDate.getDate();
+        let dateFrom, dateTo;
+
+        if (day === 15) {
+            // ✅ 26 of previous month → 10 of current month
+            dateFrom = new Date(year, month - 1, 26);
+            dateTo = new Date(year, month, 10);
+        } else {
+            // ✅ 11 → 25 of current month
+            dateFrom = new Date(year, month, 11);
+            dateTo = new Date(year, month, 25);
+        }
+
+        // ✅ Auto-fill cut-off dates
+        dateFromInput.val(formatDate(dateFrom));
+        dateToInput.val(formatDate(dateTo));
+    });
+
+    // ✅ Auto-trigger if pay_date already filled
+    if (payDateInput.val()) {
+        payDateInput.trigger('change');
+    }
+
+
+     
+
+
     });
 });

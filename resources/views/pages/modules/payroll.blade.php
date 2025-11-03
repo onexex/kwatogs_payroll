@@ -120,11 +120,11 @@
                 <i class="fa fa-calendar fa-lg me-2" style="color:#008080;"></i>
                 <h6 class="mb-0 fw-bold" style="color:#008080;">Payroll Date</h6>
             </div>
-<input type="date" id="pay_date" class="form-control mb-2" value="2025-10-31" required>
+            <input type="date" id="pay_date" class="form-control mb-2"   required>
 
             <div class="d-flex gap-2 ">
                 <button class="btn" id="btnGenerate" style="background-color:#008080;color:#fff; flex:1;">Generate</button>
-                <button class="btn btn-secondary" id="btnRelease" style="flex:1;">Approve for Release</button>
+                <button class="btn btn-secondary" id="btnRelease" style="flex:1;">Approve</button>
             </div>
         </div>
     </div>
@@ -138,8 +138,8 @@
                     <i class="fa fa-clock-o fa-lg me-2" style="color:#008080;"></i>
                     <h6 class="mb-0 fw-bold" style="color:#008080;">Cut-off Dates</h6>
                 </div>
-                <input type="date" id="date_from" class="form-control mb-2" required placeholder="Date From">
-                <input type="date" id="date_to" class="form-control mb-2" required placeholder="Date To">
+                <input type="date" id="date_from" name="date_from" class="form-control mb-2" required placeholder="Date From" readonly>
+                <input type="date" id="date_to" name="date_to" class="form-control mb-2" required placeholder="Date To" readonly>
             </div>
         </div>
     </div>
@@ -234,8 +234,8 @@
                           <thead class="table-light">
                             <tr>
                                 <th rowspan="2">#</th>
-                                <th rowspan="2" class="text-uppercase">Employee Name</th>
-                                <th rowspan="2" class="text-uppercase">Monthly Salary</th>
+                                <th rowspan="2" class="text-uppercase">Employee</th>
+                                <th rowspan="2" class="text-uppercase">Basic Salary</th>
                                 <th rowspan="2" class="text-uppercase">Bi-Monthly Rate</th>
                                 {{-- <th rowspan="2">Allowances<br>(Bi-Monthly)</th> --}}
                                 <th rowspan="2" class="text-uppercase">ABS/TRD/UT/TPO/OB DED</th>
@@ -348,7 +348,9 @@
     </div>
 
 </div>
-
+<script>
+    window.loggedEmployee = @json(session('loggedEmployee'));
+</script>
 <script src="{{ asset('js/modules/payroll.js') }}"></script>
 
 

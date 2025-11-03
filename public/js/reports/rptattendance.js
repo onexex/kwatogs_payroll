@@ -53,8 +53,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // Employee’s Daily Records
                     records.forEach((item, index) => {
-                        const timeIn = item.home_attendances?.[0]?.time_in ?? '-';
-                        const timeOut = item.home_attendances?.[0]?.time_out ?? '-';
+                        function formatTime(timeString) {
+                            if (!timeString) return '-';
+                            const date = new Date(timeString);
+                            return date.toLocaleTimeString('en-US', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true,
+                            });
+                        }
+                        // const timeIn = item.home_attendances?.[0]?.time_in ?? '-';
+                        // const timeOut = item.home_attendances?.[0]?.time_out ?? '-';
+                        const timeIn  = formatTime(attendance.time_in);
+                        const timeOut = formatTime(attendance.time_out);
                         const duration = item.total_hours ?? 0;
                         const late = item.mins_late ?? 0;
                         const under = item.mins_undertime ?? 0;
