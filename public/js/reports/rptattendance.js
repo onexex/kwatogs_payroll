@@ -54,10 +54,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Employee’s Daily Records
                     records.forEach((item, index) => {
                          
-                        // const timeIn = item.home_attendances?.[0]?.time_in ?? '-';
-                        // const timeOut = item.home_attendances?.[0]?.time_out ?? '-';
-                        const timeIn  = formatTime(attendance.time_in);
-                        const timeOut = formatTime(attendance.time_out);
+                        const timeIn = item.home_attendances?.[0]?.time_in ?? '-';
+                        const timeOut = item.home_attendances?.[0]?.time_out ?? '-';
+                        // const timeIn  = formatTime(attendance.time_in);
+                        // const timeOut = formatTime(attendance.time_out);
                         const duration = item.total_hours ?? 0;
                         const late = item.mins_late ?? 0;
                         const under = item.mins_undertime ?? 0;
