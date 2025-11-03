@@ -50,9 +50,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     //         <td colspan="9" class="text-start ps-2">${empName}</td>
                     //     </tr>
                     // `;
-                    const attendance = item.home_attendances?.[0] ?? {};
+          
                     // Employee’s Daily Records
                     records.forEach((item, index) => {
+                                  const attendance = item.home_attendances?.[0] ?? {};
                         function formatTime(timeString) {
                             if (!timeString) return '-';
                             const date = new Date(timeString);
