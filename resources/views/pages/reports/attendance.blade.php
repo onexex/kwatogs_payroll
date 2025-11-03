@@ -72,9 +72,11 @@
                                 <th scope="col">Time-in</th>
                                 <th scope="col">Time-out</th>
                                 <th scope="col">Duration</th>
-                                <th scope="col">Late (mins)</th>
-                                <th scope="col">Undertime (mins)</th>
-                                <th scope="col">Night Diff (mins)</th>
+                                <th scope="col">Late </th>
+                                <th scope="col">Undertime </th>
+                                <th scope="col">Night Diff</th>
+                                <th scope="col">Passout</th>
+                                <th scope="col">Over Break</th>
                             </thead>
                             <tbody id="tbl_rptattendance" name="tbl_rptattendance" class="text-center"></tbody>
                         </table>
