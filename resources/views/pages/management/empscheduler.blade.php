@@ -232,30 +232,138 @@ $(document).ready(function(){
         loadSchedules($('#txtSearchEmp').val(), 1, $(this).val());
     });
 
-        $('#btnSaveScheduler').on('click', function() {
+    // $('#btnSaveScheduler').on('click', function() {
             
-        let schedule_id = $('#schedule_id').val();
-        let url = schedule_id
-            ? `{{ url('employee-schedules/update') }}/${schedule_id}`
-            : "{{ route('employee-schedules.store') }}";
-        let method = schedule_id ? 'put' : 'post';
+    //     let schedule_id = $('#schedule_id').val();
+    //     let url = schedule_id
+    //         ? `{{ url('employee-schedules/update') }}/${schedule_id}`
+    //         : "{{ route('employee-schedules.store') }}";
+    //     let method = schedule_id ? 'put' : 'post';
 
-        let selectedDays = [];
-        $('.day-check:checked').each(function() {
-            selectedDays.push($(this).val());
-        });
+    //     let selectedDays = [];
+    //     $('.day-check:checked').each(function() {
+    //         selectedDays.push($(this).val());
+    //     });
 
-        let formData = {
-            employee_id: $('#selEmployee').val(),
-            sched_start_date: $('#sched_start_date').val(),
-            sched_in: $('#sched_in').val(),
-            sched_end_date: $('#sched_end_date').val(),
-            sched_out: $('#sched_out').val(),
-            shift_type: $('#shift_type').val(),
-            break_start: $('#break_start').val(),
-            break_end: $('#break_end').val(),
-            days: selectedDays,
-        };
+    //     let formData = {
+    //         employee_id: $('#selEmployee').val(),
+    //         sched_start_date: $('#sched_start_date').val(),
+    //         sched_in: $('#sched_in').val(),
+    //         sched_end_date: $('#sched_end_date').val(),
+    //         sched_out: $('#sched_out').val(),
+    //         shift_type: $('#shift_type').val(),
+    //         break_start: $('#break_start').val(),
+    //         break_end: $('#break_end').val(),
+    //         days: selectedDays,
+    //     };
+
+    //     Swal.fire({
+    //         title: 'Saving...',
+    //         text: 'Please wait while we process the schedule.',
+    //         allowOutsideClick: false,
+    //         didOpen: () => Swal.showLoading()
+    //     });
+
+    //     axios({ method, url, data: formData })
+    //         .then(res => {
+    //             Swal.fire({
+    //                 icon: 'success',
+    //                 title: 'Success',
+    //                 text: res.data.message,
+    //                 timer: 1800,
+    //                 showConfirmButton: false
+    //             });
+
+    //             $('#mdlEmpScheduler').modal('hide');
+    //             $('#frmEmpScheduler')[0].reset();
+    //             $('#schedule_id').val('');
+    //             loadSchedules();
+    //                 $('span.error-text').text('');
+    
+    //         // Or remove spans entirely if you appended them dynamically:
+    //         $('span.error-text').remove();
+    //             })
+    //             .catch(err => {
+    //                 Swal.close();
+
+    //                 if (err.response) {
+    //                     let { status, data } = err.response;
+
+    //                     // 🔸 Validation error (422)
+    //                     if (status === 422) {
+    //                         let errors = data.errors;
+    //                         $('.error-text').text('');
+    //                         Object.keys(errors).forEach(key => {
+    //                             $(`.${key}_error`).text(errors[key][0]);
+    //                         });
+
+    //                         Swal.fire({
+    //                             icon: 'error',
+    //                             title: 'Validation Error',
+    //                             text: 'Please review the highlighted fields.',
+    //                             customClass: 'swal-mini-popup'
+    //                         });
+    //                     }
+
+    //                     // 🔸 Schedule conflict (409)
+    //                     else if (status === 409) {
+    //                         Swal.fire({
+    //                             icon: 'warning',
+    //                             title: 'Schedule Conflict',
+    //                             text: data.error,
+    //                             confirmButtonColor: '#d33',
+    //                             confirmButtonText: 'OK',
+    //                             customClass: 'swal-mini-popup'
+    //                         });
+    //                     }
+
+    //                     // 🔸 Other server errors
+    //                     else {
+    //                         Swal.fire({
+    //                             icon: 'error',
+    //                             title: 'Error',
+    //                             text: data.message || 'An unexpected error occurred.',
+    //                             customClass: 'swal-mini-popup'
+    //                         });
+    //                     }
+    //                 } else {
+    //                     Swal.fire({
+    //                         icon: 'error',
+    //                         title: 'Network Error',
+    //                         text: 'Please check your internet connection and try again.',
+    //                         customClass: 'swal-mini-popup'
+    //                     });
+    //                 }
+    //             });
+    // });
+
+    $('#btnSaveScheduler').on('click', function() {
+
+    let schedule_id = $('#schedule_id').val();
+    let url = schedule_id
+        ? `{{ url('employee-schedules/update') }}/${schedule_id}`
+        : "{{ route('employee-schedules.store') }}";
+    let method = schedule_id ? 'put' : 'post';
+
+    let selectedDays = [];
+    $('.day-check:checked').each(function() {
+        selectedDays.push($(this).val());
+    });
+
+    let formData = {
+        employee_id: $('#selEmployee').val(),
+        sched_start_date: $('#sched_start_date').val(),
+        sched_in: $('#sched_in').val(),
+        sched_end_date: $('#sched_end_date').val(),
+        sched_out: $('#sched_out').val(),
+        shift_type: $('#shift_type').val(),
+        break_start: $('#break_start').val(),
+        break_end: $('#break_end').val(),
+        days: selectedDays,
+    };
+
+    function submitSchedule(data, isConfirmed = false) {
+        if (isConfirmed) data.confirm_long_shift = true;
 
         Swal.fire({
             title: 'Saving...',
@@ -264,8 +372,29 @@ $(document).ready(function(){
             didOpen: () => Swal.showLoading()
         });
 
-        axios({ method, url, data: formData })
+        axios({ method, url, data })
             .then(res => {
+                Swal.close();
+
+                // ⚠️ If backend sends warning (e.g., >9 hours)
+                if (res.data.warning) {
+                    Swal.fire({
+                        title: 'Confirm Schedule?',
+                        text: res.data.message,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, proceed',
+                        cancelButtonText: 'Cancel',
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            // 🔁 Re-submit with confirmation flag
+                            submitSchedule(data, true);
+                        }
+                    });
+                    return;
+                }
+
+                // ✅ Success
                 Swal.fire({
                     icon: 'success',
                     title: 'Success',
@@ -278,10 +407,8 @@ $(document).ready(function(){
                 $('#frmEmpScheduler')[0].reset();
                 $('#schedule_id').val('');
                 loadSchedules();
-                    $('span.error-text').text('');
-    
-    // Or remove spans entirely if you appended them dynamically:
-    $('span.error-text').remove();
+                $('span.error-text').text('');
+                $('span.error-text').remove();
             })
             .catch(err => {
                 Swal.close();
@@ -335,7 +462,12 @@ $(document).ready(function(){
                     });
                 }
             });
-    });
+    }
+
+    // Initial submission
+    submitSchedule(formData);
+});
+
 
 
     $(document).on('click', '.btnEdit', function(){
