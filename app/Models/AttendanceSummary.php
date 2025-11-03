@@ -30,10 +30,11 @@ class AttendanceSummary extends Model
         return $this->belongsTo(User::class, 'employee_id','empID');
     }
 
-      public function homeAttendances()
+  public function homeAttendances()
     {
         return $this->hasMany(HomeAttendance::class, 'employee_id', 'employee_id')
-                    ->whereColumn('home_attendances.attendance_date', 'attendance_date');
+            ->whereDate('attendance_date', '=', $this->attendance_date)
+            ->orderBy('time_in', 'asc');
     }
     protected $casts = [
         'attendance_date' => 'date', // ← This makes it a Carbon instance

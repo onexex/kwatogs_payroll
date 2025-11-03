@@ -53,20 +53,11 @@ document.addEventListener('DOMContentLoaded', function () {
           
                     // Employee’s Daily Records
                     records.forEach((item, index) => {
-                        //           const attendance = item.home_attendances?.[0] ?? {};
-                        // function formatTime(timeString) {
-                        //     if (!timeString) return '-';
-                        //     const date = new Date(timeString);
-                        //     return date.toLocaleTimeString('en-US', {
-                        //         hour: '2-digit',
-                        //         minute: '2-digit',
-                        //         hour12: true,
-                        //     });
-                        // }
-                        const timeIn = item.home_attendances?.[0]?.time_in ?? '-';
-                        const timeOut = item.home_attendances?.[0]?.time_out ?? '-';
-                        // const timeIn  = formatTime(attendance.time_in);
-                        // const timeOut = formatTime(attendance.time_out);
+                         
+                        // const timeIn = item.home_attendances?.[0]?.time_in ?? '-';
+                        // const timeOut = item.home_attendances?.[0]?.time_out ?? '-';
+                        const timeIn  = formatTime(attendance.time_in);
+                        const timeOut = formatTime(attendance.time_out);
                         const duration = item.total_hours ?? 0;
                         const late = item.mins_late ?? 0;
                         const under = item.mins_undertime ?? 0;
@@ -81,9 +72,9 @@ document.addEventListener('DOMContentLoaded', function () {
                             <tr>
                                 <td>${rowCount++}</td>
                                 <td class="text-capitalize">${empName}</td>
-                                <td>${item.attendance_date ?? '-'}</td>
-                                <td>${timeIn}</td>
-                                <td>${timeOut}</td>
+                                <td>${item.formatted_date ?? '-'}</td>
+                                <td>${item.first_time_in ?? '-'}</td>
+                                <td>${item.last_time_out ?? '-'}</td>
                                 <td>${duration} hrs</td>
                                 <td>${late}</td>
                                 <td>${under}</td>
