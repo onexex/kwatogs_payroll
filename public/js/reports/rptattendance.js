@@ -1,129 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-  const fetchAttendance = async () => {
-    const empID = document.getElementById('txtLastname')?.value || '';
-    const dateFrom = document.getElementById('txtDateFrom')?.value || '';
-    const dateTo = document.getElementById('txtDateTo')?.value || '';
-    const tokenMeta = document.querySelector('meta[name="csrf-token"]');
-    const token = tokenMeta ? tokenMeta.getAttribute('content') : '';
-
-    const tableBody = document.getElementById('tbl_rptattendance');
-    tableBody.innerHTML = `<tr><td colspan="11">Loading...</td></tr>`;
-
-    try {
-        const response = await axios.post('/attendance/fetch', {
-            employee_id: empID,
-            date_from: dateFrom,
-            date_to: dateTo,
-        }, {
-            headers: { 'X-CSRF-TOKEN': token },
-        });
-
-        const data = response.data;
-        let grouped = {};
-
-        // Group by employee name
-        data.forEach(item => {
-            const emp = item.employee;
-            const empName = emp ? `${emp.lname}, ${emp.fname}` : 'Unknown';
-            if (!grouped[empName]) grouped[empName] = [];
-            grouped[empName].push(item);
-        });
-
-        let rows = '';
-        let rowCount = 1;
-
-        if (Object.keys(grouped).length > 0) {
-            for (const [empName, records] of Object.entries(grouped)) {
-                let empTotalHours = 0;
-                let empTotalLate = 0;
-                let empTotalUnder = 0;
-                let empTotalNight = 0;
-                let empTotalPassout = 0;
-                let empTotalOverBreak = 0;
-
-                // Loop per date record
-                records.forEach(item => {
-                    // ✅ Build list of all time-ins/outs for that day
-                    let timeLogsIn = '-';
-                    let timeLogsOut = '-';
-
-                    if (item.home_attendances && item.home_attendances.length > 0) {
-                        const formatted = item.home_attendances.map(h => {
-                            const tin = h.time_in
-                                ? new Date(h.time_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })
-                                : '-';
-                            const tout = h.time_out
-                                ? new Date(h.time_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })
-                                : '-';
-                            return { tin, tout };
-                        });
-
-                        timeLogsIn = formatted.map(f => f.tin).join('<br>');
-                        timeLogsOut = formatted.map(f => f.tout).join('<br>');
-                    }
-
-                    const duration = parseFloat(item.total_hours ?? 0);
-                    const late = parseInt(item.mins_late ?? 0);
-                    const under = parseInt(item.mins_undertime ?? 0);
-                    const night = parseInt(item.mins_night_diff ?? 0);
-                    const passout = parseInt(item.outpass_minutes ?? 0);
-                    const overBreak = parseInt(item.over_break_minutes ?? 0);
-
-                    empTotalHours += duration;
-                    empTotalLate += late;
-                    empTotalUnder += under;
-                    empTotalNight += night;
-                    empTotalPassout += passout;
-                    empTotalOverBreak += overBreak;
-
-                    rows += `
-                        <tr class="text-center">
-                            <td>${rowCount++}</td>
-                            <td class="text-capitalize text-start">${empName}</td>
-                             <td>${item.attendance_date ? new Date(item.attendance_date).toISOString().split('T')[0] : '-'}</td>
-
-                            <td>${timeLogsIn}</td>
-                            <td>${timeLogsOut}</td>
-                            <td>${duration.toFixed(2)} hrs</td>
-                            <td>${late}</td>
-                            <td>${under}</td>
-                            <td>${night}</td>
-                            <td>${passout}</td>
-                            <td>${overBreak}</td>
-                        </tr>
-                    `;
-                });
-
-                // Employee subtotal
-                rows += `
-                    <tr class="fw-bold bg-light text-center">
-                        <td colspan="5" class="text-end">Total:</td>
-                        <td>${empTotalHours.toFixed(2)} hrs</td>
-                        <td>${empTotalLate}</td>
-                        <td>${empTotalUnder}</td>
-                        <td>${empTotalNight}</td>
-                        <td>${empTotalPassout}</td>
-                        <td>${empTotalOverBreak}</td>
-                    </tr>
-                `;
-            }
-        } else {
-            rows = '<tr><td colspan="11">No attendance records found</td></tr>';
-        }
-
-        tableBody.innerHTML = rows;
-        document.querySelector('.rptDateRange').textContent = `${dateFrom} to ${dateTo}`;
-    } catch (error) {
-        console.error(error);
-        tableBody.innerHTML = `<tr><td colspan="11" class="text-danger">Error loading data</td></tr>`;
-    }
-};
-
-
-
-    // Initial load
-    fetchAttendance();
+    
 
     // Refresh button
     document.getElementById('btn_rptrefresh').addEventListener('click', fetchAttendance);
@@ -160,4 +37,94 @@ document.addEventListener('DOMContentLoaded', function () {
         printWindow.print();
         printWindow.close();
     });
+
+        const btnRefresh = $("#btn_rptrefresh");
+    const empSelect = $("#txtLastname");
+    const dateFrom = $("#txtDateFrom");
+    const dateTo = $("#txtDateTo");
+    const tableBody = $("#tbl_rptattendance");
+
+    axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
+    axios.defaults.headers.common["X-CSRF-TOKEN"] = $('meta[name="csrf-token"]').attr("content");
+
+    btnRefresh.on("click", function () {
+        fetchAttendance();
+    });
+
+    function fetchAttendance() {
+        const empID = empSelect.val();
+        const from = dateFrom.val();
+        const to = dateTo.val();
+
+        tableBody.html(`<tr><td colspan="11" class="text-center">Loading...</td></tr>`);
+
+        axios.post("/attendance/fetch", {
+            empID: empID,
+            dateFrom: from,
+            dateTo: to,
+        })
+        .then(response => {
+            const res = response.data;
+            if (res.status === "success") {
+                renderTable(res.data);
+            } else {
+                tableBody.html(`<tr><td colspan="11" class="text-center text-danger">No records found</td></tr>`);
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            tableBody.html(`<tr><td colspan="11" class="text-center text-danger">Error fetching data</td></tr>`);
+        });
+    }
+
+    function renderTable(data) {
+        if (!data.length) {
+            tableBody.html(`<tr><td colspan="11" class="text-center">No records found</td></tr>`);
+            return;
+        }
+
+        let rows = "";
+        data.forEach((item, i) => {
+            const empName = item.employee ? `${item.employee.lname}, ${item.employee.fname}` : "N/A";
+
+            // Build logs list
+            let logRows = "-";
+            if (item.logs && item.logs.length > 0) {
+                const logArray = item.logs.map(log => {
+                    return `${formatTime(log.time_in)} - ${formatTime(log.time_out)}`;
+                });
+                logRows = logArray.join("<br>");
+            }
+
+            rows += `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td>${empName}</td>
+                    <td>${item.formatted_date ?? '-'}</td>
+                    <td colspan="2">${logRows}</td>
+                    <td>${item.total_hours ?? 0}</td>
+                    <td>${item.mins_late ?? 0}</td>
+                    <td>${item.mins_undertime ?? 0}</td>
+                    <td>${item.mins_night_diff ?? 0}</td>
+                    <td>${item.outpass_minutes ?? 0}</td>
+                    <td>${item.over_break_minutes ?? 0}</td>
+                </tr>
+            `;
+        });
+
+        tableBody.html(rows);
+    }
+
+    function formatTime(timeString) {
+        if (!timeString) return "-";
+        const date = new Date(timeString);
+        return date.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+        });
+    }
+
+    fetchAttendance();
+    
 });
