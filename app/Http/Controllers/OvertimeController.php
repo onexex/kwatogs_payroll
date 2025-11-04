@@ -192,7 +192,6 @@ class OvertimeController extends Controller
     {
         if ($overtime) {
             
-
             $overtime->status = $request->status;
             $overtime->save();
 

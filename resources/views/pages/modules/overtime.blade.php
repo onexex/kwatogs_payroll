@@ -8,7 +8,9 @@
 
     <div class="mb-2">
         <h4 class=" mb-0 text-gray-800">Overtime Filing System</h4>
-        <button class=" mt-3 btn text-white" style="background-color: #008080" name="btnCreateOTModal" id="btnCreateOTModal" data-bs-toggle="modal" data-bs-target="#mdlOvertime"> <i class="fa fa-plus"></i> Overtime Filing Form</button>
+        @can('createovertime')
+            <button class=" mt-3 btn text-white" style="background-color: #008080" name="btnCreateOTModal" id="btnCreateOTModal" data-bs-toggle="modal" data-bs-target="#mdlOvertime"> <i class="fa fa-plus"></i> Overtime Filing Form</button>
+        @endcan
     </div>
 
     <!-- Page Heading -->
@@ -74,26 +76,88 @@
                                             <td>
                                                 @php
                                                     $badgeClass = match($overtime['status']) {
-                                                        'APPROVED' => 'bg-success',
+                                                        'APPROVED' => 'bg-info',
+                                                        'APPROVEDBYCFO' => 'bg-success',
                                                         'DISAPPROVED' => 'bg-danger',
+                                                        'CANCELED' => 'bg-danger',
                                                         'FORAPPROVAL' => 'bg-warning text-dark',
                                                         default => 'bg-secondary'
                                                     };
                                                 @endphp
-                                                <span class="badge {{ $badgeClass }}">{{ strtoupper($overtime['status_value']) }}</span>
+                                                <span class="badge p-2 {{ $badgeClass }}">{{ strtoupper($overtime['status_value']) }}</span>
                                             </td>
 
                                             <td>
                                                 <div class="btn-group gap-2">
-                                                    @if ($overtime['status'] == 'FORAPPROVAL')
-                                                        <a href="javascript:void(0)"
-                                                            class="btn btn-sm btn-danger text-uppercase btnCancelOT"
-                                                            data-id="{{ $overtime['id'] }}"
-                                                            data-url="{{ route('overtime.status.update', ['overtime' => $overtime['id']]) }}"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#mdlCancelOvertime">
+                                                    @if ($overtime['status'] == 'FORAPPROVAL') 
+                                                        @can('cancelovertime')
+                                                            <a href="javascript:void(0)"
+                                                                class="btn btn-sm btn-danger text-uppercase btnChangeStatus"
+                                                                data-id="{{ $overtime['id'] }}"
+                                                                data-url="{{ route('overtime.status.update', ['overtime' => $overtime['id']]) }}"
+                                                                data-status="CANCELED"
+                                                                data-title="Cancel Overtime"
+                                                                data-message="Are you sure you want to cancel this overtime request? This action cannot be undone."
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#mdlStatusUpdate">
                                                                 Cancel
-                                                        </a>
+                                                            </a>
+                                                        @endcan
+                                                        @can('disapproveovertime')
+                                                            <a href="javascript:void(0)"
+                                                                class="btn btn-sm btn-danger bg-danger text-white text-uppercase btnChangeStatus"
+                                                                data-id="{{ $overtime['id'] }}"
+                                                                data-url="{{ route('overtime.status.update', ['overtime' => $overtime['id']]) }}"
+                                                                data-status="DISAPPROVED"
+                                                                data-title="Disapprove Overtime"
+                                                                data-message="Are you sure you want to disapprove this overtime request? This action cannot be undone."
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#mdlStatusUpdate">
+                                                                Disapprove
+                                                            </a>
+                                                        @endcan
+                                                        @can('approveovertime')
+                                                      
+                                                            <a href="javascript:void(0)"
+                                                                class="btn btn-sm btn-info text-uppercase btnChangeStatus"
+                                                                data-id="{{ $overtime['id'] }}"
+                                                                data-url="{{ route('overtime.status.update', ['overtime' => $overtime['id']]) }}"
+                                                                data-status="APPROVED"
+                                                                data-title="Approve Overtime"
+                                                                data-message="Are you sure you want to approve this overtime request? This action cannot be undone."
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#mdlStatusUpdate">
+                                                                Approve by COO
+                                                            </a>
+                                                        @endcan
+                                                    @endif
+                                                    @if ($overtime['status'] == 'APPROVED') 
+                                                        @can('disapproveovertime')
+                                                            <a href="javascript:void(0)"
+                                                                class="btn btn-sm btn-danger bg-danger text-white text-uppercase btnChangeStatus"
+                                                                data-id="{{ $overtime['id'] }}"
+                                                                data-url="{{ route('overtime.status.update', ['overtime' => $overtime['id']]) }}"
+                                                                data-status="DISAPPROVED"
+                                                                data-title="Disapprove Overtime"
+                                                                data-message="Are you sure you want to disapprove this overtime request? This action cannot be undone."
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#mdlStatusUpdate">
+                                                                Disapprove
+                                                            </a>
+                                                        @endcan
+                                                        @can('approvecfoovertime')
+                                                            <a href="javascript:void(0)"
+                                                                class="btn btn-sm btn-sucess bg-success text-white text-uppercase btnChangeStatus"
+                                                                data-id="{{ $overtime['id'] }}"
+                                                                data-url="{{ route('overtime.status.update', ['overtime' => $overtime['id']]) }}"
+                                                                data-status="APPROVEDBYCFO"
+                                                                data-title="Approve and Confirm Overtime"
+                                                                data-message="Are you sure you want to CFO Approve this overtime request? This action cannot be undone."
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#mdlStatusUpdate">
+                                                                Approve by CFO
+                                                            </a>
+                                                        @endcan
                                                     @endif
                                                 </div>
                                             </td>
@@ -267,26 +331,26 @@
         </div>
     </div>
 
-    <!-- Cancel Modal -->
-    <div class="modal fade" id="mdlCancelOvertime" tabindex="-1" aria-labelledby="mdlCancelOvertimeLabel" aria-hidden="true">
+   <!-- Status Update Modal -->
+    <div class="modal fade" id="mdlStatusUpdate" tabindex="-1" aria-labelledby="mdlStatusUpdateLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="mdlCancelOvertimeLabel">Cancel Overtime</h5>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="mdlStatusUpdateLabel">Update Status</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body">
-                    <p>Are you sure you want to cancel this overtime request? This action cannot be undone.</p>
+                    <p id="statusUpdateMessage">Are you sure?</p>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Keep It</button>
-                     <form id="cancelOvertimeForm" method="POST" style="display:inline;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                    <form id="statusUpdateForm" method="POST" style="display:inline;">
                         @csrf
                         @method('PUT')
-                        <input type="hidden" name="status" value="CANCELED">
-                        <button type="submit" class="btn btn-danger">Yes, Cancel It</button>
+                        <input type="hidden" name="status" id="statusInput">
+                        <button type="submit" class="btn btn-primary" id="statusUpdateButton">Yes</button>
                     </form>
                 </div>
             </div>
@@ -306,14 +370,34 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const cancelButtons = document.querySelectorAll('.btnCancelOT');
-            const cancelForm = document.getElementById('cancelOvertimeForm');
+            const modal = document.getElementById('mdlStatusUpdate');
+            const form = document.getElementById('statusUpdateForm');
+            const statusInput = document.getElementById('statusInput');
+            const modalTitle = document.getElementById('mdlStatusUpdateLabel');
+            const modalMessage = document.getElementById('statusUpdateMessage');
+            const modalButton = document.getElementById('statusUpdateButton');
 
-            cancelButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const url = this.dataset.url;
-                    cancelForm.setAttribute('action', url);
-                    console.log('Set cancel form action to:', url);
+            // Listen for button clicks that open the modal
+            document.querySelectorAll('.btnChangeStatus').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const url = btn.getAttribute('data-url');
+                    const status = btn.getAttribute('data-status');
+                    const title = btn.getAttribute('data-title');
+                    const message = btn.getAttribute('data-message');
+
+                    // Update form action and modal content dynamically
+                    form.setAttribute('action', url);
+                    statusInput.value = status;
+                    modalTitle.textContent = title || 'Update Status';
+                    modalMessage.textContent = message || 'Are you sure you want to proceed?';
+
+                    // Change button color depending on status
+                    modalButton.className = 'btn';
+                    if (status === 'CANCELED') modalButton.classList.add('btn-danger');
+                    else if (status === 'APPROVED') modalButton.classList.add('btn-success');
+                    else modalButton.classList.add('btn-primary');
+
+                    modalButton.textContent = `Yes, ${status.charAt(0) + status.slice(1).toLowerCase()}`;
                 });
             });
         });
