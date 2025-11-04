@@ -169,7 +169,11 @@
                                                 <div class="form-group mb-1">
                                                     <label class="form-check-label mb-0" for="txtPurposeRem"> Purpose <label for="" class="text-danger mb-0"></label></label>
                                                     <textarea class="form-control" id="txtPurposeRem" name="purpose" rows="4" placeholder="-" style="height: 100px">{{ old('purpose')}}</textarea>
-                                                    <span class="text-danger small error-text purpose_error"></span>
+                                                    @if ($errors->has('purpose'))
+                                                        @foreach ($errors->get('purpose') as $error)
+                                                            <span class="text-danger small d-block error-text">{{ $error }}</span>
+                                                        @endforeach
+                                                    @endif
                                                 </div>
                                             </div>
 

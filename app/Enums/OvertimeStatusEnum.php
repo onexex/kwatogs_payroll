@@ -14,5 +14,7 @@ enum OvertimeStatusEnum: string
 
     case APPROVED = 'APPROVED';
 
+    case APPROVEDBYCFO = 'APPROVED BY CFO';
+
     case DISAPPROVED = 'DISAPPROVED';
 }
