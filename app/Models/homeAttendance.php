@@ -265,38 +265,37 @@ class HomeAttendance extends Model
 
         // 🔍 Retrieve correct schedule for this punch
         $schedule = $this->schedule;
-
-        //  LUNCH BREAK HANDLING
-        if ($schedule && $schedule->break_start && $schedule->break_end) {
-        
-            // Build Carbon timestamps for the break period
-            $breakStart = Carbon::parse($actualIn->toDateString() . ' ' . $schedule->break_start);
-            $breakEnd = Carbon::parse($actualIn->toDateString() . ' ' . $schedule->break_end);
-       
-            // If employee TIME-OUT happens during break → mark as lunch break
-            if ($timeOut->between($breakStart, $breakEnd)) {
-                // $this->time_out = $timeOut;
-                $this->remarks = 'Lunch Break';    
-                $this->save();
-                // return $this;
-                
-            }
             $breakDuration = 0;
+        //  LUNCH BREAK HANDLING
+        // if ($schedule && $schedule->break_start && $schedule->break_end) {
+        
+        //     // Build Carbon timestamps for the break period
+        //     $breakStart = Carbon::parse($actualIn->toDateString() . ' ' . $schedule->break_start);
+        //     $breakEnd = Carbon::parse($actualIn->toDateString() . ' ' . $schedule->break_end);
+       
+        //     // If employee TIME-OUT happens during break → mark as lunch break
+        //     if ($timeOut->between($breakStart, $breakEnd)) {
+        //         // $this->time_out = $timeOut;
+        //         $this->remarks = 'Lunch Break';    
+        //         $this->save();
+        //         // return $this;
+        //     }
+        //     $breakDuration = 0;
 
-            if ($actualIn->lte($breakStart) && $timeOut->gte($breakEnd)) {
-                $breakDuration = $breakEnd->diffInMinutes($breakStart);
-            } 
-            // elseif ($actualIn->lte($breakStart) && $timeOut->between($breakStart, $breakEnd)) {
-            //     $breakDuration = $timeOut->diffInMinutes($breakStart);
-            // }
-             elseif ($actualIn->between($breakStart, $breakEnd) && $timeOut->gte($breakEnd)) {
-                $breakDuration = $breakEnd->diffInMinutes($actualIn);
-            } elseif ($actualIn->between($breakStart, $breakEnd) && $timeOut->between($breakStart, $breakEnd)) {
-                $breakDuration = $timeOut->diffInMinutes($actualIn);
-            } else {
-                $breakDuration = 0;
-            }
-        }
+        //     if ($actualIn->lte($breakStart) && $timeOut->gte($breakEnd)) {
+        //         $breakDuration = $breakEnd->diffInMinutes($breakStart);
+        //     } 
+        //     // elseif ($actualIn->lte($breakStart) && $timeOut->between($breakStart, $breakEnd)) {
+        //     //     $breakDuration = $timeOut->diffInMinutes($breakStart);
+        //     // }
+        //      elseif ($actualIn->between($breakStart, $breakEnd) && $timeOut->gte($breakEnd)) {
+        //         $breakDuration = $breakEnd->diffInMinutes($actualIn);
+        //     } elseif ($actualIn->between($breakStart, $breakEnd) && $timeOut->between($breakStart, $breakEnd)) {
+        //         $breakDuration = $timeOut->diffInMinutes($actualIn);
+        //     } else {
+        //         $breakDuration = 0;
+        //     }
+        // }
 
         if (!$schedule) {
             // Fallback: find schedule based on the IN date or OUT date

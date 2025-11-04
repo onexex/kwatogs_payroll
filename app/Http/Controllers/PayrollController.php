@@ -1,20 +1,23 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\OB;
 use Carbon\Carbon;
 use App\Models\Loan;
 use App\Models\User;
+use App\Models\Leave;
 use App\Models\Payroll;
+use App\Models\Overtime;
 use App\Models\EmpDetail;
 use App\Models\LoanPayment;
+use Illuminate\Http\Request;
 use App\Models\PayrollDetail;
 use App\Models\SssContribution;
 use App\Models\EmployeeSchedule;
-use App\Helpers\ContributionHelper;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use App\Models\holidayLoggerModel;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Helpers\ContributionHelper;
+use Illuminate\Support\Facades\Log;
  
 class PayrollController extends Controller
 {
@@ -108,6 +111,34 @@ class PayrollController extends Controller
                 date('Y-m-d', strtotime($holiday->date)) => $holiday->type
             ])->toArray();
 
+            // =======================================================
+            //   Preload all relevant records once
+            // =======================================================
+            $allLeaves = Leave::where('status', 'Approved')
+                ->where(function ($q) use ($startDate, $endDate) {
+                    $q->whereBetween('start_date', [$startDate, $endDate])
+                    ->orWhereBetween('end_date', [$startDate, $endDate]);
+                })
+                ->get()
+                ->groupBy('employee_id');
+
+            $allObs = OB::where('status', 'Approved')
+                ->where(function ($q) use ($startDate, $endDate) {
+                    $q->whereBetween('start_date', [$startDate, $endDate])
+                    ->orWhereBetween('end_date', [$startDate, $endDate]);
+                })
+                ->get()
+                ->groupBy('employee_id');
+
+            $allOts = Overtime::where('status', 'Approved')
+                ->where(function ($q) use ($startDate, $endDate) {
+                    $q->whereBetween('date_from', [$startDate, $endDate])
+                    ->orWhereBetween('date_to', [$startDate, $endDate]);
+                })
+                ->get()
+                ->groupBy('emp_detail_id');
+
+
             // ==============================
             //  PROCESS EACH EMPLOYEE
             // ==============================
@@ -149,6 +180,11 @@ class PayrollController extends Controller
                     ->whereBetween('attendance_date', [$startDate, $endDate])
                     ->get()
                     ->keyBy(fn($s) => date('Y-m-d', strtotime($s->attendance_date)));
+                //key ob ot leave
+                    $employeeLeaves = $allLeaves->get($emp->empID, collect());
+                    $employeeObs    = $allObs->get($emp->empID, collect());
+                    $employeeOts = $allOts->get($emp->empID, collect())
+                        ->keyBy(fn($ot) => Carbon::parse($ot->date_from)->format('Y-m-d'));  
 
                 // ==============================
                 //  DAILY ATTENDANCE LOOP
@@ -161,14 +197,34 @@ class PayrollController extends Controller
                         $dateStr = $date->format('Y-m-d');
                         $summary = $attendanceSummaries[$dateStr] ?? null;
 
+                        // --- Quick lookups using collections ---
+                        $onLeave = $employeeLeaves->first(fn($l) =>
+                            $dateStr >= $l->start_date && $dateStr <= $l->end_date
+                        );
+
+                        $onOB = $employeeObs->first(fn($ob) =>
+                            $dateStr >= $ob->start_date && $dateStr <= $ob->end_date
+                        );
+
+                        $otEntry = $employeeOts->get($dateStr);
+
+                        // OT Pay (precomputed)
+                        if ($otEntry) {
+                            // If OT pay is stored in the OT table
+                            $totalOT += $otEntry->total_pay ?? 0;
+                        } 
+
                         //  Check absence
-                        $isAbsent = (!$summary || $summary->total_hours == 0);
-                        if ($isAbsent) $absentDays++;
+                        if ($onLeave || $onOB) {
+                            $isAbsent = false;
+                        } else {
+                            $isAbsent = (!$summary || $summary->total_hours == 0);
+                            if ($isAbsent) $absentDays++;
+                        }
 
                         //  Accumulate worked hours + deductions
                         if ($summary) {
                             $totalHoursWorked += $summary->total_hours;
-                            $totalOT          += $summary->ot_hours;
                             $totalLate        += $summary->mins_late;
                             $totalUndertime   += $summary->mins_undertime;
                             $over_break_minutes  += $summary->over_break_minutes;
@@ -189,7 +245,7 @@ class PayrollController extends Controller
                             if ($holidayType == '1') {
                                 if ($worked){
                                     $holidayPay += $dailyRate * 1;
-                                } elseif ($presentBefore){
+                                 } elseif ($presentBefore || $onLeave || $onOB) {
                                     $holidayPay += $dailyRate;
                                     $absentDays = $absentDays - 1; // adjust absence
                                 } 
@@ -199,7 +255,7 @@ class PayrollController extends Controller
                                 $holidayPay += $dailyRate * .3;
                             } 
                         }
-
+                          $logsType = $onLeave ? 'Leave' : ($onOB ? 'OB' : ($isAbsent ? 'Absent' : 'Present'));
                         //  Save daily record
                         PayrollDetail::updateOrCreate(
                             [
@@ -207,7 +263,7 @@ class PayrollController extends Controller
                                 'employee_id' => $emp->empID,
                                 'payroll_date'=> $payDate,
                                 'date'        => $dateStr,
-                                'logsType'    => $isAbsent ? 'Absent' : 'Present',
+                                'logsType'    =>  $logsType,
                             ],
                             []
                         );
@@ -260,7 +316,6 @@ class PayrollController extends Controller
                 );
 
                 $monthlyGross = $grossPay + $previousGross;
-                
                 $contributions = ContributionHelper::computeAll(
                     $monthlyGross,
                     $employeeClass,

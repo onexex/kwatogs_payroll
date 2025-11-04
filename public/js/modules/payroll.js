@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
             printWindow.close();
         });
     }
-
+});
     // Initialize jQuery once DOM is ready
     $(document).ready(function () {
         const $payrollTableBody = $('#payrollTableBody');
@@ -208,122 +208,122 @@ document.addEventListener("DOMContentLoaded", function () {
         $('#btnPayroll').on('click', fetchPayroll);
 
         // ✅ Bind event: Generate Payroll
-    $(document).on('click', '#btnGenerate', function (e) {
-        e.preventDefault();
+        $(document).on('click', '#btnGenerate', function (e) {
+            e.preventDefault();
 
-        // Get date values
-        let dateFrom = $('#date_from').val();
-        let dateTo = $('#date_to').val();
-        let payDate = $('#pay_date').val();
+            // Get date values
+            let dateFrom = $('#date_from').val();
+            let dateTo = $('#date_to').val();
+            let payDate = $('#pay_date').val();
 
-        if (!dateFrom || !dateTo || !payDate) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Missing Dates',
-                text: 'Please fill in the cut-off dates and pay date before generating payroll.'
-            });
-            return;
-        }
-
-        $('#btnGenerate').prop('disabled', true).text('Generating...');
-
-        // ✅ FIX: Proper GET request with params
-        axios.get('/payroll/compute', {
-            params: {
-                date_from: dateFrom,
-                date_to: dateTo,
-                pay_date: payDate
+            if (!dateFrom || !dateTo || !payDate) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Missing Dates',
+                    text: 'Please fill in the cut-off dates and pay date before generating payroll.'
+                });
+                return;
             }
-        })
-        .then(function (response) {
-            fetchPayroll(); // reload payroll table
-            Swal.fire({
-                icon: 'success',
-                title: 'Payroll Generated',
-                text: response.data.message || 'Payroll computation completed successfully!'
+
+            $('#btnGenerate').prop('disabled', true).text('Generating...');
+
+            // ✅ FIX: Proper GET request with params
+            axios.get('/payroll/compute', {
+                params: {
+                    date_from: dateFrom,
+                    date_to: dateTo,
+                    pay_date: payDate
+                }
+            })
+            .then(function (response) {
+                fetchPayroll(); // reload payroll table
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Payroll Generated',
+                    text: response.data.message || 'Payroll computation completed successfully!'
+                });
+            })
+            .catch(function (error) {
+                console.error(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.response?.data?.message || 'An error occurred while generating payroll.'
+                });
+            })
+            .finally(function () {
+                $('#btnGenerate').prop('disabled', false).text('Generate');
             });
-        })
-        .catch(function (error) {
-            console.error(error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: error.response?.data?.message || 'An error occurred while generating payroll.'
-            });
-        })
-        .finally(function () {
-            $('#btnGenerate').prop('disabled', false).text('Generate');
         });
-    });
 
-    // ✅ Pay Date Logic
-    const payDateInput = $('#pay_date');
-    const dateFromInput = $('#date_from');
-    const dateToInput = $('#date_to');
+        // ✅ Pay Date Logic
+        const payDateInput = $('#pay_date');
+        const dateFromInput = $('#date_from');
+        const dateToInput = $('#date_to');
 
-    // Helper: Format date to YYYY-MM-DD
-    const formatDate = (d) => {
-        let mm = String(d.getMonth() + 1).padStart(2, '0');
-        let dd = String(d.getDate()).padStart(2, '0');
-        return `${d.getFullYear()}-${mm}-${dd}`;
-    };
+        // Helper: Format date to YYYY-MM-DD
+        const formatDate = (d) => {
+            let mm = String(d.getMonth() + 1).padStart(2, '0');
+            let dd = String(d.getDate()).padStart(2, '0');
+            return `${d.getFullYear()}-${mm}-${dd}`;
+        };
 
-    // Helper: Check if selected date is valid pay date (15th or last day)
-    const isValidPayDate = (dateStr) => {
-        const date = new Date(dateStr);
-        if (isNaN(date)) return false;
-        const day = date.getDate();
-        const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-        return day === 15 || day === lastDay;
-    };
+        // Helper: Check if selected date is valid pay date (15th or last day)
+        const isValidPayDate = (dateStr) => {
+            const date = new Date(dateStr);
+            if (isNaN(date)) return false;
+            const day = date.getDate();
+            const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+            return day === 15 || day === lastDay;
+        };
 
-    // ✅ When pay date changes
-    payDateInput.on('change', function () {
-        const selectedDate = $(this).val();
+        // ✅ When pay date changes
+        payDateInput.on('change', function () {
+            const selectedDate = $(this).val();
 
-        if (!isValidPayDate(selectedDate)) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Invalid Pay Date',
-                text: 'Only the 15th and the end of the month are valid pay dates.',
-                confirmButtonColor: '#008080'
-            }).then(() => {
-                $(this).val(''); // Clear invalid date
-                dateFromInput.val('');
-                dateToInput.val('');
-            });
-            return;
+            if (!isValidPayDate(selectedDate)) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid Pay Date',
+                    text: 'Only the 15th and the end of the month are valid pay dates.',
+                    confirmButtonColor: '#008080'
+                }).then(() => {
+                    $(this).val(''); // Clear invalid date
+                    dateFromInput.val('');
+                    dateToInput.val('');
+                });
+                return;
+            }
+
+            const payDate = new Date(selectedDate);
+            const year = payDate.getFullYear();
+            const month = payDate.getMonth();
+            const day = payDate.getDate();
+            let dateFrom, dateTo;
+
+            if (day === 15) {
+                // ✅ 26 of previous month → 10 of current month
+                dateFrom = new Date(year, month - 1, 26);
+                dateTo = new Date(year, month, 10);
+            } else {
+                // ✅ 11 → 25 of current month
+                dateFrom = new Date(year, month, 11);
+                dateTo = new Date(year, month, 25);
+            }
+
+            // ✅ Auto-fill cut-off dates
+            dateFromInput.val(formatDate(dateFrom));
+            dateToInput.val(formatDate(dateTo));
+        });
+
+        // ✅ Auto-trigger if pay_date already filled
+        if (payDateInput.val()) {
+            payDateInput.trigger('change');
         }
-
-        const payDate = new Date(selectedDate);
-        const year = payDate.getFullYear();
-        const month = payDate.getMonth();
-        const day = payDate.getDate();
-        let dateFrom, dateTo;
-
-        if (day === 15) {
-            // ✅ 26 of previous month → 10 of current month
-            dateFrom = new Date(year, month - 1, 26);
-            dateTo = new Date(year, month, 10);
-        } else {
-            // ✅ 11 → 25 of current month
-            dateFrom = new Date(year, month, 11);
-            dateTo = new Date(year, month, 25);
-        }
-
-        // ✅ Auto-fill cut-off dates
-        dateFromInput.val(formatDate(dateFrom));
-        dateToInput.val(formatDate(dateTo));
-    });
-
-    // ✅ Auto-trigger if pay_date already filled
-    if (payDateInput.val()) {
-        payDateInput.trigger('change');
-    }
 
 
      
 
 
     });
-});
+

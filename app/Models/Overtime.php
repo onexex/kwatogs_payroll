@@ -18,6 +18,8 @@ class Overtime extends Model
         'date_to',  
         'time_in',   
         'time_out',   
-        'purpose',     
+        'purpose',
+        'total_hrs',
+        'total_pay'   
     ];
 }
