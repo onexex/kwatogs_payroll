@@ -22,12 +22,20 @@
             <div class="row">
                 <ul class="nav nav-pills list-inline px-4" role="tablist">
                     <li class="nav-item pr-2">
-                    <a
-                        href="{{ route('user-roles.show', ['user_role' => $role->id, 'permission' => 'page']) }}"
-                        class="nav-link text-secondary list-inline-item shadow-sm {{ $permissiontab === 'page' ? 'active' : '' }}"
-                    >
-                        <i class="tf-icons bx bx-user"></i> Page Permission
-                    </a>
+                        <a
+                            href="{{ route('user-roles.show', ['user_role' => $role->id, 'permission' => 'page']) }}"
+                            class="nav-link text-secondary list-inline-item shadow-sm {{ $permissiontab === 'page' ? 'active' : '' }}"
+                        >
+                            <i class="tf-icons bx bx-user"></i> Page Permission
+                        </a>
+                    </li>
+                    <li class="nav-item pr-2">
+                        <a
+                            href="{{ route('user-roles.show', ['user_role' => $role->id, 'permission' => 'overtime']) }}"
+                            class="nav-link text-secondary list-inline-item shadow-sm {{ $permissiontab === 'overtime' ? 'active' : '' }}"
+                        >
+                            <i class="tf-icons bx bx-user"></i> Overtime Permission
+                        </a>
                     </li>
                 </ul>
             </div>

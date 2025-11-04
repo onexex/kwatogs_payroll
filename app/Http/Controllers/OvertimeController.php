@@ -7,6 +7,7 @@ use App\Models\Overtime;
 use Illuminate\Http\Request;
 use App\Models\EmployeeSchedule;
 use App\Enums\OvertimeStatusEnum;
+use App\Models\holidayLoggerModel;
 use Illuminate\Support\Facades\Auth;
 
 class OvertimeController extends Controller
@@ -49,6 +50,10 @@ class OvertimeController extends Controller
                     $from = Carbon::parse($request->dateFrom . ' ' . $request->timeFrom);
                     $to   = Carbon::parse($request->dateTo . ' ' . $request->timeTo);
 
+                    if ($request->dateFrom !== $request->dateTo) {
+                        $fail('The start and end dates must be the same.');
+                    }
+
                     if ($from->greaterThanOrEqualTo($to)) {
                         $fail('The start date and time must be earlier than the end date and time.');
                     }
@@ -57,7 +62,7 @@ class OvertimeController extends Controller
             'dateTo'   => ['required', 'date', 'after_or_equal:dateFrom'],
             'timeFrom' => ['required'],
             'timeTo'   => ['required'],
-            'purpose'  => ['nullable', 'string', 'max:255'],
+            'purpose'  => ['required', 'string', 'max:255'],
         ]);
 
         $fromDateTime = Carbon::parse($request->dateFrom . ' ' . $request->timeFrom);
@@ -82,8 +87,91 @@ class OvertimeController extends Controller
                     'dateFrom' => 'You already have a work schedule that overlaps this time range. Overtime is not allowed within scheduled hours.'
                 ])->withInput();
             }
+            $overlapping = Overtime::where('emp_detail_id', $user->empDetail->id)
+                ->where('status', '<>', OvertimeStatusEnum::CANCELED->name)
+                ->where(function ($query) use ($fromDateTime, $toDateTime) {
+                    $query->where(function ($q) use ($fromDateTime, $toDateTime) {
+                        $q->whereRaw("STR_TO_DATE(CONCAT(date_from, ' ', time_in), '%Y-%m-%d %H:%i') < ?", [$toDateTime])
+                        ->whereRaw("STR_TO_DATE(CONCAT(date_to, ' ', time_out), '%Y-%m-%d %H:%i') > ?", [$fromDateTime]);
+                    });
+                })
+                ->exists();
 
+            if ($overlapping) {
+                return back()->withErrors([
+                    'dateFrom' => 'You already have an overtime that overlaps with this date and time range.',
+                ])->withInput();
+            }
 
+            $isRegularDay = $schedules->contains(function ($schedule) use ($fromDateTime, $toDateTime) {
+                $schedStart = Carbon::parse($schedule->sched_start_date . ' ' . $schedule->sched_in);
+                $schedEnd   = Carbon::parse($schedule->sched_end_date . ' ' . $schedule->sched_out);
+
+                return $fromDateTime->between($schedStart, $schedEnd)
+                    || $toDateTime->between($schedStart, $schedEnd);
+            });
+            
+            $totalHours = $toDateTime->floatDiffInHours($fromDateTime);
+            
+            $salary = $user->empDetail->getSalaryInfo();
+            $empBasic   = $salary['basic'];
+            $dailyRate  = $empBasic / 26;
+            $hourlyRate = $dailyRate / 8;
+
+            $day_type = '';
+
+            $regholiday = holidayLoggerModel::whereDate('date', $request->dateFrom)
+                ->where('type', 0)
+                ->count();
+
+            if ( $isRegularDay ) {
+                $day_type = 'regular';
+            } else {
+                $day_type = 'rest_day';
+            }
+
+            if (($regholiday) > 0) {
+                if ($regholiday > 1) {
+                    if ($day_type == 'rest_day') {
+                        $day_type = 'rest_day_double_regular_holiday';
+                    } else {
+                        $day_type = 'double_holiday';
+                    }
+                } else {
+                    if ($day_type == 'rest_day') {
+                        $day_type = 'rest_day_regular_holiday';
+                    } else {
+                        $day_type = 'regular_holiday';
+                    }
+                }
+            }
+            
+            $specholiday = holidayLoggerModel::whereDate('date', $request->dateFrom)
+                ->where('type', 1)
+                ->count();
+
+            if ($specholiday > 0) {
+                if ($day_type == 'rest_day') {
+                    $day_type = 'rest_day_special_holiday';
+                } else {
+                    $day_type = 'special_holiday';
+                }
+            }
+
+            $overtimeRate = match ($day_type) {
+                'regular' => 1.25,
+                'rest_day' => 1.69,
+                'special_holiday' => 1.69,
+                'regular_holiday' => 2.60,
+                'rest_day_regular_holiday' => 3.38,
+                'rest_day_special_holiday' => 1.95,
+                'rest_day_double_regular_holiday' => 3.90,
+                'double_holiday' => 3.38,
+                default => 1.25,
+            };
+
+            $overtimeHourlyPay = $hourlyRate * $overtimeRate * $totalHours;
+            
             $overtime = Overtime::create([
                 'emp_detail_id' => $user->empDetail->id,
                 'status' => OvertimeStatusEnum::FORAPPROVAL->name,
@@ -91,7 +179,9 @@ class OvertimeController extends Controller
                 'date_to' => $request->dateTo,  
                 'time_in' => $request->timeFrom,   
                 'time_out' => $request->timeTo,   
-                'purpose' => $request->purpose,    
+                'purpose' => $request->purpose,  
+                'total_hrs' => $totalHours,
+                'total_pay' => $overtimeHourlyPay,
             ]);
 
             return back()->with('success', 'Overtime filed successfully!');
@@ -102,7 +192,6 @@ class OvertimeController extends Controller
     {
         if ($overtime) {
             
-
             $overtime->status = $request->status;
             $overtime->save();
 
