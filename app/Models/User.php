@@ -54,7 +54,7 @@ class User extends Authenticatable
      // 🧩 Relationship
     public function empDetail()
     {
-        return $this->hasOne(EmpDetail::class, 'empID', 'empID');
+        return $this->hasOne(empDetail::class, 'empID', 'empID');
     }
 
       public function attendanceSummaries()
