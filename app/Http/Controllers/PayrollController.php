@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Models\Leave;
 use App\Models\Payroll;
 use App\Models\Overtime;
-use App\Models\EmpDetail;
+use App\Models\empDetail;
 use App\Models\LoanPayment;
 use Illuminate\Http\Request;
 use App\Models\PayrollDetail;
