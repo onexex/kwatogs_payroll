@@ -14,8 +14,8 @@ return new class extends Migration
     {
         Schema::create('overtimes', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(EmpDetail::class);
-            $table->foreignIdFor(EmpDetail::class, 'approved_by')->nullable();
+            $table->foreignIdFor(empDetail::class);
+            $table->foreignIdFor(empDetail::class, 'approved_by')->nullable();
             $table->dateTime('approved_at')->nullable();
             $table->string('status');
             $table->date('date_from')->nullable();
