@@ -37,7 +37,7 @@ class Leave extends Model
     public function employee()
     {
         // matches emp_details.empID
-        return $this->belongsTo(EmpDetail::class, 'employee_id', 'empID');
+        return $this->belongsTo(empDetail::class, 'employee_id', 'empID');
     }
 
     public function approver()

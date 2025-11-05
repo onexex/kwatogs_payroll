@@ -34,7 +34,7 @@ class OB extends Model
     // Relationships
     public function employee()
     {
-        return $this->belongsTo(EmpDetail::class, 'employee_id', 'empID');
+        return $this->belongsTo(empDetail::class, 'employee_id', 'empID');
     }
 
     public function approver()
