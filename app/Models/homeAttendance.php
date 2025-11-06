@@ -44,8 +44,6 @@ class HomeAttendance extends Model
         return $this->belongsTo(EmployeeSchedule::class, 'schedule_id');
     }
 
-  
-
     // -----------------------
     // Helpers
     // -----------------------
@@ -63,7 +61,6 @@ class HomeAttendance extends Model
         return Carbon::parse($this->time_out)->isAfter(Carbon::parse($this->time_in)->endOfDay());
     }
 
- 
     public function calculateNightDiff(Carbon $actualIn, Carbon $actualOut)
     {
         $nightDiffMinutes = 0;
@@ -180,7 +177,7 @@ class HomeAttendance extends Model
         $summary->save();
     }
 
- protected function evaluatePunch($actualIn, $actualOut)
+    protected function evaluatePunch($actualIn, $actualOut)
     {
         $result = [
             'time_out' => $actualOut,
@@ -240,6 +237,117 @@ class HomeAttendance extends Model
         return $result;
     }
 
+    // public function logTimeOut($timeOut = null)
+    // {
+    //     $timeOut = Carbon::parse($timeOut ?: now());
+    //     $this->time_out = $timeOut;
+
+    //     if (!$this->time_in) {
+    //         $this->duration_hours = 0;
+    //         $this->night_diff_hours = 0;
+    //         $this->remarks = 'Invalid (No time-in found)';
+    //         $this->save();
+    //         $this->updateDailySummary();
+    //         return $this;
+    //     }
+
+    //     $actualIn = Carbon::parse($this->time_in);
+    //     $actualOut = $timeOut->copy();
+
+    //     // Prevent reversed times
+    //     if ($actualOut->lt($actualIn)) {
+    //         $actualOut = $actualIn->copy();
+    //         $this->time_out = $actualOut;
+    //     }
+
+    //     // 🔍 Retrieve correct schedule for this punch
+    //     $schedule = $this->schedule;
+    //         $breakDuration = 0;
+    //     //  LUNCH BREAK HANDLING
+    //     if ($schedule && $schedule->break_start && $schedule->break_end) {
+        
+    //         // Build Carbon timestamps for the break period
+    //         $breakStart = Carbon::parse($actualIn->toDateString() . ' ' . $schedule->break_start);
+    //         $breakEnd = Carbon::parse($actualIn->toDateString() . ' ' . $schedule->break_end);
+       
+    //         // If employee TIME-OUT happens during break → mark as lunch break
+    //         if ($timeOut->between($breakStart, $breakEnd)) {
+    //             // $this->time_out = $timeOut;
+    //             $this->remarks = 'Lunch Break';    
+    //             $this->save();
+    //             // return $this;
+    //         }
+    //         $breakDuration = 0;
+
+    //         if ($actualIn->lte($breakStart) && $timeOut->gte($breakEnd)) {
+    //             $breakDuration = $breakEnd->diffInMinutes($breakStart);
+    //         } 
+    //         // elseif ($actualIn->lte($breakStart) && $timeOut->between($breakStart, $breakEnd)) {
+    //         //     $breakDuration = $timeOut->diffInMinutes($breakStart);
+    //         // }
+    //          elseif ($actualIn->between($breakStart, $breakEnd) && $timeOut->gte($breakEnd)) {
+    //             $breakDuration = $breakEnd->diffInMinutes($actualIn);
+    //         } elseif ($actualIn->between($breakStart, $breakEnd) && $timeOut->between($breakStart, $breakEnd)) {
+    //             $breakDuration = $timeOut->diffInMinutes($actualIn);
+    //         } else {
+    //             $breakDuration = 0;
+    //         }
+    //     }
+
+    //     if (!$schedule) {
+    //         // Fallback: find schedule based on the IN date or OUT date
+    //         $schedule = EmployeeSchedule::where('employee_id', $this->employee_id)
+    //             ->where(function ($q) use ($actualIn, $actualOut) {
+    //                 $q->whereBetween('sched_start_date', [$actualIn->toDateString(), $actualOut->toDateString()])
+    //                 ->orWhereBetween('sched_end_date', [$actualIn->toDateString(), $actualOut->toDateString()]);
+    //             })
+    //             ->first();
+    //     }
+
+    //     // If still no schedule, last resort is today's
+    //     if (!$schedule) {
+    //         $schedule = EmployeeSchedule::where('employee_id', $this->employee_id)
+    //             ->whereDate('sched_start_date', '<=', $actualOut->toDateString())
+    //             ->whereDate('sched_end_date', '>=', $actualOut->toDateString())
+    //             ->first();
+    //     }
+
+    //     $this->schedule_id = $schedule?->id ?? $this->schedule_id;
+
+    //     // 🧮 Evaluate punch (handles overnight or normal)
+    //     $evaluated = $this->evaluatePunch($actualIn, $actualOut);
+
+    //     // Convert punch duration to minutes
+    //     $totalMinutes = $evaluated['duration_hours'] * 60;
+
+    //     // Deduct lunch break minutes if applicable
+    //     if (isset($this->break_minutes) && $this->break_minutes > 0) {
+    //         $totalMinutes -= $this->break_minutes;
+    //     }
+    //     // Deduct break
+    //     $totalMinutes -= $breakDuration;
+
+    //     // Prevent negative result
+    //     $totalMinutes = max($totalMinutes, 0);
+
+    //     // Recompute into hours
+    //     $this->duration_hours = $totalMinutes / 60;
+    //     //   $evaluated = $this->evaluatePunch($actualIn, $actualOut);
+
+    //     // $this->duration_hours = $evaluated['duration_hours'];
+  
+    //     $this->night_diff_hours = $evaluated['night_diff_hours'];
+    //     $this->remarks = $evaluated['remarks'];
+    //     $this->save();
+
+    //     // ✅ Update summary only if valid or overnight
+    //     if (empty($evaluated['remarks']) || str_contains($evaluated['remarks'], 'Overnight')) {
+    //         $this->updateDailySummary();
+    //     }
+
+    //     return $this;
+    // }
+
     public function logTimeOut($timeOut = null)
     {
         $timeOut = Carbon::parse($timeOut ?: now());
@@ -257,7 +365,7 @@ class HomeAttendance extends Model
         $actualIn = Carbon::parse($this->time_in);
         $actualOut = $timeOut->copy();
 
-        // Prevent reversed times
+        // 🛑 Prevent reversed times
         if ($actualOut->lt($actualIn)) {
             $actualOut = $actualIn->copy();
             $this->time_out = $actualOut;
@@ -265,49 +373,41 @@ class HomeAttendance extends Model
 
         // 🔍 Retrieve correct schedule for this punch
         $schedule = $this->schedule;
-            $breakDuration = 0;
-        //  LUNCH BREAK HANDLING
-        // if ($schedule && $schedule->break_start && $schedule->break_end) {
-        
-        //     // Build Carbon timestamps for the break period
-        //     $breakStart = Carbon::parse($actualIn->toDateString() . ' ' . $schedule->break_start);
-        //     $breakEnd = Carbon::parse($actualIn->toDateString() . ' ' . $schedule->break_end);
-       
-        //     // If employee TIME-OUT happens during break → mark as lunch break
-        //     if ($timeOut->between($breakStart, $breakEnd)) {
-        //         // $this->time_out = $timeOut;
-        //         $this->remarks = 'Lunch Break';    
-        //         $this->save();
-        //         // return $this;
-        //     }
-        //     $breakDuration = 0;
+        $breakDuration = 0;
 
-        //     if ($actualIn->lte($breakStart) && $timeOut->gte($breakEnd)) {
-        //         $breakDuration = $breakEnd->diffInMinutes($breakStart);
-        //     } 
-        //     // elseif ($actualIn->lte($breakStart) && $timeOut->between($breakStart, $breakEnd)) {
-        //     //     $breakDuration = $timeOut->diffInMinutes($breakStart);
-        //     // }
-        //      elseif ($actualIn->between($breakStart, $breakEnd) && $timeOut->gte($breakEnd)) {
-        //         $breakDuration = $breakEnd->diffInMinutes($actualIn);
-        //     } elseif ($actualIn->between($breakStart, $breakEnd) && $timeOut->between($breakStart, $breakEnd)) {
-        //         $breakDuration = $timeOut->diffInMinutes($actualIn);
-        //     } else {
-        //         $breakDuration = 0;
-        //     }
-        // }
+        // 🍱 LUNCH BREAK HANDLING
+        if ($schedule && $schedule->break_start && $schedule->break_end) {
+            $breakStart = Carbon::parse($actualIn->toDateString() . ' ' . $schedule->break_start);
+            $breakEnd = Carbon::parse($actualIn->toDateString() . ' ' . $schedule->break_end);
 
+            // If employee TIME-OUT happens during break → mark as lunch break
+            if ($timeOut->between($breakStart, $breakEnd)) {
+                $this->remarks = 'Lunch Break';
+                $this->save();
+            }
+
+            if ($actualIn->lte($breakStart) && $timeOut->gte($breakEnd)) {
+                $breakDuration = $breakEnd->diffInMinutes($breakStart);
+            } elseif ($actualIn->between($breakStart, $breakEnd) && $timeOut->gte($breakEnd)) {
+                $breakDuration = $breakEnd->diffInMinutes($actualIn);
+            } elseif ($actualIn->between($breakStart, $breakEnd) && $timeOut->between($breakStart, $breakEnd)) {
+                $breakDuration = $timeOut->diffInMinutes($actualIn);
+            } else {
+                $breakDuration = 0;
+            }
+        }
+
+        // 🧭 If no schedule attached, find one
         if (!$schedule) {
-            // Fallback: find schedule based on the IN date or OUT date
             $schedule = EmployeeSchedule::where('employee_id', $this->employee_id)
                 ->where(function ($q) use ($actualIn, $actualOut) {
                     $q->whereBetween('sched_start_date', [$actualIn->toDateString(), $actualOut->toDateString()])
-                    ->orWhereBetween('sched_end_date', [$actualIn->toDateString(), $actualOut->toDateString()]);
+                        ->orWhereBetween('sched_end_date', [$actualIn->toDateString(), $actualOut->toDateString()]);
                 })
                 ->first();
         }
 
-        // If still no schedule, last resort is today's
+        // Fallback: today’s schedule
         if (!$schedule) {
             $schedule = EmployeeSchedule::where('employee_id', $this->employee_id)
                 ->whereDate('sched_start_date', '<=', $actualOut->toDateString())
@@ -316,34 +416,42 @@ class HomeAttendance extends Model
         }
 
         $this->schedule_id = $schedule?->id ?? $this->schedule_id;
+            // dd($schedule->sched_in);
 
-        // 🧮 Evaluate punch (handles overnight or normal)
+        //  ADJUST if actual time-in is earlier than scheduled time-in
+        if ($schedule && $schedule->sched_in) {
+            $schedIn = Carbon::parse($actualIn->toDateString() . ' ' . $schedule->sched_in);
+
+            // If employee clocked in before schedule start, adjust from schedIn
+            if ($actualIn->lt($schedIn) && $actualOut->gte($schedIn)) {
+                $actualIn = $schedIn->copy();
+            }
+        }
+
+        //  Evaluate punch (handles overnight or normal)
         $evaluated = $this->evaluatePunch($actualIn, $actualOut);
 
         // Convert punch duration to minutes
         $totalMinutes = $evaluated['duration_hours'] * 60;
 
         // Deduct lunch break minutes if applicable
-        // if (isset($this->break_minutes) && $this->break_minutes > 0) {
-        //     $totalMinutes -= $this->break_minutes;
-        // }
-        // Deduct break
+        if (isset($this->break_minutes) && $this->break_minutes > 0) {
+            $totalMinutes -= $this->break_minutes;
+        }
+
+        // Deduct computed break duration
         $totalMinutes -= $breakDuration;
 
-        // Prevent negative result
+        //  Prevent negative result
         $totalMinutes = max($totalMinutes, 0);
 
-        // Recompute into hours
+        // Convert back to hours
         $this->duration_hours = $totalMinutes / 60;
-        //   $evaluated = $this->evaluatePunch($actualIn, $actualOut);
-
-        // $this->duration_hours = $evaluated['duration_hours'];
-  
         $this->night_diff_hours = $evaluated['night_diff_hours'];
         $this->remarks = $evaluated['remarks'];
         $this->save();
 
-        // ✅ Update summary only if valid or overnight
+        //  Update summary only if valid or overnight
         if (empty($evaluated['remarks']) || str_contains($evaluated['remarks'], 'Overnight')) {
             $this->updateDailySummary();
         }
@@ -351,14 +459,17 @@ class HomeAttendance extends Model
         return $this;
     }
 
-        // ==============================================================
+
+    // ==============================================================
     //  📌 MAIN LOG TIME-IN FUNCTION (with overnight-safe logic)
     // ==============================================================
     public static function logTimeIn($employeeId)
     {
+
         $now = now();
         $today = $now->toDateString();
         $yesterday = $now->copy()->subDay()->toDateString();
+    
 
         // 1️⃣ Auto-close any previous open logs from older days
         $previousOpenLogs = self::where('employee_id', $employeeId)
@@ -375,43 +486,44 @@ class HomeAttendance extends Model
             $log->save();
         }
 
-        // 2️⃣ Prevent duplicate punches within same window
+        // 2️⃣ Prevent duplicate open punches
         $openPunch = self::where('employee_id', $employeeId)
             ->whereNull('time_out')
             ->first();
 
         if ($openPunch) {
             $lastIn = Carbon::parse($openPunch->time_in);
-
-            // If less than 16h ago, assume still open
             if ($now->diffInHours($lastIn) < 16) {
                 throw new \Exception('You still have an active punch. Please log out before punching in again.');
             }
         }
 
-        // 3️⃣ Match an active schedule (consider overnight)
-        $bufferMinutes = 60; // ±1 hour
-        $tomorrow = $now->copy()->addDay()->toDateString();
+        // 3️⃣ Match an active schedule (supports overnight)
+        $bufferMinutes = 60; // Allow 1 hour early login before shift
 
         $candidates = EmployeeSchedule::where('employee_id', $employeeId)
-            ->where(function ($q) use ($yesterday, $tomorrow) {
-                $q->whereBetween('sched_start_date', [$yesterday, $tomorrow])
-                  ->orWhereBetween('sched_end_date', [$yesterday, $tomorrow]);
+            ->where(function ($q) use ($today, $yesterday) {
+                // Only consider today's and yesterday's schedules
+                $q->whereDate('sched_start_date', $today)
+                ->orWhereDate('sched_start_date', $yesterday);
             })
             ->get();
 
         $matchedSchedule = null;
 
         foreach ($candidates as $s) {
+            // Build datetime for schedule in/out
             $schedIn = Carbon::parse($s->sched_start_date . ' ' . $s->sched_in);
             $schedOut = Carbon::parse($s->sched_end_date . ' ' . $s->sched_out);
 
+            // Handle overnight shifts
             if ($schedOut->lessThanOrEqualTo($schedIn)) {
-                $schedOut->addDay(); // overnight
+                $schedOut->addDay();
             }
 
+            // Allow time-in from 1 hour before start until actual schedOut (no post-shift)
             $windowStart = $schedIn->copy()->subMinutes($bufferMinutes);
-            $windowEnd = $schedOut->copy()->addMinutes($bufferMinutes);
+            $windowEnd = $schedOut->copy();
 
             if ($now->between($windowStart, $windowEnd)) {
                 $matchedSchedule = $s;
@@ -434,22 +546,23 @@ class HomeAttendance extends Model
             }
 
             if ($now->between($earlyReturn, $breakEnd)) {
-                $now = $breakEnd->copy(); // snap to break end
+                $now = $breakEnd->copy(); // Snap to break end
             }
         }
 
         // 5️⃣ Use schedule start as the "work day"
         $attendanceDate = Carbon::parse($matchedSchedule->sched_start_date)->toDateString();
 
-        // 6️⃣ Save new punch
+        // 6️⃣ Save new punch (multiple punches allowed)
         return self::create([
-            'employee_id' => $employeeId,
-            'schedule_id' => $matchedSchedule->id,
+            'employee_id'     => $employeeId,
+            'schedule_id'     => $matchedSchedule->id,
             'attendance_date' => $attendanceDate,
-            'time_in' => $now,
-            'status' => 'Present',
+            'time_in'         => $now,
+            'status'          => 'Present',
         ]);
     }
+
 
 
         
