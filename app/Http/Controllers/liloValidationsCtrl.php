@@ -8,6 +8,11 @@ use DB;
 use Illuminate\Http\Request;
 class liloValidationsCtrl extends Controller
 {
+    public function index()
+    {
+        $lilovalidations =liloValidations::latest('created_at')->get();
+        return view('pages.management.lilovalidations', compact('lilovalidations'));
+    }
     //getall
     public function getall(Request $request){
         $getA = liloValidations::latest('created_at')->get();
@@ -24,13 +29,16 @@ class liloValidationsCtrl extends Controller
 
     //create_update
     public function create_update(Request $request){
-        // dd(session()->get('LoggedUserComp'));
+
         $value =[
-            'empCompID'=>session()->get('LoggedUserComp'),
+            'empCompID'=> session()->get('LoggedUserComp'),
             'lilo_gracePrd' => $request->graceperiod,
             'managersOverride' => $request->mngrsOverride,
             'managersTime' => $request->mngrsTime,
-         ];
+            'no_logout_has_deduction' => $request->no_logout_has_deduction,
+            'minute_deduction' => $request->minute_deduction,
+        ];
+
          $validator = Validator::make($request->all(),[
             'graceperiod' =>'required',
             'mngrsOverride' =>'required',
@@ -40,9 +48,17 @@ class liloValidationsCtrl extends Controller
             return response()->json(['status'=>201, 'error'=>$validator->errors()->toArray()]);
         }else{
                 if($request->formAction==1){
-                    $query = liloValidations::create($value);
+                    $lilovalidation = liloValidations::where('empCompID', session()->get('LoggedUserComp'))
+                        ->first();
+
+                    if ($lilovalidation) {
+                        return response()->json(['status'=> 202, 'msg'=>'Company lilo validation already exist.']);
+                    } else {
+                        $query = liloValidations::create($value);
+                    }
+                    
                 }else{
-                    $query = liloValidations::where('id',$request->liloID)->update($value);
+                    $query = liloValidations::where('id', $request->liloID)->update($value);
                 }
             if($query){
                 if($request->formAction==1){

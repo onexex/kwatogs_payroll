@@ -55,6 +55,8 @@ $(document).ready(function() {
                 $('#txtGracePeriod').val(row.lilo_gracePrd);
                 $('#txtMngrOverride').val(row.managersOverride);
                 $('#txtMngrTime').val(row.managersTime);
+                $('#no_logout_deduction').val(row.no_logout_has_deduction);
+                $('#minute_deduction').val(row.minute_deduction);
             })
         })
         .catch(function (error) {
@@ -99,6 +101,7 @@ $(document).ready(function() {
                     dialog.alert({
                         message: response.data.msg,
                     })
+                    window.location.reload()
                 }else if(response.data.status == 202){
                     $('span.error-text').text("");
                     $('input.border').removeClass('border border-danger');

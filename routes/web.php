@@ -145,7 +145,6 @@ Route::group(['middleware'=>['AuthCheck']], function(){
     Route::get('/pages/management/relationship',[pageCtrl::class, 'relationship']);
     Route::get('/pages/management/leavevalidations',[pageCtrl::class, 'leavevalidations']);
     Route::get('/pages/management/holidaylogger',[pageCtrl::class, 'holidaylogger']);
-    Route::get('/pages/management/lilovalidations',[pageCtrl::class, 'lilovalidations']);
     Route::get('/pages/management/obvalidations',[pageCtrl::class, 'obvalidations']);
     Route::get('/pages/management/ssscontribution',[pageCtrl::class, 'ssscontribution']);
     Route::get('/pages/management/pagibigcontribution',[pageCtrl::class, 'pagibigcontribution']);
@@ -216,6 +215,7 @@ Route::group(['middleware'=>['AuthCheck']], function(){
     Route::get('/agency/edit',[agenciesCtrl::class, 'edit']);
 
     //Lilo Validation Shai
+    Route::get('/pages/management/lilovalidations',[liloValidationsCtrl::class, 'index']);
     Route::post('/lilo/create_update',[liloValidationsCtrl::class, 'create_update']);
     Route::get('/lilo/getall',[liloValidationsCtrl::class, 'getall']);
     Route::get('/lilo/edit',[liloValidationsCtrl::class, 'edit']);
