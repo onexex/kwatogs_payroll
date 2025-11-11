@@ -249,7 +249,6 @@ class pageCtrl extends Controller
 
     public function lilovalidations()
     {
-        return view('pages.management.lilovalidations');
     }
 
     public function obvalidations()

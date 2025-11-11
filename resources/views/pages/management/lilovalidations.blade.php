@@ -33,13 +33,25 @@
                                     <tr>
                                         <th class="text-dark" scope="col">Grace Period</th>
                                         <th class="text-dark" scope="col">Managers Override</th>
-                                        <th class="text-dark" scope="col">Managaers Time</th>
+                                        <th class="text-dark" scope="col">Managers Time</th>
+                                        <th class="text-dark" scope="col">No Logout Has Deduction</th>
+                                        <th class="text-dark" scope="col">Minute Deduction</th>
                                         {{-- <th class="text-dark" scope="col">Updated Time</th> --}}
                                         <th class="text-dark" scope="col">Update</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tblLiloVal">
-
+                                <tbody >
+                                    @foreach ($lilovalidations as $lilovalidation)
+                                        <tr>
+                                            <td>{{ $lilovalidation->lilo_gracePrd }}</td>
+                                            <td>{{ $lilovalidation->managersOverride }}</td>
+                                            <td>{{ $lilovalidation->managersTime }}</td>
+                                            <td>{{ $lilovalidation->no_logout_has_deduction == 0 ? 'No' : 'Yes' }}</td>
+                                            <td>{{ $lilovalidation->minute_deduction }}</td>
+                                            <td class=''>
+                                                <button type="button" value='{{ $lilovalidation->id  }}' class="btn btn-details" data-toggle="tooltip" data-placement="bottom"  id="btnUpdateMdl" title=" Schedule" data-bs-toggle="modal" data-bs-target="#mdlLiloVal" > <i class="fa fa-pencil"></i> </button></td>
+                                        </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -78,6 +90,21 @@
                                         <div class="form-floating mb-2">
                                             <input class="form-control" id="txtMngrTime" name="mngrsTime" type="number" placeholder="-"/>
                                             <label class="form-check-label" for="txtMngrTime">Managers Time<label for="" class="text-danger">*</label></label>
+                                            <span class="text-danger small error-text mngrsTime_error"></span>
+                                        </div>
+                                        <div class="form-floating mb-2">
+                                            <div class="form-floating mb-1">
+                                                <select  class="form-control" name="no_logout_has_deduction" id="no_logout_deduction"  >
+                                                    <option value="1">Yes</option>
+                                                    <option value="0">No</option>
+                                                </select>
+                                                <label for="missionobjective" class="text-muted"> No Logout Has Deduction<label for="" class="text-danger">*</label></label>
+                                                <span class="text-danger small error-text status_error"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-floating mb-2">
+                                            <input class="form-control" id="minute_deduction" name="minute_deduction" type="number" placeholder="-"/>
+                                            <label class="form-check-label" for="txtMngrTime">Minute Deduction<label for="" class="text-danger">*</label></label>
                                             <span class="text-danger small error-text mngrsTime_error"></span>
                                         </div>
                                     </div>
