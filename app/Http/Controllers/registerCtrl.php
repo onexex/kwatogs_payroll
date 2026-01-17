@@ -238,8 +238,10 @@ class registerCtrl extends Controller
 
     public function create(Request $request)
     {
+       
         $defaultpass = "123456";
         $current_date_time = now();
+     
 
         $validator = Validator::make($request->all(), [
             'email' => 'required|unique:users',
@@ -253,12 +255,34 @@ class registerCtrl extends Controller
             'department' => 'required',
             'classification' => 'required',
             'position' => 'required',
-            'job_level' => 'required',
+            // 'job_level' => 'required',
+            'religion' => 'required',
+            'birthdate' => 'required',
+            'homephone' => 'required',
+            'province' => 'required',
+            'mobile' => 'required',
+            'city' => 'required',
+            'barangay' => 'required',
+            'zipcode' => 'required',
+            'country' => 'required',
+            // 'agency' => 'required',
+            // 'hmo' => 'required',
+            'no_work_days' => 'required',
+            'date_hired' => 'required',
+            'basic'=>'required|numeric',
+            'allowance'=>'required|numeric',
+            
+
+            
+
+
+            
         ]);
 
         if (!$validator->passes()) {
             return response()->json(['status' => 201, 'error' => $validator->errors()->toArray()]);
         }
+   
 
         DB::beginTransaction();
         try {

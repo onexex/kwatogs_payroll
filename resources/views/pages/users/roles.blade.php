@@ -1,147 +1,129 @@
-@extends('layout.app', 
-    ['title' => 'User Roles']
-)
+@extends('layout.app', ['title' => 'User Roles'])
 
 @section('content')
-    <div class="container-fluid">
-        
-        <div class="mb-2 d-sm-flex align-items-center justify-content-between">
-            <h4 class=" mb-0 text-gray-800">User Roles</h4>
-            <button 
-                class=" mt-3 btn text-white" 
-                style="background-color: #008080" 
-                name="createUserRole" 
-                id="createUserRole" 
-                data-bs-toggle="modal" 
-                data-bs-target="#createUserRoleModal"
-            > <i class="fa fa-plus"></i> 
-                Add User Role
-            </button>
+<style>
+    /* Consistent Sticky Header and Table Design */
+    .table-sticky-header thead th {
+        position: sticky !important;
+        top: 0;
+        background-color: #ffffff;
+        z-index: 10;
+        border-bottom: 2px solid #f8f9fa;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #fcfcfc;
+        transition: background-color 0.2s ease;
+    }
+</style>
+
+<div class="container-fluid px-4 py-3">
+
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h4 class="fw-bold text-dark m-0">Settings</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item text-muted">Settings</li>
+                    <li class="breadcrumb-item active fw-semibold text-primary" aria-current="page">User Roles Definition</li>
+                </ol>
+            </nav>
         </div>
+        <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold" id="createUserRole" data-bs-toggle="modal" data-bs-target="#createUserRoleModal">
+            <i class="fas fa-plus me-2"></i> Add User Role
+        </button>
+    </div>
 
-        <div class="row mt-2">
-            <div class="col-xl-12 col-lg-12">
-                <div class="card mb-4">
-                    <!-- Card Body -->
-                    <div class="card-body">
-                        <div class="chart-area">
-                            <div class="table-responsive border-0">
-                                <table class="table table-hover table-border-none  ">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-dark" scope="col">No</th>
-                                            <th class="text-dark" scope="col">Roles</th>
-                                            <th class="text-dark" scope="col">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($roles as $role)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $role->name }}</td>
-                                            <td>
-                                                <button
-                                                    class="btn btn-sm btn-light editRoleBtn" 
-                                                    data-id="{{ $role->id }}" 
-                                                    data-name="{{ $role->name }}" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#editRoleBtnModal{{ $role->id }}"
-                                                >
-                                                    <i class="fa fa-edit text-primary"></i>
-                                                    Edit
-                                                </button>
-                                                <a 
-                                                    href="{{ route('user-roles.show', $role->id) }}" 
-                                                    class="btn btn-sm btn-light"
-                                                >
-                                                    <i class="fa fa-eye text-success"></i>
-                                                    View Permission
-                                                </a>
-                                            </td>
-                                        </tr>
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
+                <table class="table table-hover align-middle table-sticky-header mb-0">
+                    <thead class="bg-light">
+                        <tr class="text-secondary small fw-bold text-uppercase tracking-wider">
+                            <th class="ps-4 py-3" style="width: 80px;">No</th>
+                            <th class="py-3">Role Name</th>
+                            <th class="pe-4 py-3 text-end" style="width: 250px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        @foreach($roles as $role)
+                        <tr>
+                            <td class="ps-4 text-muted small">{{ $loop->iteration }}</td>
+                            <td class="fw-bold text-dark text-uppercase">{{ $role->name }}</td>
+                            <td class="pe-4 text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button class="btn btn-light btn-sm rounded-pill shadow-sm px-3 fw-bold text-primary editRoleBtn" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editRoleBtnModal{{ $role->id }}">
+                                        <i class="fa fa-edit me-1"></i> Edit
+                                    </button>
+                                    
+                                    <a href="{{ route('user-roles.show', $role->id) }}" class="btn btn-light btn-sm rounded-pill shadow-sm px-3 fw-bold text-success">
+                                        <i class="fa fa-eye me-1"></i> Permissions
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
 
-                                        <!-- Edit Role Modal -->
-                                        <div class="modal fade" id="editRoleBtnModal{{ $role->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editRoleBtnModalLabel{{ $role->id }}" aria-hidden="true" style="background-color: rgb(249 200 200 / 17%);">
-                                            <div class="modal-dialog modal-xl">
-                                                <div class="modal-content">
-                                                    <div class="modal-header bg-info dragable_touch" >
-                                                        <h5 class="modal-title fst-italic text-white" id="staticBackdropLabel"><label for="" class="" id="lblTitleOBT"> Edit Role Form</label></h5>
-                                                        <button type="button" class="btn-close text-white closereset_update" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="card mb-3 ">
-                                                            <div class="card-body ">
-
-                                                                <form 
-                                                                    method="POST" 
-                                                                    action="{{ route('user-roles.update', $role->id) }}" 
-                                                                    id="frmEditRoles{{ $role->id }}" 
-                                                                >
-                                                                    @csrf 
-                                                                    @method('PUT')
-                                                                    <div class="row">
-                                                                        <div class="col-lg-12 mb-2">
-                                                                            <div class="form-floating">
-                                                                                <input class="form-control" id="txtEditRole{{ $role->id }}" required name="role" type="text" placeholder="-" value="{{ $role->name }}" />
-                                                                                <label class="form-check-label" for="txtEditRole{{ $role->id }}">Role Name <label for="" class="text-danger">*</label></label>
-                                                                                <span class="text-danger small error-text role_error"></span>       
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button  id="btnUpdateRole{{ $role->id }}" type="submit" class="btn btn-secondary ">Update</button>
-                                                                    </div>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                        <div class="modal fade" id="editRoleBtnModal{{ $role->id }}" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content border-0 shadow rounded-4">
+                                    <div class="modal-header border-0 pt-4 px-4">
+                                        <h5 class="modal-title fw-bold text-secondary text-uppercase tracking-wide">
+                                            <i class="fas fa-edit me-2 text-primary"></i> Edit Role
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <form method="POST" action="{{ route('user-roles.update', $role->id) }}" id="frmEditRoles{{ $role->id }}">
+                                            @csrf 
+                                            @method('PUT')
+                                            <div class="form-group mb-0">
+                                                <label class="form-label small fw-semibold text-muted">Role Name <span class="text-danger">*</span></label>
+                                                <input class="form-control form-control-lg bg-light border-0 fs-6" name="role" type="text" value="{{ $role->name }}" required />
+                                                <span class="text-danger small error-text role_error"></span>
                                             </div>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-      <div class="modal fade" id="createUserRoleModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="createUserRoleModal" aria-hidden="true" style="background-color: rgb(249 200 200 / 17%);">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header bg-info dragable_touch" >
-                    <h5 class="modal-title fst-italic text-white" id="staticBackdropLabel"><label for="" class="" id="lblTitleOBT"> Create Role Form</label></h5>
-                    <button type="button" class="btn-close text-white closereset_update" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="card mb-3 ">
-                        <div class="card-body ">
-
-                            <form 
-                                method="POST" 
-                                action="{{ route('user-roles.store') }}" 
-                                id="frmRoles" 
-                            >
-                                @csrf 
-                                <div class="row">
-                                    <div class="col-lg-12 mb-2">
-                                        <div class="form-floating">
-                                            <input class="form-control" id="txtRole" required name="role" type="text" placeholder="-" />
-                                            <label class="form-check-label" for="txtRole">Role Name <label for="" class="text-danger">*</label></label>
-                                            <span class="text-danger small error-text role_error"></span>
-                                        </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer border-0 pb-4 px-4">
+                                        <button type="button" class="btn btn-light rounded-pill px-4 fw-bold text-muted me-2" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" form="frmEditRoles{{ $role->id }}" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">Update Role</button>
                                     </div>
                                 </div>
-                                <div class="modal-footer">
-                                    <!-- <button type="button" class="btn btn-secondary closereset_update" data-bs-dismiss="modal">Close</button> -->
-                                    <button  id="btnSaveOBT" type="submit" class="btn btn-secondary ">Submit</button>
-                                </div>
-                            </form>
+                            </div>
                         </div>
-                    </div>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createUserRoleModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow rounded-4">
+                <div class="modal-header border-0 pt-4 px-4">
+                    <h5 class="modal-title fw-bold text-secondary text-uppercase tracking-wide">
+                        <i class="fas fa-plus-circle me-2 text-primary"></i> New User Role
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form method="POST" action="{{ route('user-roles.store') }}" id="frmRoles">
+                        @csrf 
+                        <div class="form-group mb-0">
+                            <label class="form-label small fw-semibold text-muted">Role Name <span class="text-danger">*</span></label>
+                            <input class="form-control form-control-lg bg-light border-0 fs-6" name="role" type="text" placeholder="e.g., Department Head" required />
+                            <span class="text-danger small error-text role_error"></span>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 pb-4 px-4">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold text-muted me-2" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="frmRoles" id="btnSaveOBT" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">Submit Role</button>
                 </div>
             </div>
         </div>
     </div>
-    </div>
+</div>
 @endsection

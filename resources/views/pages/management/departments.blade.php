@@ -2,89 +2,85 @@
 @section('content')
 
 <style>
-    .table thead th {
-        position:sticky !important;
+    /* Consistent Sticky Header and Table Design */
+    .table-sticky-header thead th {
+        position: sticky !important;
         top: 0;
-        background-color: #f8f9fa;
+        background-color: #ffffff;
         z-index: 10;
+        border-bottom: 2px solid #f8f9fa;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #fcfcfc;
+        transition: background-color 0.2s ease;
     }
 </style>
 
+<div class="container-fluid px-4 py-3">
 
-<!--SHAIRA-->
-
-<div class="container-fluid">
-
-    <div class="pb-2">
-        <h4 class="text-secondary-800 m-0">Settings / <label class="text-black">Department </label></h4>
-    </div>
-
-    <div class="row pb-2">
-        <div class="col-lg-4 col-md-12">
-            <button type="button" class="btn btn-details mb-2" name="department" id="btnCreateDept" data-bs-toggle="modal" data-bs-target="#mdlDepartment"> Department </button>
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h4 class="fw-bold text-dark m-0">Settings</h4>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item text-muted">Settings</li>
+                    <li class="breadcrumb-item active fw-semibold text-primary" aria-current="page">Department</li>
+                </ol>
+            </nav>
         </div>
+        <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold" name="department" id="btnCreateDept" data-bs-toggle="modal" data-bs-target="#mdlDepartment">
+            <i class="fas fa-plus me-2"></i> Add Department
+        </button>
     </div>
 
-    <!-- Content Row dar -->
-    <div class="row px-2">
-        <div class="card shadow">
-            <div class="card-body">
-                <div class="row">
-                    <div class="table-responsive overflow-auto-settings">
-                        <table class="table table-hover">
-                            <thead class="text-center">
-                                <th class="text-dark" scope="col">Department Name</th>
-                                <th class="text-dark" scope="col">Action</th>
-                            <tbody id="tblDepartments" class="text-center">
-
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-0">
+            <div class="table-responsive" style="max-height: 70vh; overflow-y: auto;">
+                <table class="table table-hover align-middle table-sticky-header mb-0">
+                    <thead class="bg-light">
+                        <tr class="text-secondary small fw-bold text-uppercase tracking-wider">
+                            <th class="ps-4 py-3">Department Name</th>
+                            <th class="pe-4 py-3 text-end" style="width: 150px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblDepartments" class="border-top-0">
+                        <tr>
+                            <td colspan="2" class="text-center py-5 text-muted">
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                Loading departments...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <!-- Modal Department -->
-    <div class="modal fade" id="mdlDepartment" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="background-color: rgb(249 200 200 / 17%);">
-        <div class="modal-dialog modal-md">
-            <div class="modal-content">
-                <div class="modal-header dragable_touch" >
-                    <h5 class="modal-title lblActionDesc" id="staticBackdropLabel"><label for="" class="" id="lblTitleDept"> Department</label></h5>
-                    <button type="button" class="btn-close text-white closereset_update" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade" id="mdlDepartment" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content border-0 shadow rounded-4">
+                <div class="modal-header border-0 pt-4 px-4">
+                    <h5 class="modal-title fw-bold text-secondary text-uppercase tracking-wide">
+                        <i class="fas fa-sitemap me-2 text-primary"></i> 
+                        <span id="lblTitleDept">Department</span>
+                    </h5>
+                    <button type="button" class="btn-close closereset_update" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <div class="card mb-3 rounded">
-                        <div class="card-body ">
-
-                            <form action="" id="frmDepartment">
-                                <div class="row">
-                                    <div class="col-lg-12 mb-1">
-                                        <div class="form-floating">
-                                            <input class="form-control" id="txtDeptName" name="department" type="text" placeholder="-"/>
-                                            <label class="form-check-label" for="missionDesc">Department Name <label for="" class="text-danger">*</label></label>
-                                            <span class="text-danger small error-text department_error"></span>
-                                        </div>
-                                    </div>
-
-                                    <!-- <div class="col-xl-6 col-lg-12">
-                                        <div class="form-floating mb-2 fs-6">
-                                            <select  class="form-control" name="company" id="selCompany">
-                                                <option value="0">WeDo BPO Inc.</option>
-                                            </select>
-                                            <label  class="form-check-label" for="missionobjective" class="text-muted">Company<label for="" class="text-danger">*</label></label>
-                                            <span class="text-danger small error-text company_error"></span>
-                                        </div>
-                                    </div> -->
-                                </div>
-                            </form>
-
+                
+                <div class="modal-body p-4">
+                    <form id="frmDepartment">
+                        <div class="form-group mb-0">
+                            <label for="txtDeptName" class="form-label small fw-semibold text-muted">Department Name <span class="text-danger">*</span></label>
+                            <input class="form-control form-control-lg bg-light border-0 fs-6" id="txtDeptName" name="department" type="text" placeholder="e.g. Human Resources" />
+                            <span class="text-danger small error-text department_error"></span>
                         </div>
-                    </div>
+                    </form>
                 </div>
-                <div class="modal-footer">
-                    <!-- <button type="button" class="btn btn-secondary closereset_update" data-bs-dismiss="modal">Close</button> -->
-                    <button  id="btnDepSave" type="button" class="btn btn-details">Save Entries</button>
+                
+                <div class="modal-footer border-0 pb-4 px-4">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold text-muted me-2" data-bs-dismiss="modal">Cancel</button>
+                    <button id="btnDepSave" type="button" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">Save Department</button>
                 </div>
             </div>
         </div>
@@ -92,7 +88,6 @@
 
 </div>
 
-<script src="{{ asset('js/settings/department.js') }}"  deffer></script>
+<script src="{{ asset('js/settings/department.js') }}" defer></script>
 
 @endsection
-

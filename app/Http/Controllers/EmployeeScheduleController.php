@@ -31,10 +31,15 @@ class EmployeeScheduleController extends Controller
                 )
             )
             ->join('users', 'employee_schedules.employee_id', '=', 'users.empID')
+            // 1. Group by Year and Month Descending (Newest Month at top)
+            ->orderByRaw('YEAR(sched_start_date) DESC')
+            ->orderByRaw('MONTH(sched_start_date) DESC')
+            // 2. Sort days within that month Ascending (1st, 2nd, 3rd...)
+            ->orderBy('sched_start_date', 'asc')
+            // 3. Alphabetical Sort
             ->orderBy('users.lname')
             ->orderBy('users.fname')
-            ->orderBy('sched_start_date', 'asc')
-            ->select('employee_schedules.*'); // important when joining
+            ->select('employee_schedules.*');
 
         $schedules = $query->paginate($perPage);
 

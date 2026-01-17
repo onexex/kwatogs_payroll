@@ -341,5 +341,23 @@ Route::group(['middleware'=>['AuthCheck']], function(){
     Route::resource('/overtime', OvertimeController::class);
     Route::put('/overtime/{overtime}/updatestatus', [OvertimeController::class, 'updateStatus'])->name('overtime.status.update');
 
+    Route::get('/department/delete', [departmentCtrl::class, 'delete']); // Add this line
+    Route::get('/position/delete', [positionCtrl::class, 'delete']);
+
+    Route::group(['prefix' => 'pages/management/e201', 'middleware' => ['auth']], function () {
+    
+    // 1. The Main View (Loads the search page)
+    Route::get('/', [EmployeeRecordController::class, 'index'])->name('e201.index');
+
+    // 2. The Search/Get Function (The AJAX "Messenger")
+    // This is what retrieves the full bio-data without refreshing
+    Route::get('/details/{empID}', [EmployeeRecordController::class, 'getEmployeeDetails'])
+         ->name('e201.details');
+
+    // 3. Optional: Export to PDF
+    Route::get('/print/{empID}', [EmployeeRecordController::class, 'printProfile'])
+         ->name('e201.print');
+});
+
 });
 

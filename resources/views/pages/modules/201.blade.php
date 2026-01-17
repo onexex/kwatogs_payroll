@@ -1,624 +1,190 @@
 @extends('layout.app')
+
 @section('content')
-<div class="container-fluid">
+<style>
+    .profile-hero { background: linear-gradient(135deg, #008080 0%, #005a5a 100%); border-radius: 1.5rem; color: white; border: none; }
+    .profile-img-container { width: 150px; height: 150px; border: 5px solid rgba(255, 255, 255, 0.2); object-fit: cover; }
+    .nav-resume { border: none; gap: 8px; }
+    .nav-resume .nav-link { border: none; color: #6c757d; font-weight: 600; padding: 10px 20px; border-radius: 50px; }
+    .nav-resume .nav-link.active { background-color: #008080 !important; color: white !important; }
+    .info-label { font-size: 0.72rem; font-weight: 800; color: #008080; text-transform: uppercase; letter-spacing: 0.5px; }
+    .info-value { font-size: 0.95rem; color: #2d3748; font-weight: 500; }
+    .resume-card { border: none; border-radius: 1.25rem; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.05); }
+    .text-teal { color: #008080 !important; }
+</style>
 
-  {{-- JOHN MARC CASQUIO  --}}
+<div class="container-fluid px-4 py-3">
 
-    <div class="card mb-3 p-5" style="">
-        <div class="row g-2">
-          <div class="col-lg-2 col-md-4 text-center">
-            <img src="https://miro.medium.com/max/600/1*PiHoomzwh9Plr9_GA26JcA.png" alt="profile" class="img-thumbnail rounded-circle d-flex" id="imgProfile">
-          </div>
-          <div class="col-lg-10 col-md-8 mt-4">
-            <div class="card-body">
-              <h2 class="card-title">Mon Gemana</h2>
-              <h4 class="card-text">IT Supervisor</h4>
-              <p class="card-text">Back End</p>
-              <p class="card-text">
-                <button class="btn btn-info text-white"><i class="fa-solid fa-print"></i></button>
-                <button class="btn btn-danger text-white"><i class="fa-solid fa-pen-to-square"></i></button>
-                <button class="btn btn-success text-white"><i class="fa-solid fa-key"></i></button>
-              </p>
+    {{-- Hero Section --}}
+    <div class="card profile-hero shadow-sm mb-4">
+        <div class="card-body p-4 p-lg-5">
+            <div class="row align-items-center">
+                <div class="col-lg-2 text-center mb-3 mb-lg-0">
+                    <img src="{{ $emp->path ?? URL::asset('/img/undraw_profile.svg') }}" 
+                         alt="profile" class="rounded-circle profile-img-container shadow-lg">
+                </div>
+                <div class="col-lg-7 text-center text-lg-start">
+                    <div class="d-flex align-items-center justify-content-center justify-content-lg-start mb-2">
+                        <h1 class="fw-bold mb-0 me-3">
+                            {{ $emp->firstname ?? 'Select' }} {{ $emp->middlename ?? '' }} {{ $emp->lastname ?? 'Employee' }} {{ $emp->suffix ?? '' }}
+                        </h1>
+                        @if(isset($emp->status))
+                        <span class="badge {{ $emp->status == 1 ? 'bg-success' : 'bg-danger' }} rounded-pill px-3">
+                            {{ $emp->status == 1 ? 'ACTIVE' : 'RESIGNED' }}
+                        </span>
+                        @endif
+                    </div>
+                    <p class="fs-5 opacity-75 mb-3">{{ $emp->pos_desc ?? 'Position' }} <span class="mx-2">|</span> {{ $emp->dep_name ?? 'Department' }}</p>
+                    <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-2">
+                        <span class="badge bg-white bg-opacity-20 rounded-pill px-3 py-2"><i class="fa-solid fa-id-card me-1 text-info"></i> {{ $emp->employee_number ?? '---' }}</span>
+                        <span class="badge bg-white bg-opacity-20 rounded-pill px-3 py-2"><i class="fa-solid fa-envelope me-1 text-info"></i> {{ $emp->email ?? '---' }}</span>
+                    </div>
+                </div>
+                <div class="col-lg-3 text-center text-lg-end">
+                    <div class="btn-group shadow-sm">
+                        <button class="btn btn-white text-primary" title="Print Resume"><i class="fa-solid fa-file-pdf"></i></button>
+                        <button class="btn btn-white text-info" title="Edit Record"><i class="fa-solid fa-user-pen"></i></button>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
     </div>
 
-    <ul class="nav nav-tabs mt-5" id="myTab" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="true">Contact Information</button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="educational-tab" data-bs-toggle="tab" data-bs-target="#educational" type="button" role="tab" aria-controls="educational" aria-selected="false">Educational Background</button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="employment-tab" data-bs-toggle="tab" data-bs-target="#employment" type="button" role="tab" aria-controls="employment" aria-selected="false">Employment Details</button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="compliance-tab" data-bs-toggle="tab" data-bs-target="#compliance" type="button" role="tab" aria-controls="compliance" aria-selected="false">Compliance Document Data</button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="E201-tab" data-bs-toggle="tab" data-bs-target="#E201" type="button" role="tab" aria-controls="E201" aria-selected="false">E201 Files</button>
-        </li>
-      </ul>
-      <div class="tab-content" id="myTabContent">
+    {{-- Tabs --}}
+    <ul class="nav nav-resume mb-4" id="resumeTab" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#personal">Personal Info</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#education">Education</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#employment">Employment</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#compliance">Compliance</button></li>
+    </ul>
 
-        <div class="tab-pane fade show active" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-            <div class="card p-5">
-                
-                    <div class="card mb-3">
-                      <div class="card-body">
-                            <div class="row">
-                                <div class="col-sm-3">
-                                    <h6 class="mb-0">
-                                        <strong>Address</strong>
-                                    </h6>
+    <div class="tab-content">
+        {{-- Personal Tab --}}
+        <div class="tab-pane fade show active" id="personal" role="tabpanel">
+            <div class="card resume-card p-4">
+                <div class="row g-4">
+                    <div class="col-md-12"><h6 class="fw-bold text-teal text-uppercase"><i class="fa-solid fa-user me-2"></i>General Details</h6><hr></div>
+                    <div class="col-md-4">
+                        <div class="info-label">Gender / Citizenship</div>
+                        <div class="info-value">
+                            {{ isset($emp->gender) ? ($emp->gender == 1 ? 'Male' : 'Female') : '---' }} / {{ $emp->citizenship ?? '---' }}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-label">Birth Date</div>
+                        <div class="info-value">{{ isset($emp->birthdate) ? date('M d, Y', strtotime($emp->birthdate)) : '---' }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-label">Contact Numbers</div>
+                        <div class="info-value">{{ $emp->mobile ?? '---' }} {{ isset($emp->homephone) ? '/ '.$emp->homephone : '' }}</div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="info-label">Mailing Address</div>
+                        <div class="info-value">
+                            {{ $emp->street ?? '---' }}, Brgy. {{ $emp->barangay ?? '---' }}, {{ $emp->city ?? '---' }}, {{ $emp->province ?? '---' }}, {{ $emp->zipcode ?? '' }}, {{ $emp->country ?? '' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Education Tab --}}
+        <div class="tab-pane fade" id="education" role="tabpanel">
+            <div class="card resume-card p-4">
+                <div class="row g-4">
+                    <div class="col-md-12 d-flex align-items-center">
+                        <div class="bg-light p-3 rounded-circle me-3 text-primary"><i class="fa-solid fa-graduation-cap"></i></div>
+                        <div>
+                            <div class="info-label">Tertiary Education</div>
+                            <div class="info-value fw-bold">{{ $emp->tertiary_school ?? 'Not Specified' }}</div>
+                            <div class="small text-muted">{{ $emp->tertiary_year_started ?? '' }} - {{ $emp->tertiary_year_graduated ?? '' }} | {{ $emp->tertiary_school_address ?? '' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 d-flex align-items-center border-top pt-4">
+                        <div class="bg-light p-3 rounded-circle me-3 text-secondary"><i class="fa-solid fa-school"></i></div>
+                        <div>
+                            <div class="info-label">Secondary Education</div>
+                            <div class="info-value fw-bold">{{ $emp->secondary_school ?? 'Not Specified' }}</div>
+                            <div class="small text-muted">{{ $emp->secondary_year_started ?? '' }} - {{ $emp->secondary_year_graduated ?? '' }} | {{ $emp->secondary_school_address ?? '' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Employment Tab --}}
+        <div class="tab-pane fade" id="employment" role="tabpanel">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="card resume-card p-4 bg-light">
+                        <h6 class="fw-bold mb-3">Compensation</h6>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="info-label">Basic Salary</span>
+                            <span class="info-value">₱ {{ number_format($emp->basic ?? 0, 2) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="info-label">Allowance</span>
+                            <span class="info-value">₱ {{ number_format($emp->allowance ?? 0, 2) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between border-top pt-2">
+                            <span class="info-label">Hourly Rate</span>
+                            <span class="info-value">₱ {{ number_format($emp->hourly_rate ?? 0, 2) }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="card resume-card p-4">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="info-label">Company / Agency</div>
+                                <div class="info-value">{{ $emp->comp_name ?? '---' }} / {{ $emp->ag_name ?? 'Direct' }}</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="info-label">Date Hired</div>
+                                <div class="info-value text-primary fw-bold">{{ isset($emp->date_hired) ? date('M d, Y', strtotime($emp->date_hired)) : '---' }}</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="info-label">Job Level / Classification</div>
+                                <div class="info-value">{{ $emp->job_desc ?? '---' }} / {{ $emp->class_desc ?? '---' }}</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="info-label">HMO Provider / No.</div>
+                                <div class="info-value">{{ $emp->hmoName ?? 'None' }} ({{ $emp->hmo_number ?? 'N/A' }})</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Compliance Tab --}}
+        <div class="tab-pane fade" id="compliance" role="tabpanel">
+            <div class="card resume-card p-4">
+                <div class="row g-4">
+                    @php
+                        $governmentFields = [
+                            ['label' => 'SSS Number', 'val' => $emp->sss ?? null, 'icon' => 'fa-shield-halved'],
+                            ['label' => 'PhilHealth', 'val' => $emp->philhealth ?? null, 'icon' => 'fa-kit-medical'],
+                            ['label' => 'Pag-IBIG', 'val' => $emp->pagibig ?? null, 'icon' => 'fa-house-chimney-user'],
+                            ['label' => 'TIN', 'val' => $emp->tin ?? null, 'icon' => 'fa-file-invoice'],
+                            ['label' => 'UMID', 'val' => $emp->umid ?? null, 'icon' => 'fa-address-card'],
+                            ['label' => 'Passport', 'val' => $emp->passport_no ?? null, 'icon' => 'fa-passport']
+                        ];
+                    @endphp
+                    @foreach($governmentFields as $item)
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center p-3 bg-light rounded-4">
+                                <div class="fs-4 text-teal me-3"><i class="fa-solid {{ $item['icon'] }}"></i></div>
+                                <div>
+                                    <div class="info-label">{{ $item['label'] }}</div>
+                                    <div class="info-value fw-bold">{{ $item['val'] ?? 'Not Provided' }}</div>
                                 </div>
-                                <div class="col-sm-9">
-                                    B15 L4 LESSANDRA HOMES KAYPIAN CSJDM San Jose Del Monte Bulacan 3023 Philippines
-                                </div>
                             </div>
-                            <hr>
-                            <div class="row">
-                              <div class="col-sm-3">
-                                  <h6 class="mb-0">
-                                      <strong>Date of Birth</strong>
-                                  </h6>
-                              </div>
-                              <div class="col-sm-9">
-                                1993-11-02
-                              </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                              <div class="col-sm-3">
-                                  <h6 class="mb-0">
-                                      <strong>Age</strong>
-                                  </h6>
-                              </div>
-                              <div class="col-sm-9">
-                                28 Years Old
-                              </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                              <div class="col-sm-3">
-                                  <h6 class="mb-0">
-                                      <strong>Gender</strong>
-                                  </h6>
-                              </div>
-                              <div class="col-sm-9">
-                                Male
-                              </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                              <div class="col-sm-3">
-                                  <h6 class="mb-0">
-                                      <strong>Civil Status</strong>
-                                  </h6>
-                              </div>
-                              <div class="col-sm-9">
-                                Single
-                              </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                              <div class="col-sm-3">
-                                  <h6 class="mb-0">
-                                      <strong>Email</strong>
-                                  </h6>
-                              </div>
-                              <div class="col-sm-9">
-                                gemanaramon@yahoo.com 
-                              </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                              <div class="col-sm-3">
-                                  <h6 class="mb-0">
-                                      <strong>Home No</strong>
-                                  </h6>
-                              </div>
-                              <div class="col-sm-9">
-                                09352427713
-                              </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                              <div class="col-sm-3">
-                                  <h6 class="mb-0">
-                                      <strong>Contact No</strong>
-                                  </h6>
-                              </div>
-                              <div class="col-sm-9">
-                                N/A
-                              </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                              <div class="col-sm-3">
-                                  <h6 class="mb-0">
-                                      <strong>Citizenship</strong>
-                                  </h6>
-                              </div>
-                              <div class="col-sm-9">
-                                Filipino
-                              </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                              <div class="col-sm-3">
-                                  <h6 class="mb-0">
-                                      <strong>Religion</strong>
-                                  </h6>
-                              </div>
-                              <div class="col-sm-9">
-                                Roman Catholic
-                              </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                              <div class="card-title text-center">
-                                <h3><strong>IN CASE OF EMERGENCY</strong></h3>
-                              </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                              <div class="col-sm-3">
-                                  <h6 class="mb-0">
-                                      <strong>Name</strong>
-                                  </h6>
-                              </div>
-                              <div class="col-sm-9">
-                                GENIVIVE OBONG
-                              </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                              <div class="col-sm-3">
-                                  <h6 class="mb-0">
-                                      <strong>Address</strong>
-                                  </h6>
-                              </div>
-                              <div class="col-sm-9">
-                                B15 L4 LESSANDRA HOMES
-                              </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                              <div class="col-sm-3">
-                                  <h6 class="mb-0">
-                                      <strong>Relationship</strong>
-                                  </h6>
-                              </div>
-                              <div class="col-sm-9">
-                                Common Wife
-                              </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                              <div class="col-sm-3">
-                                  <h6 class="mb-0">
-                                      <strong>ICE</strong>
-                                  </h6>
-                              </div>
-                              <div class="col-sm-9">
-                                Yes
-                              </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                              <div class="col-sm-3">
-                                  <h6 class="mb-0">
-                                      <strong>Contact Number</strong>
-                                  </h6>
-                              </div>
-                              <div class="col-sm-9">
-                                09364414116
-                              </div>
-                            </div>
-                      </div>
-                    </div>
-                {{-- </div> --}}
-
+                        </div>
+                    @endforeach
+                </div>
             </div>
         </div>
-
-        <div class="tab-pane fade" id="educational" role="tabpanel" aria-labelledby="educational-tab">
-          
-          <div class="card p-5">
-
-            <div class="card mb-3">
-
-              <div class="card-body">
-                <table class="table table-responsive p-3">
-                  <thead>
-                    <tr>
-                      <th scope="col" ></th>
-                      <th scope="col" class="col-lg-3">School</th>
-                      <th scope="col" class="col-lg-3">Year Started</th>
-                      <th scope="col" class="col-lg-3">Year End</th>
-                      <th scope="col" class="col-lg-3">School Address</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <th scope="col">Primary</td>
-                      <td>OQUENDO NATIONAL ELEMENTARY SCHOOL 	</td>
-                      <td>2000</td>
-                      <td>2006</td>
-                      <td>OQUENDO CALBAYOG CITY SAMAR</td>
-                    </tr>
-                    
-                    <tr>
-                      <th scope="col">Secondary</td>
-                      <td>OQUENDO NATIONAL HIGH SCHOOL</td>
-                      <td>2006</td>
-                      <td>2010</td>
-                      <td>OQUENDO CALBAYOG CITY SAMAR</td>
-                    </tr>
-                    
-                    <tr>
-                      <th scope="col">Tertiary</td>
-                      <td>NORTHWEST SAMAR STATE UNIVERSITY</td>
-                      <td>2010</td>
-                      <td>2015</td>
-                      <td>CALBAYOG CITY SAMAR</td>
-                    </tr>
-
-                  </tbody>
-                </table>
-              </div>
-
-            </div>
-
-          </div>
-        </div>
-
-        <div class="tab-pane fade" id="employment" role="tabpanel" aria-labelledby="employment-tab">
-          
-          <div class="card p-5">
-            
-            <div class="card mb-3">
-              <div class="card-body">
-                
-                <div class="row">
-
-                  <div class="col-lg-4 col-md-4 col-sm-12">
-
-                    <div class="col-lg-12">
-                      <i class="fa-solid fa-briefcase"></i><strong> IT Supervisor/ </strong><span class="text-secondary">Current</span>
-                    </div>
-                    <div class="col-lg-12">
-                      <p class="text-secondary">
-                        SysAd Department
-                      </p>
-                    </div>
-                    <div class="col-lg-12">
-                      <p class="text-secondary">
-                        2021-02-19
-                      </p>
-                    </div>
-                    <div class="col-lg-12">
-                      <i class="fa-solid fa-briefcase"></i><strong> / </strong><span class="text-secondary">Current</span>
-                    </div>
-
-                  </div>
-
-                  <div class="col-lg-8 col-md-8 col-sm-12">
-
-                    <div class="row">
-                      <div class="col-sm-3">
-                          <h6 class="mb-0">
-                              <strong>Employee ID </strong>
-                          </h6>
-                      </div>
-                      <div class="col-sm-9">
-                          WeDoinc-0010
-                      </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                      <div class="col-sm-3">
-                          <h6 class="mb-0">
-                              <strong>HMO Number </strong>
-                          </h6>
-                      </div>
-                      <div class="col-sm-9">
-                          1
-                      </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                      <div class="col-sm-3">
-                          <h6 class="mb-0">
-                              <strong>HMO Provider </strong>
-                          </h6>
-                      </div>
-                      <div class="col-sm-9">
-                          
-                      </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                      <div class="col-sm-3">
-                          <h6 class="mb-0">
-                              <strong>Status </strong>
-                          </h6>
-                      </div>
-                      <div class="col-sm-9">
-                          Employed
-                      </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                      <div class="col-sm-3">
-                          <h6 class="mb-0">
-                              <strong>Classification</strong>
-                          </h6>
-                      </div>
-                      <div class="col-sm-9">
-                        Back-End
-                      </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                      <div class="col-sm-3">
-                          <h6 class="mb-0">
-                              <strong>Department</strong>
-                          </h6>
-                      </div>
-                      <div class="col-sm-9">
-                        SysAd Department 
-                      </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                      <div class="col-sm-3">
-                          <h6 class="mb-0">
-                              <strong>Job Level</strong>
-                          </h6>
-                      </div>
-                      <div class="col-sm-9">
-                        Supervisory
-                      </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                      <div class="col-sm-3">
-                          <h6 class="mb-0">
-                              <strong>Position</strong>
-                          </h6>
-                      </div>
-                      <div class="col-sm-9">
-                        IT Supervisor
-                      </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                      <div class="col-sm-3">
-                          <h6 class="mb-0">
-                              <strong>Immediate</strong>
-                          </h6>
-                      </div>
-                      <div class="col-sm-9">
-                        Mark Reolester Ledesma Llapitan
-                      </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                      <div class="col-sm-3">
-                          <h6 class="mb-0">
-                              <strong>Date Hired</strong>
-                          </h6>
-                      </div>
-                      <div class="col-sm-9">
-                        2021-02-19
-                      </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                      <div class="col-sm-3">
-                          <h6 class="mb-0">
-                              <strong>Date Resigned</strong>
-                          </h6>
-                      </div>
-                      <div class="col-sm-9">
-                        2021-02-05
-                      </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                      <div class="col-sm-3">
-                          <h6 class="mb-0">
-                              <strong>Salary Details</strong>
-                          </h6>
-                      </div>
-                      <div class="col-sm-9">
-                        <button class="btn" id="btnShowSalary"><i class="fa-solid fa-arrow-down"></i></button>
-                        <button class="btn d-none" id="btnHideSalary"><i class="fa-solid fa-arrow-up"></i></button>
-                      </div>
-                    </div>
-                    <hr>
-                    <div class="d-none" id="salaryDetails">
-                      <div class="row">
-                        <div class="col-sm-3">
-                            <h6 class="mb-0">
-                                <strong>Basic</strong>
-                            </h6>
-                        </div>
-                        <div class="col-sm-9">
-                          222, 000.00
-                        </div>
-                      </div>
-                      <hr>
-                      <div class="row">
-                        <div class="col-sm-3">
-                            <h6 class="mb-0">
-                                <strong>Allowance</strong>
-                            </h6>
-                        </div>
-                        <div class="col-sm-9">
-                          0.00
-                        </div>
-                      </div>
-                      <hr>
-                      <div class="row">
-                        <div class="col-sm-3">
-                            <h6 class="mb-0">
-                                <strong>Hourly Rate</strong>
-                            </h6>
-                        </div>
-                        <div class="col-sm-9">
-                          0.00
-                        </div>
-                      </div>
-                      <hr>
-                    </div>
-
-                    <div class="card-title"><strong class="text-danger mt-5">Work Schedule</strong></div>
-                    <table class="table table-responsive">
-                      <thead>
-                        <tr>
-                          <th scope="col">Monday</th>
-                          <th scope="col">Tuesday</th>
-                          <th scope="col">Wednesday</th>
-                          <th scope="col">Thursday</th>
-                          <th scope="col">Friday</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>08:00 AM-08:00 PM </td>
-                          <td>08:00 AM-08:00 PM </td>
-                          <td>08:00 AM-08:00 PM </td>
-                          <td>08:00 AM-08:00 PM </td>
-                          <td>Rest Day</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  
-                </div>
-
-
-              </div>
-            </div>
-          
-          </div>
-
-        </div>
-
-        <div class="tab-pane fade" id="compliance" role="tabpanel" aria-labelledby="compliance-tab">
-          
-          <div class="card p-5">
-            <div class="card mb-3">
-              <div class="card-body">
-
-                <div class="row">
-                  <div class="col-sm-3">
-                      <h6 class="mb-0">
-                          <strong>Passport Number</strong>
-                      </h6>
-                  </div>
-                  <div class="col-sm-9">
-                    P1721998A
-                  </div>
-                </div>
-                <hr>
-                <div class="row">
-                  <div class="col-sm-3">
-                      <h6 class="mb-0">
-                          <strong>PAG-IBIG</strong>
-                      </h6>
-                  </div>
-                  <div class="col-sm-9">
-                    1211-503-3276-8
-                  </div>
-                </div>
-                <hr>
-                <div class="row">
-                  <div class="col-sm-3">
-                      <h6 class="mb-0">
-                          <strong>PHILHEALTH</strong>
-                      </h6>
-                  </div>
-                  <div class="col-sm-9">
-                    0102-582-2305-0
-                  </div>
-                </div>
-                <hr>
-                <div class="row">
-                  <div class="col-sm-3">
-                      <h6 class="mb-0">
-                          <strong>SSS Number</strong>
-                      </h6>
-                  </div>
-                  <div class="col-sm-9">
-                    3452-505-309
-                  </div>
-                </div>
-                <hr>
-                <div class="row">
-                  <div class="col-sm-3">
-                      <h6 class="mb-0">
-                          <strong>TIN</strong>
-                      </h6>
-                  </div>
-                  <div class="col-sm-9">
-                    471-087-632-000
-                  </div>
-                </div>
-                <hr>
-                <div class="row">
-                  <div class="col-sm-3">
-                      <h6 class="mb-0">
-                          <strong>UMID</strong>
-                      </h6>
-                  </div>
-                  <div class="col-sm-9">
-                    011189439287
-                  </div>
-                </div>
-                <hr>
-
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="tab-pane fade" id="E201" role="tabpanel" aria-labelledby="E201-tab">
-          
-          <div class="card p-5">
-            <div class="card mb-3">
-              <div class="card-body">
-                <h3>EMPTY</h3>
-              </div>
-            </div>
-          </div>
-        </div>
-       
-      </div>
-    
+    </div>
 </div>
-
-<script src="{{ asset('js/201.js') }}" defer></script>
-<script>
-  $(document).ready(function(){
-
-    $(document).on('click', '#btnShowSalary', function(e){
-      $('#salaryDetails').removeClass("d-none").addClass("d-block");
-      $('#btnShowSalary').hide();
-      $('#btnHideSalary').removeClass("d-none").addClass("d-block");
-    });
-
-    $(document).on('click', '#btnHideSalary', function(e){
-      $('#salaryDetails').removeClass("d-block").addClass("d-none");
-      $('#btnShowSalary').show();
-      $('#btnHideSalary').removeClass("d-block").addClass("d-none");
-    });
-
-  })
-</script>
-@endsection    
+@endsection

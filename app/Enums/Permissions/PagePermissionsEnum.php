@@ -50,4 +50,6 @@ enum PagePermissionsEnum: string
     case attendance = 'Attendance Viewer';
     case laboratory = 'Laboratory';
     case loanmanagement = 'Loan Management';
+    case admine201 = 'Admin E-201';
+    
 }
