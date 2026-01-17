@@ -1,6 +1,62 @@
 @extends('layout.app', ['title' => 'Roles Permission'])
 
 @section('content')
+    
+    <div class="container-fluid">
+        
+        <div class="mb-2 d-sm-flex align-items-center justify-content-between">
+            <h4 class=" mb-0 text-gray-800">Roles Permission : {{ $role->name }}</h4>
+            <div>
+                <a 
+                    href="{{ route('user-roles.index') }}" 
+                    class=" btn text-white" 
+                    style="background-color: #008080" 
+                > <i class="fa fa-arrow-left"></i> 
+                    Back to Roles
+                </a>
+            </div>
+        </div>
+        <div>
+            <div class="row">
+                <ul class="nav nav-pills list-inline px-4" role="tablist">
+                    <li class="nav-item pr-2">
+                        <a
+                            href="{{ route('user-roles.show', ['user_role' => $role->id, 'permission' => 'page']) }}"
+                            class="nav-link text-secondary list-inline-item shadow-sm {{ $permissiontab === 'page' ? 'active' : '' }}"
+                        >
+                            <i class="tf-icons bx bx-user"></i> Page Permission
+                        </a>
+                    </li>
+                    <li class="nav-item pr-2">
+                        <a
+                            href="{{ route('user-roles.show', ['user_role' => $role->id, 'permission' => 'overtime']) }}"
+                            class="nav-link text-secondary list-inline-item shadow-sm {{ $permissiontab === 'overtime' ? 'active' : '' }}"
+                        >
+                            <i class="tf-icons bx bx-user"></i> Overtime Permission
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-xl-12 col-lg-12">
+                <div class="card mb-4">
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <div class="chart-area">
+                            <div class="table-responsive border-0">
+                                <table class="table table-hover table-border-none  ">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-dark" scope="col">No</th>
+                                            <th class="text-dark" scope="col">Permissions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($permissions as $group)
+                                            <tr class="table-primary">
+                                                <td colspan="3"><strong>{{ $group['title'] }}</strong></td>
+                                            </tr>
 
 <style>
     /* Uniform Design Elements */

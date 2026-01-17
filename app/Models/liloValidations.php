@@ -12,5 +12,12 @@ class liloValidations extends Model
     protected $table = "lilo_validations";
     protected $primaryKey = "id";
     public $timestamps = true;
-    protected $fillable = ['empCompID','lilo_gracePrd','managersOverride','managersTime'];
+    protected $fillable = [
+        'empCompID',
+        'lilo_gracePrd',
+        'managersOverride',
+        'managersTime',
+        'no_logout_has_deduction',
+        'minute_deduction',
+    ];
 }
