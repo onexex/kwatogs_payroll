@@ -134,10 +134,24 @@
     </style>
     <div class="container-fluid">
         <div class="row mb-3">
-            <div class="col-12">
-                <h4 class="text-secondary-800">Settings / <label class="text-black">Employee Registration</label></h4>
+           <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h4 class="fw-bold text-dark m-0">Personnel Onboarding</h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item text-muted">Operation</li>
+                            <li class="breadcrumb-item active fw-semibold text-primary" aria-current="page">Employee Registration</li>
+                        </ol>
+                    </nav>
+                </div>
+                
+                <div class="d-none d-md-block">
+                    <span class="badge bg-soft-teal text-teal border border-teal rounded-pill px-3 py-2">
+                        <i class="fa-solid fa-user-plus me-1"></i> New Enrollment
+                    </span>
+                </div>
             </div>
-        
+                
 
        
             <div class="col-12">
