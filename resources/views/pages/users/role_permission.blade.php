@@ -2,7 +2,7 @@
 
 @section('content')
     
-    <div class="container-fluid">
+    {{-- <div class="container-fluid">
         
         <div class="mb-2 d-sm-flex align-items-center justify-content-between">
             <h4 class=" mb-0 text-gray-800">Roles Permission : {{ $role->name }}</h4>
@@ -56,7 +56,7 @@
                                         @foreach($permissions as $group)
                                             <tr class="table-primary">
                                                 <td colspan="3"><strong>{{ $group['title'] }}</strong></td>
-                                            </tr>
+                                            </tr> --}}
 
 <style>
     /* Uniform Design Elements */
