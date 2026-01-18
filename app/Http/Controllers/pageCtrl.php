@@ -13,6 +13,7 @@ use App\Models\department;
 use Illuminate\Http\Request;
 use App\Models\classification;
 use DB;
+use Illuminate\Support\Facades\Auth;
 
 class pageCtrl extends Controller
 {
@@ -210,7 +211,12 @@ class pageCtrl extends Controller
 
     public function e201File()
     {
-        return view('pages.modules.201');
+        $user = Auth::user();
+        $empployeeDetails = $user->empDetail;
+        return view('pages.modules.201', [
+            'emp' => $empployeeDetails,
+            'user' => $user,
+        ]);
     }
     public function memorandum()
     {
