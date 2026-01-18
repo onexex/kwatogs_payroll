@@ -36,14 +36,15 @@ use App\Http\Controllers\classiticationCtrl;
 use App\Http\Controllers\homeAttendanceCtrl;
 
  
+use App\Http\Controllers\OvertimeController;
 use App\Http\Controllers\leavevalidationCtrl;
 use App\Http\Controllers\liloValidationsCtrl;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\parentalSettingsCtrl;
 use App\Http\Controllers\reportAttendanceCtrl;
 use App\Http\Controllers\Roles\RolesController;
+use App\Http\Controllers\EmployeeRecordController;
 use App\Http\Controllers\EmployeeScheduleController;
-use App\Http\Controllers\OvertimeController;
 use App\Http\Controllers\Roles\EmployeeRoleController;
 
 Route::get('/r', function () {
@@ -357,7 +358,16 @@ Route::group(['middleware'=>['AuthCheck']], function(){
     // 3. Optional: Export to PDF
     Route::get('/print/{empID}', [EmployeeRecordController::class, 'printProfile'])
          ->name('e201.print');
+
+
 });
+    
+    // The {id} here corresponds to the empID passed from the frontend
+    // Route::get('/admin/e201/fetch/{id}', [EmployeeRecordController::class, 'getE201Data'])->name('e201.fetch');
+    
+
+// Ensure this is OUTSIDE any other conflicting groups
+Route::get('admin/e201/fetch/{empID}', [EmployeeRecordController::class, 'getEmployeeDetails']);
 
 });
 

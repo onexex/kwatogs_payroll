@@ -10,7 +10,7 @@ class RoleServices
     
     public function getAllRoles()
     {
-        return Role::all();
+        return Role::orderBy('name')->get();
     }
     
     public function store(

@@ -144,7 +144,14 @@
                     'debitadvise'      => ['name' => 'Debit Advise', 'url' => '/pages/modules/debitAdvise', 'icon' => 'fa-receipt'],
                     'sendobt'          => ['name' => 'Send to OBT', 'url' => '/pages/modules/sendOBT', 'icon' => 'fa-paper-plane'],
                 ];
-                $hasPagesAccess = collect($modulePages)->keys()->some(fn($key) => auth()->user()?->can($key));
+                
+                // 1. Sort the main array first
+$modulePages = collect($modulePages)->sort()->toArray();
+
+// 2. Use the sorted array for your check
+$hasPagesAccess = collect($modulePages)->keys()->some(fn($key) => auth()->user()?->can($key));
+
+// 3. Pass $modulePages to your view—it will now be alphabetical!
             @endphp
 
             @if ($hasPagesAccess)
@@ -196,7 +203,12 @@
                     'userroles'           => ['name' => 'User Roles', 'url' => '/user-roles', 'icon' => 'fa-shield-halved'],
                     'admine201'           => ['name' => 'Admin E-201', 'url' => '/pages/management/e201', 'icon' => 'fa-id-card-alt'],
                 ];
+                // 1. Sort the modules by their values (labels) A-Z
+                $managementModules = collect($managementModules)->sort()->toArray();
+
+                // 2. Perform your access check
                 $hasManagementAccess = collect($managementModules)->keys()->some(fn($key) => auth()->user()?->can($key));
+                // $hasManagementAccess = collect($managementModules)->keys()->some(fn($key) => auth()->user()?->can($key));
             @endphp
 
             @if ($hasManagementAccess)

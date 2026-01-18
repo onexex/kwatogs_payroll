@@ -61,4 +61,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(AttendanceSummary::class, 'employee_id', 'empID');
     }
+  public function education()
+{
+    return $this->hasMany(emp_education::class, 'empID', 'empID');
+}
+
 }

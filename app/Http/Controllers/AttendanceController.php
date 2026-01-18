@@ -111,76 +111,76 @@ class AttendanceController extends Controller
         ]);
     }
 
-public function timeIn(Request $request)
-{
-    $empID = Session::get('LoggedUserEmpID');
+    public function timeIn(Request $request)
+    {
+        $empID = Session::get('LoggedUserEmpID');
 
-    if (!$empID) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Session expired'
-        ]);
-    }
-
-    try {
-        $attendance = HomeAttendance::logTimeIn($empID);
-
-        $responseMessage = 'Time In recorded';
-        if (!empty($attendance->remarks)) {
-            $responseMessage .= ' (' . $attendance->remarks . ')';
+        if (!$empID) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Session expired'
+            ]);
         }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => $responseMessage,
-            'data' => $attendance
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => $e->getMessage()
-        ]);
-    }
-}
+        try {
+            $attendance = HomeAttendance::logTimeIn($empID);
 
-public function timeOut(Request $request)
-{
-    $empID = Session::get('LoggedUserEmpID');
-    $today = now()->toDateString();
+            $responseMessage = 'Time In recorded';
+            if (!empty($attendance->remarks)) {
+                $responseMessage .= ' (' . $attendance->remarks . ')';
+            }
 
-    $attendance = HomeAttendance::where('employee_id', $empID)
-        // ->whereDate('attendance_date', $today)
-        ->whereNull('time_out')
-        ->latest('time_in')
-        ->first();
-
-    if (!$attendance) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'No active punch found'
-        ]);
+            return response()->json([
+                'status' => 'success',
+                'message' => $responseMessage,
+                'data' => $attendance
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
-    try {
-        $attendance->logTimeOut();
+    public function timeOut(Request $request)
+    {
+        $empID = Session::get('LoggedUserEmpID');
+        $today = now()->toDateString();
 
-        $responseMessage = 'Time Out recorded';
-        if (!empty($attendance->remarks)) {
-            $responseMessage .= ' (' . $attendance->remarks . ')';
+        $attendance = HomeAttendance::where('employee_id', $empID)
+            // ->whereDate('attendance_date', $today)
+            ->whereNull('time_out')
+            ->latest('time_in')
+            ->first();
+
+        if (!$attendance) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No active punch found'
+            ]);
         }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => $responseMessage,
-            'data' => $attendance
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => $e->getMessage()
-        ]);
+        try {
+            $attendance->logTimeOut();
+
+            $responseMessage = 'Time Out recorded';
+            if (!empty($attendance->remarks)) {
+                $responseMessage .= ' (' . $attendance->remarks . ')';
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => $responseMessage,
+                'data' => $attendance
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
     }
-}
 
 
 

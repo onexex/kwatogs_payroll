@@ -9,7 +9,7 @@ class emp_education extends Model
 {
     use HasFactory;
     protected $table = 'emp_educations';
-    protected $primaryKey = 'id ';
+    // protected $primaryKey = 'id ';
     public $timestamps = true;   
 
     protected $fillable = [

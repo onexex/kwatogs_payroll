@@ -33,10 +33,13 @@ class EmpDetail extends Model
         'empDateRegular' => 'date',
     ];
 
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(company::class, 'empCompID', 'comp_id');
-    }
+   public function company(): BelongsTo
+{
+    // 1. Related Model: Company
+    // 2. Foreign Key (in emp_details): 'empCompID'
+    // 3. Owner Key (in companies): 'comp_id'
+    return $this->belongsTo(company::class, 'empCompID', 'comp_id');
+}
 
     public function department(): BelongsTo
     {
@@ -52,6 +55,8 @@ class EmpDetail extends Model
     {
         return $this->belongsTo(User::class, 'empID', 'empID');
     }
+
+   
 
     public function getSalaryInfo()
     {

@@ -58,40 +58,75 @@ class RolesController extends Controller
         }
     }
 
-    public function show(Role $user_role, Request $request)
-    {
-        $permissionEnums = [];
+    // public function show(Role $user_role, Request $request)
+    // {
+    //     $permissionEnums = [];
 
-        if ($request->permission) {
-            if ($request->permission == 'page') {
-                $permissionEnums = [
-                    'Page Permissions' => PagePermissionsEnum::class,
-                ];
-            } else if ($request->permission == 'overtime') {
-                $permissionEnums = [
-                    'Overtime Permissions' => OvertimePermissionEnum::class,
-                ];
-            } else {
-                $permissionEnums = [
-                    'Page Permissions' => PagePermissionsEnum::class,
-                ];
-            }
+    //     if ($request->permission) {
+    //         if ($request->permission == 'page') {
+    //             $permissionEnums = [
+    //                 'Page Permissions' => PagePermissionsEnum::class,
+    //             ];
+    //         } else if ($request->permission == 'overtime') {
+    //             $permissionEnums = [
+    //                 'Overtime Permissions' => OvertimePermissionEnum::class,
+    //             ];
+    //         } else {
+    //             $permissionEnums = [
+    //                 'Page Permissions' => PagePermissionsEnum::class,
+    //             ];
+    //         }
 
-        }
+    //     }
 
-        $permissions = collect($permissionEnums)->map(function ($enumClass, $title) {
-            return [
-                'title' => $title,
-                'permissions' => $enumClass::toArray(),
-            ];
-        })->values()->toArray();
+    //     $permissions = collect($permissionEnums)->map(function ($enumClass, $title) {
+    //         return [
+    //             'title' => $title,
+    //             'permissions' => $enumClass::toArray(),
+    //         ];
+    //     })->values()->toArray();
         
-        return view('pages.users.role_permission', [
-            'permissions' => $permissions,
-            'role' => $user_role,   
-            'permissiontab' => $request->permission ?? '',
-        ]);
+    //     return view('pages.users.role_permission', [
+    //         'permissions' => $permissions,
+    //         'role' => $user_role,   
+    //         'permissiontab' => $request->permission ?? '',
+    //     ]);
+    // }
+
+    public function show(Role $user_role, Request $request)
+{
+    $permissionEnums = [];
+
+    if ($request->permission == 'overtime') {
+        $permissionEnums = [
+            'Overtime Permissions' => OvertimePermissionEnum::class,
+        ];
+    } else {
+        // Default to Page Permissions
+        $permissionEnums = [
+            'Page Permissions' => PagePermissionsEnum::class,
+        ];
     }
+
+    $permissions = collect($permissionEnums)->map(function ($enumClass, $title) {
+        // 1. Get the array from the Enum
+        $data = $enumClass::toArray(); 
+
+        // 2. Sort the array alphabetically by value
+        asort($data); 
+
+        return [
+            'title' => $title,
+            'permissions' => $data,
+        ];
+    })->values()->toArray();
+    
+    return view('pages.users.role_permission', [
+        'permissions' => $permissions,
+        'role' => $user_role,   
+        'permissiontab' => $request->permission ?? 'page', // Default tab text
+    ]);
+}
 
     public function addPermission(Role $role, Request $request)
     {

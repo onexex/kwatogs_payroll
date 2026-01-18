@@ -2,33 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class EmployeeRecordController extends Controller
 {
     // Load the initial Admin Search Page
     public function index() {
-        $resultUser = DB::table('employees')->orderBy('lname', 'asc')->get();
-        return view('pages.management.e201_admin', compact('resultUser'));
+        // Fetch users with their details, ordered alphabetically by last name
+        $resultUser = User::with('empDetail.position')
+            ->orderBy('lname', 'asc')
+            ->get();
+
+        return view('pages.management.e201', compact('resultUser'));
     }
 
-    // THE GET FUNCTION: Fetch full bio-data
+    // THE GET FUNCTION: Fetch full bio-data using Eloquent
     public function getEmployeeDetails($empID) {
-        $details = DB::table('employees as e')
-            ->leftJoin('departments as d', 'e.department', '=', 'd.id')
-            ->leftJoin('positions as p', 'e.position', '=', 'p.id')
-            ->leftJoin('companies as c', 'e.company', '=', 'c.comp_id')
-            ->leftJoin('agencies as a', 'e.agency', '=', 'a.id')
-            ->leftJoin('job_levels as j', 'e.job_level', '=', 'j.id')
-            ->leftJoin('hmos as h', 'e.hmo', '=', 'h.idNo')
-            ->where('e.empID', $empID)
-            ->first();
+        $user = User::with([
+            'empDetail.department',
+            'empDetail.position',
+            'empDetail.company',
+            'education' // <--- Add your new relationship here
+        ])
+        ->where('empID', $empID)
+        ->first();
 
-        if ($details) {
+        if ($user) {
             return response()->json([
                 'status' => 200,
-                'data' => $details
+                'data' => $user
             ]);
         }
 
