@@ -294,7 +294,14 @@ class pageCtrl extends Controller
 
     public function leaveApplication()
     {
-        return view('pages.modules.leaveApplication');
+        $user = Auth::user();
+        $empployeeDetails = $user->empDetail;
+        $leaveTypes = leavetype::all();
+        return view('pages.modules.leaveApplication', [
+            'employeeDetails' => $empployeeDetails,
+            'user' => $user,
+            'leaveTypes' => $leaveTypes,
+        ]);
     }
 
     public function debitAdvise()
