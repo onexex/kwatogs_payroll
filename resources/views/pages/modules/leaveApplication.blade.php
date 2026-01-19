@@ -7,7 +7,7 @@
 
     <div class="mb-2">
         <h4 class=" mb-0 text-gray-800">Automated Leave Application</h4>
-        <button class=" mt-3 btn text-white" style="background-color: #008080" name="btnCreateLeaveModal" id="btnCreateLeaveModal" data-bs-toggle="modal" data-bs-target="#mdlLeaveApp"> <i class="fa fa-plus"></i> Leave Application Form</button>
+        <button class=" mt-3 btn text-white btn-blue" name="btnCreateLeaveModal" id="btnCreateLeaveModal" data-bs-toggle="modal" data-bs-target="#mdlLeaveApp"> <i class="fa fa-plus"></i> Leave Application Form</button>
     </div>
 
     <!-- Page Heading -->
