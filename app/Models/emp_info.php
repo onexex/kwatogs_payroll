@@ -29,6 +29,8 @@ class emp_info extends Model
         'empProv',
         'empZipcode',
         'empCountry',
+        'gender',
+        'citizenship',
     ];
 
      // 🔗 Relationship back to User

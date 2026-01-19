@@ -330,6 +330,8 @@ class registerCtrl extends Controller
             $valueInfos = [
                 'empEmail' => $request->email,
                 'empID' => $empID,
+                'gender' => $request->gender,
+                'citizenship' => $request->citizenship,
                 'empBdate' => $request->birthdate,
                 'empCStatus' => $request->status,
                 'empReligion' => $request->religion,

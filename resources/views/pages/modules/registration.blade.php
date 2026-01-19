@@ -226,8 +226,8 @@
                                             <div class="col-lg-3 col-md-6">
                                                 <label for="selGender" class="form-label small fw-semibold text-muted">Gender <span class="text-danger">*</span></label>
                                                 <select class="form-select form-control-lg bg-light border-0 fs-6" name="gender" id="selGender">
-                                                    <option value="0">Female</option>
-                                                    <option value="1">Male</option>
+                                                    <option value="Female">Female</option>
+                                                    <option value="Male">Male</option>
                                                 </select>
                                             </div>
 

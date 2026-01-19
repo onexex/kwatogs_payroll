@@ -68,7 +68,7 @@
                     <div class="col-md-4">
                         <div class="info-label">Gender / Citizenship</div>
                         <div class="info-value">
-                            {{ isset($user->employeeInformation?->gender) ? ($user->employeeInformation->gender == 1 ? 'Male' : 'Female') : '---' }} / {{ $emp->citizenship ?? '---' }}
+                            {{ isset($user->employeeInformation?->gender) ? ($user->employeeInformation->gender == 1 ? 'Male' : 'Female') : '---' }} / {{ $user->employeeInformation->citizenship ?? '---' }}
                         </div>
                     </div>
                     <div class="col-md-4">
