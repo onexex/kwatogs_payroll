@@ -6,6 +6,7 @@
     .profile-img-container { width: 150px; height: 150px; border: 5px solid rgba(255, 255, 255, 0.2); object-fit: cover; }
     .nav-resume { border: none; gap: 8px; }
     .nav-resume .nav-link { border: none; color: #6c757d; font-weight: 600; padding: 10px 20px; border-radius: 50px; }
+    .nav-resume .nav-link:hover { background-color: #008080 !important; color: white !important; }
     .nav-resume .nav-link.active { background-color: #008080 !important; color: white !important; }
     .info-label { font-size: 0.72rem; font-weight: 800; color: #008080; text-transform: uppercase; letter-spacing: 0.5px; }
     .info-value { font-size: 0.95rem; color: #2d3748; font-weight: 500; }
@@ -25,19 +26,19 @@
                 </div>
                 <div class="col-lg-7 text-center text-lg-start">
                     <div class="d-flex align-items-center justify-content-center justify-content-lg-start mb-2">
-                        <h1 class="fw-bold mb-0 me-3">
-                            {{ $emp->firstname ?? 'Select' }} {{ $emp->middlename ?? '' }} {{ $emp->lastname ?? 'Employee' }} {{ $emp->suffix ?? '' }}
+                        <h1 class="fw-bold mb-0 me-3 text-capitalize">
+                            {{ $user->fname ?? 'Select' }} {{ $user->mname ?? '' }} {{ $user->lname ?? 'Employee' }} {{ $user->suffix ?? '' }}
                         </h1>
-                        @if(isset($emp->status))
-                        <span class="badge {{ $emp->status == 1 ? 'bg-success' : 'bg-danger' }} rounded-pill px-3">
-                            {{ $emp->status == 1 ? 'ACTIVE' : 'RESIGNED' }}
-                        </span>
+                        @if(isset($user->status))
+                            <span class="badge {{ $user->status == 1 ? 'bg-success' : 'bg-danger' }} rounded-pill px-3">
+                                {{ $user->status == 1 ? 'ACTIVE' : 'RESIGNED' }}
+                            </span>
                         @endif
                     </div>
-                    <p class="fs-5 opacity-75 mb-3">{{ $emp->pos_desc ?? 'Position' }} <span class="mx-2">|</span> {{ $emp->dep_name ?? 'Department' }}</p>
+                    <p class="fs-5 opacity-75 mb-3">{{ $emp->position->pos_desc ?? 'Position' }} <span class="mx-2">|</span> {{ $emp->department->dep_name ?? 'Department' }}</p>
                     <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-2">
-                        <span class="badge bg-white bg-opacity-20 rounded-pill px-3 py-2"><i class="fa-solid fa-id-card me-1 text-info"></i> {{ $emp->employee_number ?? '---' }}</span>
-                        <span class="badge bg-white bg-opacity-20 rounded-pill px-3 py-2"><i class="fa-solid fa-envelope me-1 text-info"></i> {{ $emp->email ?? '---' }}</span>
+                        <span class="badge bg-white bg-opacity-20 rounded-pill px-3 text-black py-2"><i class="fa-solid fa-id-card me-1 text-info"></i> {{ $emp->empID ?? '---' }}</span>
+                        <span class="badge bg-white bg-opacity-20 rounded-pill px-3 text-black py-2"><i class="fa-solid fa-envelope me-1 text-info"></i> {{ $user->email ?? '---' }}</span>
                     </div>
                 </div>
                 <div class="col-lg-3 text-center text-lg-end">
@@ -67,21 +68,21 @@
                     <div class="col-md-4">
                         <div class="info-label">Gender / Citizenship</div>
                         <div class="info-value">
-                            {{ isset($emp->gender) ? ($emp->gender == 1 ? 'Male' : 'Female') : '---' }} / {{ $emp->citizenship ?? '---' }}
+                            {{ isset($user->employeeInformation?->gender) ? ($user->employeeInformation->gender == 1 ? 'Male' : 'Female') : '---' }} / {{ $user->employeeInformation->citizenship ?? '---' }}
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="info-label">Birth Date</div>
-                        <div class="info-value">{{ isset($emp->birthdate) ? date('M d, Y', strtotime($emp->birthdate)) : '---' }}</div>
+                        <div class="info-value">{{ isset($user->employeeInformation->empBdate) ? date('M d, Y', strtotime($user->employeeInformation->empBdate)) : '---' }}</div>
                     </div>
                     <div class="col-md-4">
                         <div class="info-label">Contact Numbers</div>
-                        <div class="info-value">{{ $emp->mobile ?? '---' }} {{ isset($emp->homephone) ? '/ '.$emp->homephone : '' }}</div>
+                        <div class="info-value">{{ $user->employeeInformation->empPContact ?? '---' }} {{ isset($user->employeeInformation->empHContact) ? '/ '.$user->employeeInformation->empHContact : '' }}</div>
                     </div>
                     <div class="col-md-12">
                         <div class="info-label">Mailing Address</div>
                         <div class="info-value">
-                            {{ $emp->street ?? '---' }}, Brgy. {{ $emp->barangay ?? '---' }}, {{ $emp->city ?? '---' }}, {{ $emp->province ?? '---' }}, {{ $emp->zipcode ?? '' }}, {{ $emp->country ?? '' }}
+                            {{ $user->employeeInformation->empAddStreet ?? '---' }}, Brgy. {{ $user->employeeInformation->empAddBrgyDesc ?? '---' }}, {{ $user->employeeInformation->empAddCityDesc ?? '---' }}, {{ $user->employeeInformation->empProvDesc ?? '---' }}, {{ $user->employeeInformation->empZipcode ?? '' }}, {{ $user->employeeInformation->empCountry ?? '' }}
                         </div>
                     </div>
                 </div>
@@ -92,22 +93,16 @@
         <div class="tab-pane fade" id="education" role="tabpanel">
             <div class="card resume-card p-4">
                 <div class="row g-4">
-                    <div class="col-md-12 d-flex align-items-center">
-                        <div class="bg-light p-3 rounded-circle me-3 text-primary"><i class="fa-solid fa-graduation-cap"></i></div>
-                        <div>
-                            <div class="info-label">Tertiary Education</div>
-                            <div class="info-value fw-bold">{{ $emp->tertiary_school ?? 'Not Specified' }}</div>
-                            <div class="small text-muted">{{ $emp->tertiary_year_started ?? '' }} - {{ $emp->tertiary_year_graduated ?? '' }} | {{ $emp->tertiary_school_address ?? '' }}</div>
+                    @foreach ($user->education as $education)
+                        <div class="col-md-12 d-flex align-items-center">
+                            <div class="bg-light p-3 rounded-circle me-3 text-primary"><i class="fa-solid fa-graduation-cap"></i></div>
+                            <div>
+                                <div class="info-label">{{ $education->schoolLevel }} Education</div>
+                                <div class="info-value fw-bold text-capitalize">{{ $education->schoolName ?? 'Not Specified' }}</div>
+                                <div class="small text-muted text-capitalize">{{ $education->schoolYearStarted ?? '' }} - {{ $education->schoolYearEnded ?? '' }} | {{ $education->schoolAddress ?? '' }}</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-12 d-flex align-items-center border-top pt-4">
-                        <div class="bg-light p-3 rounded-circle me-3 text-secondary"><i class="fa-solid fa-school"></i></div>
-                        <div>
-                            <div class="info-label">Secondary Education</div>
-                            <div class="info-value fw-bold">{{ $emp->secondary_school ?? 'Not Specified' }}</div>
-                            <div class="small text-muted">{{ $emp->secondary_year_started ?? '' }} - {{ $emp->secondary_year_graduated ?? '' }} | {{ $emp->secondary_school_address ?? '' }}</div>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -120,15 +115,15 @@
                         <h6 class="fw-bold mb-3">Compensation</h6>
                         <div class="d-flex justify-content-between mb-2">
                             <span class="info-label">Basic Salary</span>
-                            <span class="info-value">₱ {{ number_format($emp->basic ?? 0, 2) }}</span>
+                            <span class="info-value">₱ {{ number_format($emp->empBasic ?? 0, 2) }}</span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span class="info-label">Allowance</span>
-                            <span class="info-value">₱ {{ number_format($emp->allowance ?? 0, 2) }}</span>
+                            <span class="info-value">₱ {{ number_format($emp->empAllowance ?? 0, 2) }}</span>
                         </div>
                         <div class="d-flex justify-content-between border-top pt-2">
                             <span class="info-label">Hourly Rate</span>
-                            <span class="info-value">₱ {{ number_format($emp->hourly_rate ?? 0, 2) }}</span>
+                            <span class="info-value">₱ {{ number_format($emp->empHrate ?? 0, 2) }}</span>
                         </div>
                     </div>
                 </div>
@@ -137,19 +132,19 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <div class="info-label">Company / Agency</div>
-                                <div class="info-value">{{ $emp->comp_name ?? '---' }} / {{ $emp->ag_name ?? 'Direct' }}</div>
+                                <div class="info-value">{{ $emp->company->comp_name ?? '---' }} / {{ $emp->agency->ag_name ?? 'Direct' }}</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <div class="info-label">Date Hired</div>
-                                <div class="info-value text-primary fw-bold">{{ isset($emp->date_hired) ? date('M d, Y', strtotime($emp->date_hired)) : '---' }}</div>
+                                <div class="info-value text-primary fw-bold">{{ isset($emp->empDateHired) ? date('M d, Y', strtotime($emp->empDateHired)) : '---' }}</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <div class="info-label">Job Level / Classification</div>
-                                <div class="info-value">{{ $emp->job_desc ?? '---' }} / {{ $emp->class_desc ?? '---' }}</div>
+                                <div class="info-value">{{ $emp->jobLevel->job_desc ?? '---' }} / {{ $emp->empClassification ?? '---' }}</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <div class="info-label">HMO Provider / No.</div>
-                                <div class="info-value">{{ $emp->hmoName ?? 'None' }} ({{ $emp->hmo_number ?? 'N/A' }})</div>
+                                <div class="info-value">{{ $emp->hmo->hmoName ?? 'None' }} ({{ $emp->empHMONo ?? 'N/A' }})</div>
                             </div>
                         </div>
                     </div>
@@ -163,12 +158,12 @@
                 <div class="row g-4">
                     @php
                         $governmentFields = [
-                            ['label' => 'SSS Number', 'val' => $emp->sss ?? null, 'icon' => 'fa-shield-halved'],
-                            ['label' => 'PhilHealth', 'val' => $emp->philhealth ?? null, 'icon' => 'fa-kit-medical'],
-                            ['label' => 'Pag-IBIG', 'val' => $emp->pagibig ?? null, 'icon' => 'fa-house-chimney-user'],
-                            ['label' => 'TIN', 'val' => $emp->tin ?? null, 'icon' => 'fa-file-invoice'],
-                            ['label' => 'UMID', 'val' => $emp->umid ?? null, 'icon' => 'fa-address-card'],
-                            ['label' => 'Passport', 'val' => $emp->passport_no ?? null, 'icon' => 'fa-passport']
+                            ['label' => 'SSS Number', 'val' => $emp->empSSS ?? null, 'icon' => 'fa-shield-halved'],
+                            ['label' => 'PhilHealth', 'val' => $emp->empPhilhealth ?? null, 'icon' => 'fa-kit-medical'],
+                            ['label' => 'Pag-IBIG', 'val' => $emp->empPagibig ?? null, 'icon' => 'fa-house-chimney-user'],
+                            ['label' => 'TIN', 'val' => $emp->empTIN ?? null, 'icon' => 'fa-file-invoice'],
+                            ['label' => 'UMID', 'val' => $emp->empUMID ?? null, 'icon' => 'fa-address-card'],
+                            ['label' => 'Passport', 'val' => $emp->empPassport ?? null, 'icon' => 'fa-passport']
                         ];
                     @endphp
                     @foreach($governmentFields as $item)

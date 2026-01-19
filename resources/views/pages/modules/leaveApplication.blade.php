@@ -7,7 +7,7 @@
 
     <div class="mb-2">
         <h4 class=" mb-0 text-gray-800">Automated Leave Application</h4>
-        <button class=" mt-3 btn text-white" style="background-color: #008080" name="btnCreateLeaveModal" id="btnCreateLeaveModal" data-bs-toggle="modal" data-bs-target="#mdlLeaveApp"> <i class="fa fa-plus"></i> Leave Application Form</button>
+        <button class=" mt-3 btn text-white btn-blue" name="btnCreateLeaveModal" id="btnCreateLeaveModal" data-bs-toggle="modal" data-bs-target="#mdlLeaveApp"> <i class="fa fa-plus"></i> Leave Application Form</button>
     </div>
 
     <!-- Page Heading -->
@@ -81,7 +81,7 @@
                                         <div class="row">
                                             <div class="col-lg-12 mb-2">
                                                 <div class="form-floating">
-                                                    <input class="form-control" id="txtPersonnel" name="personnel" type="text" placeholder="-" readonly/>
+                                                    <input class="form-control text-capitalize" id="txtPersonnel" value="{{ $user->fname . ' ' . $user->mname . ' ' . $user->lname }}" name="personnel" type="text" placeholder="-" readonly/>
                                                     <label class="form-check-label" for="txtPersonnel">Personnel Name <label for="" class="text-danger">*</label></label>
                                                     <span class="text-danger small error-text personnel_error"></span>
                                                 </div>
@@ -89,7 +89,7 @@
 
                                             <div class="col-lg-12 mb-2">
                                                 <div class="form-floating">
-                                                    <input class="form-control" id="txtCompany" name="company" type="text" placeholder="-" readonly/>
+                                                <input class="form-control" id="txtCompany" value="{{ $employeeDetails->company->comp_name }}" name="company" type="text" placeholder="-" readonly/>
                                                     <label class="form-check-label" for="txtCompany">Company Name <label for="" class="text-danger">*</label></label>
                                                     <span class="text-danger small error-text company_error"></span>
                                                 </div>
@@ -97,7 +97,7 @@
 
                                             <div class="col-lg-12 mb-2">
                                                 <div class="form-floating">
-                                                    <input class="form-control" id="txtDepartment" name="department" type="text" placeholder="-" readonly/>
+                                                    <input class="form-control" id="txtDepartment" value="{{ $employeeDetails->department->dep_name }}" name="department" type="text" placeholder="-" readonly/>
                                                     <label class="form-check-label" for="txtDepartment">Department<label for="" class="text-danger">*</label></label>
                                                     <span class="text-danger small error-text department_error"></span>
                                                 </div>
@@ -105,7 +105,7 @@
 
                                             <div class="col-lg-12 mb-2">
                                                 <div class="form-floating">
-                                                    <input class="form-control" id="txtDesignation" name="designation" type="text" placeholder="-" readonly/>
+                                                    <input class="form-control" id="txtDesignation" value="{{ $employeeDetails->position->pos_desc }}" name="designation" type="text" placeholder="-" readonly/>
                                                     <label class="form-check-label" for="txtDesignation">Designation<label for="" class="text-danger">*</label></label>
                                                     <span class="text-danger small error-text designation_error"></span>
                                                 </div>
@@ -125,6 +125,9 @@
                                             <div class="col-lg-12 mb-2">
                                                 <div class="form-floating">
                                                     <select  class="form-control" name="leavetype" id="selLeaveType">
+                                                        @foreach ($leaveTypes as $leaveType)
+                                                            <option value="{{ $leaveType->id }}">{{ $leaveType->type_leave }}</option>
+                                                        @endforeach
                                                         {{-- <option value="0"></option> --}}
                                                     </select>
                                                     <label  class="form-check-label" for="missionobjective" class="text-muted">Leave Type<label for="" class="text-danger">*</label></label>
@@ -154,18 +157,18 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-lg-12 mb-2">
+                                            {{-- <div class="col-lg-12 mb-2">
                                                 <div class="form-floating">
                                                     <input class="form-control" id="txtFilingDate" name="date" type="text" placeholder="-" readonly/>
                                                     <label class="form-check-label" for="txtFilingDate">Designation<label for="" class="text-danger">*</label></label>
                                                     <span class="text-danger small error-text date_error"></span>
                                                 </div>
-                                            </div>
+                                            </div> --}}
 
                                             <div class="col-lg-12 mb-2">
                                                 <div class="form-floating">
                                                     <input class="form-control" id="txtLStartEnd" name="date" type="date" placeholder="-"/>
-                                                    <label class="form-check-label" for="txtLStartEnd">Designation<label for="" class="text-danger">*</label></label>
+                                                    <label class="form-check-label" for="txtLStartEnd">From <label for="" class="text-danger">*</label></label>
                                                     <span class="text-danger small error-text date_error"></span>
                                                 </div>
                                             </div>
@@ -173,7 +176,7 @@
                                             <div class="col-lg-12 mb-2">
                                                 <div class="form-floating">
                                                     <input class="form-control" id="txtLEndDate" name="date" type="date" placeholder="-"/>
-                                                    <label class="form-check-label" for="txtLEndDate">Designation<label for="" class="text-danger">*</label></label>
+                                                    <label class="form-check-label" for="txtLEndDate">To<label for="" class="text-danger">*</label></label>
                                                     <span class="text-danger small error-text date_error"></span>
                                                 </div>
                                             </div>

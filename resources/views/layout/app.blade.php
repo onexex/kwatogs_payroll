@@ -88,6 +88,17 @@
         /* Topbar & Alerts */
         .topbar { box-shadow: 0 1px 10px rgba(0,0,0,0.05) !important; }
         .alert { border-radius: 12px; border: none; }
+
+        .btn-blue {
+            background-color: #008080;
+            color: #fff;
+        }
+
+        .btn-blue:hover {
+            background-color: #ffffff;
+            color: #008080 !important;
+            border: 1px solid #008080 !important;
+        }
     </style>
 </head>
 

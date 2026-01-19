@@ -57,13 +57,18 @@ class User extends Authenticatable
         return $this->hasOne(empDetail::class, 'empID', 'empID');
     }
 
-      public function attendanceSummaries()
+    public function attendanceSummaries()
     {
         return $this->hasMany(AttendanceSummary::class, 'employee_id', 'empID');
     }
-  public function education()
-{
-    return $this->hasMany(emp_education::class, 'empID', 'empID');
-}
 
+    public function education()
+    {
+        return $this->hasMany(emp_education::class, 'empID', 'empID');
+    }
+
+    public function employeeInformation()
+    {
+        return $this->belongsTo(emp_info::class, 'empID', 'empID');
+    }
 }

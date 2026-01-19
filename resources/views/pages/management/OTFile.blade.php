@@ -4,7 +4,7 @@
     <div class="mb-2">
         <h4 class="text-gray-800 mb-3 title">OT Filing Maintenance</h4>
         <div class="mb-2">
-            <button class=" mt-3 btn btn-danger radius-1" name="btnCreateOTMaintinance" id="btnCreateOTMaintinance" data-bs-toggle="modal" data-bs-target="#mdlOTFile"> <i class="fa fa-plus"></i> Filing Maintenance</button>
+            <button class=" mt-3 btn text-white btn-blue radius-1" name="btnCreateOTMaintinance" id="btnCreateOTMaintinance" data-bs-toggle="modal" data-bs-target="#mdlOTFile"> <i class="fa fa-plus"></i> Filing Maintenance</button>
         </div>
     </div>
 
