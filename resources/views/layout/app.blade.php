@@ -213,6 +213,7 @@ $hasPagesAccess = collect($modulePages)->keys()->some(fn($key) => auth()->user()
                     'leavetypes'          => ['name' => 'Leave Types', 'url' => '/pages/management/leavetypes', 'icon' => 'fa-list-check'],
                     'userroles'           => ['name' => 'User Roles', 'url' => '/user-roles', 'icon' => 'fa-shield-halved'],
                     'admine201'           => ['name' => 'Admin E-201', 'url' => '/pages/management/e201', 'icon' => 'fa-id-card-alt'],
+                    'leavecreditallocation'          => ['name' => 'Leave Credit Allocation', 'url' => '/pages/management/leavecreditallocations', 'icon' => 'fa-list-check'],
                 ];
                 // 1. Sort the modules by their values (labels) A-Z
                 $managementModules = collect($managementModules)->sort()->toArray();
