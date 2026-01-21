@@ -45,6 +45,7 @@ use App\Http\Controllers\reportAttendanceCtrl;
 use App\Http\Controllers\Roles\RolesController;
 use App\Http\Controllers\EmployeeRecordController;
 use App\Http\Controllers\EmployeeScheduleController;
+use App\Http\Controllers\LeaveCreditAllocationController;
 use App\Http\Controllers\Roles\EmployeeRoleController;
 
 Route::get('/r', function () {
@@ -150,6 +151,12 @@ Route::group(['middleware'=>['AuthCheck']], function(){
     Route::get('/pages/management/ssscontribution',[pageCtrl::class, 'ssscontribution']);
     Route::get('/pages/management/pagibigcontribution',[pageCtrl::class, 'pagibigcontribution']);
     Route::get('/pages/management/empscheduler',[pageCtrl::class, 'empscheduler']);
+    // leave
+    Route::get('/pages/management/leavecreditallocations',[LeaveCreditAllocationController::class, 'index']);
+    Route::post('/pages/leavecreditallocations/store',[LeaveCreditAllocationController::class, 'store'])->name('leavecreditallocation.store');
+    Route::post('/pages/leavecreditallocations/update', [LeaveCreditAllocationController::class, 'update']);
+    Route::delete('/pages/leavecreditallocations/delete/{leaveCreditAllocation}', [LeaveCreditAllocationController::class, 'destroy']);
+
 
     // employee role
     Route::post('/emprole/create_update',[EmployeeRoleController::class, 'create_update'])->name('employee.roles.assign');

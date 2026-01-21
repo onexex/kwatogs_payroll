@@ -51,5 +51,6 @@ enum PagePermissionsEnum: string
     case laboratory = 'Laboratory';
     case loanmanagement = 'Loan Management';
     case admine201 = 'Admin E-201';
+    case leavecreditallocation = 'Leave Credit Allocations';
     
 }
